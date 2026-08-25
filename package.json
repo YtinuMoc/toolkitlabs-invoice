@@ -1,0 +1,22 @@
+{
+  "name": "toolkitlabs-invoice",
+  "version": "1.0.0",
+  "description": "Free browser invoice generator (print/PDF) plus batch CLI — no account",
+  "license": "CC0-1.0",
+  "keywords": ["invoice", "receipt", "pdf", "print", "freelancer", "billing", "batch", "static", "free"],
+  "homepage": "https://ytinumoc.github.io/toolkitlabs-invoice/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/YtinuMoc/toolkitlabs-invoice.git"
+  },
+  "files": [
+    "index.html",
+    "invoice_batch.py",
+    "README.md",
+    "LICENSE",
+    "sample.csv"
+  ],
+  "bin": {
+    "invoice-batch": "invoice_batch.py"
+  }
+}
