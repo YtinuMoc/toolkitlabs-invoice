@@ -10,6 +10,8 @@ Open in any browser:
 
 Enter seller, buyer, line items, and tax — then **Print / Save as PDF**.
 
+**Receipt:** https://ytinumoc.github.io/toolkitlabs-invoice/receipt.html — payment-received receipt, same print-to-PDF flow.
+
 ## Batch CLI (paid pack, EUR 9)
 
 Generate dozens of invoices from a CSV:
