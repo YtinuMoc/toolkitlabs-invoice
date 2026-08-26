@@ -35,6 +35,8 @@ Add `--seller-name "Your Co"` (and address/tax if needed). Each row becomes HTML
 
 Clone of [SellerLedger on Gumroad ($17)](https://nexusai82.gumroad.com/l/kfyuh) — merge both CSV exports into one profit ledger with fee rows and quarterly set-aside estimate.
 
+**Who it's for:** solo Gumroad/Stripe sellers, freelancers who want organized income/expense records without accounting software, anyone who exports CSVs but can't see net profit after fees.
+
 **https://ytinumoc.github.io/toolkitlabs-invoice/ledger/**
 
 ```bash
