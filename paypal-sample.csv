@@ -1,0 +1,4 @@
+Date,Time,TimeZone,Name,Type,Status,Currency,Gross,Fee,Net,From Email Address,To Email Address,Transaction ID,Shipping Address,Item Title,Item ID,Sales Tax,Quantity,Receipt ID,Balance,Address Line 1,Town/City,State/Province,Zip/Postal Code,Country Code,Invoice Number,Tax ID
+2026-08-01,10:30:00,CEST,Alice Buyer,Payment,Completed,EUR,49.00,-1.75,47.25,alice@example.com,billing@yourco.example,TXN001ABC,,Design Template Pack,ITEM001,9.31,1,RCP001,1047.25,12 Hauptstrasse,Berlin,,10115,DE,,DE123456789
+2026-08-15,14:22:00,CEST,Bob Creator,Payment,Completed,EUR,29.00,-1.15,27.85,bob@example.com,billing@yourco.example,TXN002DEF,,Monthly Membership,ITEM002,5.51,1,RCP002,1075.10,5 Rue de Rivoli,Paris,,75001,FR,,FR987654321
+2026-08-20,09:05:00,CEST,Carol Reader,Payment,Completed,EUR,99.00,-3.20,95.80,carol@example.com,billing@yourco.example,TXN003GHI,,E-book Bundle,ITEM003,18.81,1,RCP003,1170.90,10 Baker Street,London,,SW1A 1AA,GB,,GB555666777

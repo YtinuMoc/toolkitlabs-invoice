@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Lemon Squeezy CSV to Invoice — bulk PDF invoices from your orders export</title>
-<meta name="description" content="Export Lemon Squeezy orders CSV and generate bulk printable invoices. One-time EUR 9 CLI pack — no subscription. Same workflow digital sellers already pay for.">
+<title>PayPal CSV to Invoice — bulk PDF invoices from your activity export</title>
+<meta name="description" content="Export PayPal activity CSV and generate bulk printable invoices. One-time EUR 9 CLI pack — no subscription. Same workflow merchants already pay for.">
 <style>
-:root{--ink:#1a1a1a;--muted:#666;--line:#ddd;--accent:#7047eb;--bg:#f8f7f4;--green:#0d7a3e}
+:root{--ink:#1a1a1a;--muted:#666;--line:#ddd;--accent:#0070ba;--bg:#f8f7f4;--green:#0d7a3e}
 *{box-sizing:border-box}
 body{margin:0;font:16px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;color:var(--ink);background:var(--bg)}
 .wrap{max-width:820px;margin:0 auto;padding:32px 20px 64px}
@@ -35,32 +35,32 @@ code{background:#eee;padding:2px 6px;border-radius:3px;font-size:.9em}
 </head>
 <body>
 <div class="wrap">
-<nav><a href="../index.html">Invoice generator</a> · <a href="../gumroad/">Gumroad CSV</a> · <a href="../stripe/">Stripe CSV</a> · <a href="../paypal/">PayPal CSV</a> · <a href="../receipt.html">Receipt</a> · <a href="../commercial/">Commercial</a></nav>
+<nav><a href="../index.html">Invoice generator</a> · <a href="../gumroad/">Gumroad CSV</a> · <a href="../stripe/">Stripe CSV</a> · <a href="../lemon/">Lemon Squeezy CSV</a> · <a href="../receipt.html">Receipt</a> · <a href="../commercial/">Commercial</a></nav>
 
-<h1>Bulk convert Lemon Squeezy CSV to invoices</h1>
-<p class="lead">Lemon Squeezy records sales but does not ship bulk EU-ready invoice PDFs from your orders export. Dashboard → Orders → Export CSV, run one command, print each HTML to PDF. Same workflow digital sellers pay subscription tools for — <strong>one-time EUR 9</strong>, no account after purchase.</p>
+<h1>Bulk convert PayPal CSV to invoices</h1>
+<p class="lead">PayPal records transactions but does not ship bulk EU-ready invoice PDFs from your activity export. Reports → Activity download → CSV, run one command, print each HTML to PDF. Same workflow merchants pay subscription tools for — <strong>one-time EUR 9</strong>, no account after purchase.</p>
 
 <div class="price-box">
 <div class="amt">EUR 9 · one-time</div>
-<div class="sub">Unlimited batches · Lemon Squeezy column mapping · HTML → print PDF</div>
-<a class="cta" id="buy" href="https://buy.stripe.com/dRm9AUgpwb648Jg7NX5Ne0l?client_reference_id=lemon-landing-v1">Get the batch CLI pack</a>
+<div class="sub">Unlimited batches · PayPal column mapping · HTML → print PDF</div>
+<a class="cta" id="buy" href="https://buy.stripe.com/dRm9AUgpwb648Jg7NX5Ne0l?client_reference_id=paypal-landing-v1">Get the batch CLI pack</a>
 </div>
 
 <div class="steps">
-<div class="step"><div class="step-num">1</div><div><h3>Export CSV from Lemon Squeezy</h3><p>Lemon Squeezy Dashboard → Orders → Export button → CSV is emailed to the store owner.</p></div></div>
-<div class="step"><div class="step-num">2</div><div><h3>Run the batch script</h3><p><code>python3 lemon_batch.py lemon-sample.csv -o ./invoices/ --seller-name "Your Co"</code></p></div></div>
+<div class="step"><div class="step-num">1</div><div><h3>Export CSV from PayPal</h3><p>PayPal → Reports (or Activity) → Activity download → Transaction Type "Balance affecting" → date range → CSV format → Create Report.</p></div></div>
+<div class="step"><div class="step-num">2</div><div><h3>Run the batch script</h3><p><code>python3 paypal_batch.py paypal-sample.csv -o ./invoices/ --seller-name "Your Co"</code></p></div></div>
 <div class="step"><div class="step-num">3</div><div><h3>Add your business details once</h3><p>Name, address, VAT number — applied to every invoice in the batch.</p></div></div>
 <div class="step"><div class="step-num">4</div><div><h3>Print to PDF</h3><p>Open each HTML in a browser → Print → Save as PDF. Zip and send to your accountant.</p></div></div>
 </div>
 
 <ul class="check">
-<li>Maps Lemon Squeezy columns: order_number, product_name, variant_name, subtotal, tax, user_email, country</li>
-<li>Sequential invoice numbers (LS-…)</li>
+<li>Maps PayPal columns: Date, Gross, Fee, Net, Name, Transaction ID, Item Title, Sales Tax, From Email Address</li>
+<li>Sequential invoice numbers (PP-…)</li>
 <li>Runs locally — your CSV never leaves your machine</li>
-<li>Also: <a href="../gumroad/">Gumroad CSV batch</a> · <a href="../stripe/">Stripe CSV batch</a> · free <a href="../index.html">single invoice generator</a></li>
+<li>Also: <a href="../gumroad/">Gumroad CSV batch</a> · <a href="../stripe/">Stripe CSV batch</a> · <a href="../lemon/">Lemon Squeezy CSV batch</a> · free <a href="../index.html">single invoice generator</a></li>
 </ul>
 
-<p class="compare">Clone of paid Lemon Squeezy CSV converters (e.g. <a href="https://www.csv2invoice.com/platform/lemon-squeezy-csv-to-invoice/">csv2invoice.com</a> at €10/month). One-time CLI pack, same export → bulk invoice shape.</p>
+<p class="compare">Clone of paid PayPal CSV converters (e.g. <a href="https://www.csv2invoice.com/platform/paypal-csv-to-invoice/">csv2invoice.com</a> at €10/month). One-time CLI pack, same export → bulk invoice shape.</p>
 
 <footer>CC0 · <a href="https://toolkitlabs.org/">Toolkit Labs</a> · <a href="https://github.com/YtinuMoc/toolkitlabs-invoice">source</a></footer>
 </div>
