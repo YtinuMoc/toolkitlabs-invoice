@@ -122,6 +122,32 @@
     </div>
   </section>
 
+  <section id="setup">
+    <h2>Up and running in three steps</h2>
+    <p class="lead">Clone of Orion's Gumroad <strong>one-page setup guide (PDF)</strong> — same three-step promise on <a href="https://nexusai82.gumroad.com/l/kfyuh">SellerLedger ($17)</a>, adapted for CLI + instant zip delivery.</p>
+    <div class="grid">
+      <div class="feat">
+        <h4>Step 1 — Get the CLI</h4>
+        <p>After EUR 9 Stripe checkout you are redirected to <a href="https://github.com/YtinuMoc/toolkitlabs-invoice/releases/download/seller-ledger-v1.0.0/seller-ledger-cli-v1.0.0.zip">seller-ledger-cli-v1.0.0.zip</a>. Unzip — <code>seller_ledger.py</code> is inside. Or try free with the sample CSVs below.</p>
+      </div>
+      <div class="feat">
+        <h4>Step 2 — Export your CSVs</h4>
+        <p>Gumroad: <strong>Settings → Payouts → Export</strong>. Stripe: <strong>Payments → Export</strong>. Save both files locally — the CLI never uploads them.</p>
+      </div>
+      <div class="feat">
+        <h4>Step 3 — Run one command</h4>
+        <p><code>python3 seller_ledger.py gumroad.csv stripe.csv -o ledger.csv --tax-rate 0.28</code> — prints gross, fees, net profit, and quarterly set-aside. Open <code>ledger.csv</code> in Sheets for the tab view.</p>
+      </div>
+      <div class="feat">
+        <h4>Need client documents too?</h4>
+        <p>Orion cross-sells his Freelancer Kit on Gumroad. Our clone: the <a href="../index.html">invoice batch pack</a> + <a href="#solo-stack">solo-business stack bundle</a> — win clients, track every dollar.</p>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:24px">
+      <a class="buy-cta" href="https://buy.stripe.com/dRm9AUgpwb648Jg7NX5Ne0l?client_reference_id=ledger-setup-v2-run36">Get SellerLedger CLI — EUR 9 →</a>
+    </div>
+  </section>
+
   <section id="try-free">
     <h2>Try it before you buy</h2>
     <p class="lead">Clone of Orion's Gumroad <strong>WHAT YOU GET</strong> — sample Gumroad and Stripe CSV files for testing before you have real sales. Download, run locally, no checkout required.</p>
