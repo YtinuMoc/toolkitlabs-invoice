@@ -37,7 +37,7 @@ Clone of [SellerLedger on Gumroad ($17)](https://nexusai82.gumroad.com/l/kfyuh) 
 
 **Who it's for:** solo Gumroad/Stripe sellers, freelancers who want organized income/expense records without accounting software, anyone who exports CSVs but can't see net profit after fees. **14-day refund** — email support@toolkitlabs.org with your Stripe receipt (clone of Orion Gumroad refund policy).
 
-**https://ytinumoc.github.io/toolkitlabs-invoice/ledger/**
+**https://ytinumoc.github.io/toolkitlabs-invoice/ledger/** — [3-step setup guide](https://ytinumoc.github.io/toolkitlabs-invoice/ledger/#setup) (clone of Orion Gumroad PDF promise)
 
 Free sample CSVs (clone of Orion Gumroad pre-checkout delivery): [gumroad-sample.csv](https://ytinumoc.github.io/toolkitlabs-invoice/ledger/gumroad-sample.csv) · [stripe-sample.csv](https://ytinumoc.github.io/toolkitlabs-invoice/ledger/stripe-sample.csv)
 
