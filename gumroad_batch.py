@@ -3,7 +3,7 @@
 
 Export: Gumroad → Customers → Export CSV.
 Purchase batch CLI pack (EUR 9, one-time):
-https://buy.stripe.com/3cI4gA8X44HGgbI6JT5Ne0j?client_reference_id=gumroad-batch-py
+https://buy.stripe.com/dRm9AUgpwb648Jg7NX5Ne0l?client_reference_id=gumroad-batch-py
 """
 from __future__ import annotations
 

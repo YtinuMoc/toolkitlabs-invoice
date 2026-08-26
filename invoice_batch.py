@@ -2,7 +2,7 @@
 """Batch invoice HTML generator — reads CSV, writes printable invoice pages.
 
 Purchase the batch CLI pack (EUR 9, one-time):
-https://buy.stripe.com/3cI4gA8X44HGgbI6JT5Ne0j?client_reference_id=invoice-batch-py
+https://buy.stripe.com/dRm9AUgpwb648Jg7NX5Ne0l?client_reference_id=invoice-batch-py
 """
 from __future__ import annotations
 
@@ -89,7 +89,7 @@ def render_invoice(row: dict) -> str:
 def main() -> int:
     p = argparse.ArgumentParser(
         description="Batch printable invoice HTML from CSV",
-        epilog="Buy batch CLI pack (EUR 9): https://buy.stripe.com/3cI4gA8X44HGgbI6JT5Ne0j?client_reference_id=invoice-batch-help",
+        epilog="Buy batch CLI pack (EUR 9): https://buy.stripe.com/dRm9AUgpwb648Jg7NX5Ne0l?client_reference_id=invoice-batch-help",
     )
     p.add_argument("input", type=Path, help="CSV file (see sample.csv)")
     p.add_argument("-o", "--out", type=Path, default=Path("invoice-out"), help="output directory")
