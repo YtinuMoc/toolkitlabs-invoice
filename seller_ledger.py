@@ -196,6 +196,11 @@ def main() -> int:
     print(f"Platform fees:   {s['platform_fees']:.2f}")
     print(f"Net profit:      {s['net_profit']:.2f}")
     print(f"Set-aside @{args.tax_rate:.0%}: {set_aside:.2f}")
+    print("--- Tax-prep summary (US Schedule C organizer, 2026) ---")
+    print(f"Line 1  Gross receipts/sales: {s['gross_revenue']:.2f}")
+    print(f"Line 28 Total expenses:      {s['platform_fees']:.2f}")
+    print(f"Line 31 Net profit (loss):    {s['net_profit']:.2f}")
+    print("Data organizer for your accountant — not tax advice.")
     return 0
 
 
