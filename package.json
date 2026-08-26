@@ -1,7 +1,7 @@
 {
   "name": "toolkitlabs-invoice",
   "version": "1.1.0",
-  "description": "Free browser invoice generator (print/PDF) plus batch CLI — no account",
+  "description": "Free browser invoice generator (print/PDF) plus batch CLI (EUR 9): https://buy.stripe.com/3cI4gA8X44HGgbI6JT5Ne0j",
   "license": "CC0-1.0",
   "keywords": ["invoice", "receipt", "pdf", "print", "freelancer", "billing", "batch", "static", "free"],
   "homepage": "https://ytinumoc.github.io/toolkitlabs-invoice/",
