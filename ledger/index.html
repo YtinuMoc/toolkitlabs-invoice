@@ -69,9 +69,19 @@
   .mesh{font-size:13px;line-height:1.8;margin-top:12px}
   .mesh a{color:var(--muted);text-decoration:none;margin:0 6px}
   .mesh a:hover{color:var(--brand)}
-  .capture{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:22px;margin-top:18px}
-  .capture h3{margin:0 0 8px;font-size:17px}
-  .capture p{margin:0;color:var(--muted);font-size:14px}
+  .capture{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:22px;margin-top:18px;max-width:560px;margin-left:auto;margin-right:auto}
+  .capture h3{margin:0 0 6px;font-size:18px}
+  .capture p{margin:0 0 18px;color:var(--muted);font-size:14px}
+  form{display:flex;gap:10px;flex-wrap:wrap}
+  .field{flex-basis:100%;display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--muted);text-align:left}
+  .field strong{color:var(--ink);font-size:14px}
+  input[type=email],select,textarea{width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--line);
+       background:#0c0f14;color:var(--ink);font-size:15px;font-family:inherit}
+  select option{background:#161b23}
+  textarea{min-height:88px;resize:vertical}
+  button[type=submit]{padding:13px 22px;border:0;border-radius:10px;background:var(--brand);color:#fff;font-weight:700;
+       font-size:15px;cursor:pointer;width:100%;margin-top:4px}
+  button[type=submit]:hover{background:#3c7cf0}
   footer{padding:36px 0;border-top:1px solid var(--line);color:#6f7d90;font-size:13px;text-align:center}
   a{color:var(--brand)}
   code{background:#0c0f14;padding:2px 6px;border-radius:4px;font-size:.9em}
@@ -230,10 +240,56 @@
     </div>
   </section>
 
-  <section>
-    <h2>Not ready to buy yet?</h2>
-    <p class="lead">Orion's landing asks solo sellers what they need before checkout. Same shape here — read the walkthroughs first, then decide.</p>
+  <section id="research">
+    <h2>Help us improve it</h2>
+    <p class="lead">Not ready to buy yet, or want to share your bookkeeping situation? Answer 3 quick questions and we'll follow up only if it's useful to you.</p>
     <div class="capture">
+      <h3>Quick seller survey (2 min)</h3>
+      <p>Helps us understand what solo sellers actually need. No spam — one follow-up max, only if relevant.</p>
+      <form action="https://formsubmit.co/support@toolkitlabs.org" method="POST">
+        <label class="field">
+          <strong>What platform(s) do you sell on? <span style="color:var(--warn)">*</span></strong>
+          <select name="platform" required>
+            <option value="">Select one...</option>
+            <option value="Gumroad">Gumroad</option>
+            <option value="Stripe (direct)">Stripe (direct checkout)</option>
+            <option value="Gumroad + Stripe">Both Gumroad &amp; Stripe</option>
+            <option value="Etsy">Etsy</option>
+            <option value="Other marketplace">Other marketplace</option>
+          </select>
+        </label>
+        <label class="field" style="margin-top:14px">
+          <strong>How do you currently track income &amp; expenses? <span style="color:var(--warn)">*</span></strong>
+          <select name="current_tracking" required>
+            <option value="">Select one...</option>
+            <option value="Nothing yet">Nothing yet — I wing it</option>
+            <option value="Manual spreadsheet">Manual spreadsheet (Excel / Sheets)</option>
+            <option value="Accounting software">Accounting software (QuickBooks, Wave, etc.)</option>
+            <option value="Accountant handles it">My accountant handles it</option>
+            <option value="Other">Something else</option>
+          </select>
+        </label>
+        <label class="field" style="margin-top:14px">
+          <strong>Biggest bookkeeping headache? (optional)</strong>
+          <textarea name="pain_point" placeholder="e.g. Figuring out actual profit after fees, knowing what to set aside for taxes..."></textarea>
+        </label>
+        <label class="field" style="margin-top:14px">
+          <strong>Your email <span style="color:var(--warn)">*</span></strong>
+          <input type="email" name="email" placeholder="you@email.com" required>
+        </label>
+        <input type="hidden" name="_subject" value="SellerLedger seller survey">
+        <input type="hidden" name="_captcha" value="true">
+        <input type="hidden" name="_template" value="table">
+        <input type="hidden" name="_next" value="https://ytinumoc.github.io/toolkitlabs-invoice/ledger/#research">
+        <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off">
+        <label style="flex-basis:100%;display:flex;gap:8px;align-items:flex-start;font-size:12px;color:var(--muted);margin-top:14px">
+          <input type="checkbox" name="consent" required style="margin-top:3px">
+          I agree to receive one follow-up email (if relevant) and have read the <a href="#privacy">privacy notice</a>.
+        </label>
+        <button type="submit" style="margin-top:14px">Send answers →</button>
+      </form>
+    </div>
+    <div class="capture" style="margin-top:22px">
       <h3>Seller finance walkthroughs (free)</h3>
       <p>Eight dev.to articles covering CSV → profit clarity, tax set-aside, and the tools/templates Gumroad sellers actually use. No signup.</p>
       <p class="mesh" style="margin-top:14px">
@@ -259,9 +315,9 @@
 
   <section id="privacy">
     <h2>Privacy Notice</h2>
-    <p class="lead">Clone of Orion's SellerLedger privacy shape — adapted for Stripe checkout + GitHub release delivery (no email survey on this page).</p>
+    <p class="lead">Clone of Orion's SellerLedger privacy shape — adapted for Stripe checkout + GitHub release delivery + seller survey.</p>
     <div class="ai-note">
-      <strong>What we collect:</strong> Stripe processes your payment; we receive only what Stripe shares for fulfillment (email if you enter it at checkout, payment status). This gh-pages site uses no tracking cookies, no analytics pixels, no ad pixels.<br><br>
+      <strong>What we collect:</strong> Stripe processes your payment; we receive only what Stripe shares for fulfillment (email if you enter it at checkout, payment status). The optional seller survey (formsubmit.co) sends your answers and email to <a href="mailto:support@toolkitlabs.org">support@toolkitlabs.org</a> — one follow-up max if relevant. This gh-pages site uses no tracking cookies, no analytics pixels, no ad pixels.<br><br>
       <strong>Why:</strong> to deliver <code>seller-ledger-cli-v1.0.0.zip</code> after a successful EUR 9 payment and to operate the product.<br><br>
       <strong>Processors:</strong> Stripe (payment) and GitHub (file hosting). Your CSV files never leave your machine — the CLI runs locally.<br><br>
       <strong>Your rights:</strong> for access, correction, or deletion of purchase records, contact <a href="mailto:support@toolkitlabs.org">support@toolkitlabs.org</a>.
