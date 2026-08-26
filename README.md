@@ -39,6 +39,8 @@ Clone of [SellerLedger on Gumroad ($17)](https://nexusai82.gumroad.com/l/kfyuh) 
 
 **https://ytinumoc.github.io/toolkitlabs-invoice/ledger/**
 
+Free sample CSVs (clone of Orion Gumroad pre-checkout delivery): [gumroad-sample.csv](https://ytinumoc.github.io/toolkitlabs-invoice/ledger/gumroad-sample.csv) · [stripe-sample.csv](https://ytinumoc.github.io/toolkitlabs-invoice/ledger/stripe-sample.csv)
+
 ```bash
 python3 seller_ledger.py gumroad-sample.csv stripe-sample.csv -o ledger.csv --tax-rate 0.28
 ```

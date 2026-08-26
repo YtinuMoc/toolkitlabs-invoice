@@ -1,0 +1,4 @@
+ID,Email,Seller ID,Product Name,Product ID,Sale Timestamp,Sale Price ($),Buyer Email,Quantity,Referrer,Country,Recurrence,Variant,Discount Code,Subtotal,Shipping,Tax,Sale Price,Fully Refunded?,Customer Tax ID
+abc123,buyer1@example.com,seller1,Design Template Pack,prod_1,2026-08-01 10:30:00 UTC,29.00,buyer1@example.com,1,twitter,US,,,,29.00,0.00,0.00,29.00,No,
+def456,buyer2@example.com,seller1,Monthly Membership,prod_2,2026-08-15 14:22:00 UTC,15.00,buyer2@example.com,1,,DE,Monthly,,,15.00,0.00,2.85,15.00,No,DE123456789
+ghi789,buyer3@example.com,seller1,E-book Bundle,prod_3,2026-08-20 09:05:00 UTC,49.00,buyer3@example.com,1,newsletter,GB,,,,49.00,0.00,9.80,49.00,No,

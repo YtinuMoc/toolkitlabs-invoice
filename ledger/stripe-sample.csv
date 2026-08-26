@@ -1,0 +1,4 @@
+id,Amount,Amount Refunded,Currency,Fee,Tax,Net,Status,Description,Customer ID,Customer Email,Created (UTC)
+ch_abc001,150.00,0.00,eur,4.65,28.50,116.85,Paid,Consulting retainer,cus_abc1,client1@example.com,2026-08-01 10:30:00
+ch_abc002,89.00,0.00,eur,2.88,16.91,69.21,Paid,SaaS subscription,cus_abc2,ops@startup.example,2026-08-15 14:22:00
+ch_abc003,240.00,0.00,eur,7.26,45.60,187.14,Paid,Annual license,cus_abc3,billing@corp.example,2026-08-20 09:05:00

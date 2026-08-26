@@ -112,14 +112,36 @@
     </div>
   </section>
 
+  <section id="try-free">
+    <h2>Try it before you buy</h2>
+    <p class="lead">Clone of Orion's Gumroad <strong>WHAT YOU GET</strong> — sample Gumroad and Stripe CSV files for testing before you have real sales. Download, run locally, no checkout required.</p>
+    <div class="grid">
+      <div class="feat">
+        <h4>Sample CSV downloads (free)</h4>
+        <p>
+          <a href="gumroad-sample.csv">gumroad-sample.csv</a> ·
+          <a href="stripe-sample.csv">stripe-sample.csv</a>
+        </p>
+        <p style="margin-top:10px;font-size:13px"><code>python3 seller_ledger.py gumroad-sample.csv stripe-sample.csv -o ledger.csv --tax-rate 0.28</code></p>
+      </div>
+      <div class="feat">
+        <h4>Same shape as Orion's sheet</h4>
+        <p>Orion ships sample CSVs inside the $17 Gumroad purchase. We ship them on the landing so you can test the importer before checkout — same pre-purchase trust signal.</p>
+      </div>
+    </div>
+  </section>
+
   <section>
     <h2>A look inside</h2>
-    <p class="lead">Sample output from <code>seller_ledger.py</code> with the included sample CSVs. One unified ledger with fee rows and a P&amp;L summary printed to stdout.</p>
+    <p class="lead">Clone of Orion's five-tab sheet shape — Transactions, P&amp;L Dashboard, Tax Summary, Tax Estimator, and setup guide. CLI prints ledger + P&amp;L; open <code>ledger.csv</code> in Sheets for the tab view.</p>
 
     <div class="sheet">
       <div class="tabs">
         <span class="tab on">Transactions</span>
-        <span class="tab">P&amp;L Summary</span>
+        <span class="tab">P&amp;L Dashboard</span>
+        <span class="tab">Tax Summary</span>
+        <span class="tab">Tax Estimator</span>
+        <span class="tab">Setup guide</span>
       </div>
       <table>
         <thead><tr><th>Date</th><th>Platform</th><th>Description</th><th>Category</th><th class="num">Net</th></tr></thead>
@@ -178,7 +200,7 @@
     <h2>What you get</h2>
     <ul class="check">
       <li><code>seller_ledger.py</code> — merge Gumroad + Stripe CSVs into one ledger</li>
-      <li>Sample CSV files so you can test before you have real sales data</li>
+      <li>Sample CSV files — <a href="gumroad-sample.csv">gumroad-sample.csv</a> + <a href="stripe-sample.csv">stripe-sample.csv</a> (free download, clone of Orion Gumroad delivery)</li>
       <li>Stdout P&amp;L summary: gross, fees, net profit, quarterly set-aside estimate</li>
       <li>Outputs <code>ledger.csv</code> — open in Google Sheets or Excel</li>
       <li><strong>Instant delivery:</strong> after EUR 9 Stripe checkout you are redirected to <a href="https://github.com/YtinuMoc/toolkitlabs-invoice/releases/download/seller-ledger-v1.0.0/seller-ledger-cli-v1.0.0.zip">seller-ledger-cli-v1.0.0.zip</a> (clone of Gumroad's instant file download)</li>
@@ -195,9 +217,17 @@
     </p>
   </section>
 
-  <section>
-    <h2>Also useful for freelancers</h2>
-    <p class="lead">Clone of Orion's Gumroad cross-sell: SellerLedger tracks money coming in. If you also need documents for winning and onboarding clients — proposals, contracts, invoices — see the <a href="../index.html">Toolkit Labs invoice generator</a> (same EUR 9 checkout rail).</p>
+  <section id="solo-stack">
+    <h2>Complete solo-business stack</h2>
+    <p class="lead">Clone of Orion's Gumroad bundle cross-sell between SellerLedger and his Freelancer Business Starter Kit ($27):</p>
+    <div class="ai-note">
+      <strong>SellerLedger</strong> tracks the money coming in. If you also need the documents for winning and onboarding clients — proposals, contracts, invoices, scope of work — the <a href="../index.html">Toolkit Labs invoice generator</a> covers that side.<br><br>
+      <strong>Buy both and you have the complete solo-business stack:</strong> win clients, deliver professional documents, track every dollar you earn. Same EUR 9 one-time checkout rail for each tool.
+    </div>
+    <div style="display:flex;gap:14px;flex-wrap:wrap;margin-top:18px;justify-content:center">
+      <a class="buy-cta" href="https://buy.stripe.com/dRm9AUgpwb648Jg7NX5Ne0l?client_reference_id=ledger-stack-ledger-v2-run29">SellerLedger CLI — EUR 9 →</a>
+      <a class="buy-cta" style="background:var(--brand)" href="https://buy.stripe.com/dRm9AUgpwb648Jg7NX5Ne0l?client_reference_id=ledger-stack-invoice-v2-run29">Invoice generator — EUR 9 →</a>
+    </div>
   </section>
 
   <section>
