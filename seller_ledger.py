@@ -145,6 +145,25 @@ def detect_platform(path: Path) -> str:
     raise ValueError(f"unknown CSV format: {path}")
 
 
+def monthly_pnl(rows: list[dict]) -> dict[str, dict[str, float]]:
+    """Monthly gross/fees/net — clone of Orion SellerLedger P&L Dashboard tab."""
+    by_month: dict[str, dict[str, float]] = defaultdict(
+        lambda: {"gross_revenue": 0.0, "platform_fees": 0.0, "refunds": 0.0, "net_profit": 0.0}
+    )
+    for row in rows:
+        month = row["date"][:7] if row.get("date") else "unknown"
+        cat = row["category"]
+        if cat == "Product Revenue":
+            by_month[month]["gross_revenue"] += _money(row["amount"])
+        elif cat == "Platform Fee":
+            by_month[month]["platform_fees"] += abs(_money(row["net"]))
+        elif cat == "Refund":
+            by_month[month]["refunds"] += _money(row["net"])
+    for month, m in by_month.items():
+        m["net_profit"] = m["gross_revenue"] - m["platform_fees"] + m["refunds"]
+    return dict(sorted(by_month.items()))
+
+
 def summarize(rows: list[dict]) -> dict[str, float]:
     totals: dict[str, float] = defaultdict(float)
     for row in rows:
@@ -190,12 +209,21 @@ def main() -> int:
         w.writerows(all_rows)
 
     s = summarize(all_rows)
+    months = monthly_pnl(all_rows)
     set_aside = s["net_profit"] * args.tax_rate
     print(f"Wrote {len(all_rows)} rows → {out}")
     print(f"Gross revenue:   {s['gross_revenue']:.2f}")
     print(f"Platform fees:   {s['platform_fees']:.2f}")
     print(f"Net profit:      {s['net_profit']:.2f}")
     print(f"Set-aside @{args.tax_rate:.0%}: {set_aside:.2f}")
+    if months:
+        print("--- P&L Dashboard (monthly) ---")
+        for month, m in months.items():
+            print(
+                f"{month}  Gross: {m['gross_revenue']:>8.2f}  "
+                f"Fees: {m['platform_fees']:>7.2f}  Net: {m['net_profit']:>8.2f}"
+            )
+        print("Annual total above matches gross/fees/net summary.")
     print("--- Tax-prep summary (US Schedule C organizer, 2026) ---")
     print(f"Line 1  Gross receipts/sales: {s['gross_revenue']:.2f}")
     print(f"Line 28 Total expenses:      {s['platform_fees']:.2f}")

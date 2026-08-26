@@ -244,6 +244,31 @@
     </div>
   </section>
 
+  <section id="pnl-dashboard">
+    <h2>Auto-calculating P&amp;L dashboard</h2>
+    <p class="lead">Clone of Orion's Gumroad <strong>Auto-Calculating P&amp;L Dashboard</strong> module — monthly and annual profit &amp; loss calculated automatically. See your real margins, not just gross revenue.</p>
+    <div class="grid">
+      <div class="feat">
+        <h4>Monthly breakdown</h4>
+        <p>Every CLI run prints gross revenue, platform fees, and net profit <strong>per month</strong> — same P&amp;L Dashboard tab on <a href="https://nexusnetworkai-jpg.github.io/sellerledger/">Orion's gh-pages landing</a>.</p>
+      </div>
+      <div class="feat">
+        <h4>Annual roll-up</h4>
+        <p>Month lines sum to the annual totals in the summary block above. Open <code>ledger.csv</code> in Sheets for a tab view if you want to chart trends.</p>
+      </div>
+    </div>
+    <div class="ai-note" style="margin-top:18px">
+      <strong>Example stdout (sample data):</strong><br>
+      <code>python3 seller_ledger.py gumroad-sample.csv stripe-sample.csv -o ledger.csv --tax-rate 0.28</code><br><br>
+      <pre style="margin:8px 0 0;font-size:12px;overflow-x:auto">--- P&amp;L Dashboard (monthly) ---
+2026-01  Gross:   131.00  Fees:    7.08  Net:   104.92</pre>
+      Walkthrough: <a href="https://dev.to/toolkitlabs/gumroad-stripe-csv-monthly-pnl-dashboard-without-a-17-google-sheet">monthly P&amp;L from CSV</a>.
+    </div>
+    <div style="text-align:center;margin-top:22px">
+      <a class="buy-cta" href="https://buy.stripe.com/dRm9AUgpwb648Jg7NX5Ne0l?client_reference_id=ledger-pnl-dashboard-v2-run43">Get SellerLedger CLI — EUR 9 →</a>
+    </div>
+  </section>
+
   <section id="quarterly-estimator">
     <h2>Quarterly set-aside estimator</h2>
     <p class="lead">Clone of Orion's Gumroad <strong>Quarterly Set-Aside Estimator</strong> module — enter net income plus a rate you configure, get an estimated quarterly payment. Planning tool only; consult a tax professional.</p>
