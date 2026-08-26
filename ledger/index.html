@@ -244,6 +244,34 @@
     </div>
   </section>
 
+  <section id="transactions-log">
+    <h2>Transactions log</h2>
+    <p class="lead">Clone of Orion's Gumroad <strong>Transactions Log</strong> module — pre-built income and expense categories for digital sellers: platform fees, processing fees, ad spend, software, contractors, refunds. Pre-filled with sample data.</p>
+    <div class="grid">
+      <div class="feat">
+        <h4>Auto-categorized imports</h4>
+        <p>Gumroad and Stripe CSV rows map to <strong>Product Revenue</strong>, <strong>Platform Fee</strong>, and <strong>Refund</strong> automatically. Fee rows split from revenue — same importer shape as Orion's sheet.</p>
+      </div>
+      <div class="feat">
+        <h4>Manual expense categories</h4>
+        <p>Add rows in <code>ledger.csv</code> for <strong>Ad Spend</strong>, <strong>Software</strong>, and <strong>Contractors</strong> — the categories Orion pre-builds for digital sellers on the Transactions tab.</p>
+      </div>
+    </div>
+    <div class="ai-note" style="margin-top:18px">
+      <strong>Example stdout (sample data):</strong><br>
+      <code>python3 seller_ledger.py gumroad-sample.csv stripe-sample.csv -o ledger.csv --tax-rate 0.28</code><br><br>
+      <pre style="margin:8px 0 0;font-size:12px;overflow-x:auto">--- Transactions Log (by category) ---
+Product Revenue      count=  2  net=   131.00
+Platform Fee         count=  2  net=    -7.08
+Refund               count=  1  net=   -19.00
+Manual categories (add rows in ledger.csv): Ad Spend, Software, Contractors</pre>
+      Walkthrough: <a href="https://dev.to/toolkitlabs/gumroad-stripe-csv-categorized-transactions-log-without-a-17-google-sheet-4abc">transactions log from CSV</a>.
+    </div>
+    <div style="text-align:center;margin-top:22px">
+      <a class="buy-cta" href="https://buy.stripe.com/dRm9AUgpwb648Jg7NX5Ne0l?client_reference_id=ledger-transactions-log-v2-run44">Get SellerLedger CLI — EUR 9 →</a>
+    </div>
+  </section>
+
   <section id="pnl-dashboard">
     <h2>Auto-calculating P&amp;L dashboard</h2>
     <p class="lead">Clone of Orion's Gumroad <strong>Auto-Calculating P&amp;L Dashboard</strong> module — monthly and annual profit &amp; loss calculated automatically. See your real margins, not just gross revenue.</p>
@@ -382,8 +410,9 @@
     </div>
     <div class="capture" style="margin-top:22px">
       <h3>Seller finance walkthroughs (free)</h3>
-      <p>Twenty dev.to articles covering CSV → profit clarity, monthly P&amp;L dashboard, Schedule C organizer, quarterly set-aside estimator, and the tools/templates Gumroad sellers actually use. No signup.</p>
+      <p>Twenty-one dev.to articles covering CSV → profit clarity, categorized transactions log, monthly P&amp;L dashboard, Schedule C organizer, quarterly set-aside estimator, and the tools/templates Gumroad sellers actually use. No signup.</p>
       <p class="mesh" style="margin-top:14px">
+        <a href="https://dev.to/toolkitlabs/gumroad-stripe-csv-categorized-transactions-log-without-a-17-google-sheet-4abc">Transactions log</a> ·
         <a href="https://dev.to/toolkitlabs/gumroad-stripe-seller-ledger-from-csv-real-net-profit-without-a-17-spreadsheet-46ii">Ledger walkthrough</a> ·
         <a href="https://dev.to/toolkitlabs/solo-gumroad-seller-tax-tracking-from-csv-income-fees-quarterly-set-aside-without-a-17-sheet-4fhj">Tax tracking</a> ·
         <a href="https://dev.to/toolkitlabs/product-4-on-my-gumroad-stack-a-17-income-tracker-and-the-eur-9-csv-ledger-i-use-instead-1gb6">Product 4 build log</a> ·

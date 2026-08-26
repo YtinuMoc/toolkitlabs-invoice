@@ -164,6 +164,16 @@ def monthly_pnl(rows: list[dict]) -> dict[str, dict[str, float]]:
     return dict(sorted(by_month.items()))
 
 
+def category_breakdown(rows: list[dict]) -> dict[str, dict[str, float]]:
+    """Per-category counts and net totals — clone of Orion Transactions Log tab."""
+    by_cat: dict[str, dict[str, float]] = defaultdict(lambda: {"count": 0, "net": 0.0})
+    for row in rows:
+        cat = row["category"]
+        by_cat[cat]["count"] += 1
+        by_cat[cat]["net"] += _money(row["net"])
+    return dict(sorted(by_cat.items()))
+
+
 def summarize(rows: list[dict]) -> dict[str, float]:
     totals: dict[str, float] = defaultdict(float)
     for row in rows:
@@ -210,12 +220,21 @@ def main() -> int:
 
     s = summarize(all_rows)
     months = monthly_pnl(all_rows)
+    cats = category_breakdown(all_rows)
     set_aside = s["net_profit"] * args.tax_rate
     print(f"Wrote {len(all_rows)} rows → {out}")
     print(f"Gross revenue:   {s['gross_revenue']:.2f}")
     print(f"Platform fees:   {s['platform_fees']:.2f}")
     print(f"Net profit:      {s['net_profit']:.2f}")
     print(f"Set-aside @{args.tax_rate:.0%}: {set_aside:.2f}")
+    if cats:
+        print("--- Transactions Log (by category) ---")
+        for cat, c in cats.items():
+            print(f"{cat:20} count={int(c['count']):>3}  net={c['net']:>9.2f}")
+        print(
+            "Manual categories (add rows in ledger.csv): "
+            "Ad Spend, Software, Contractors — same shape as Orion's sheet."
+        )
     if months:
         print("--- P&L Dashboard (monthly) ---")
         for month, m in months.items():
