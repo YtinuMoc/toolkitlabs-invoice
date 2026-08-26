@@ -1,0 +1,4 @@
+identifier,order_number,product_name,variant_name,user_name,user_email,city,country,postal_code,card_brand,card_last_four,currency,currency_rate,subtotal,discount_total,tax,total,tax_name,tax_rate,tax_number,date_utc
+ls_abc001,1001,Design Template Pack,Default,Alice Buyer,alice@example.com,Berlin,DE,10115,visa,4242,USD,1.0,29.00,0.00,5.51,34.51,VAT,19,,2026-08-01 10:30:00
+ls_abc002,1002,Monthly Membership,Pro,Bob Creator,bob@example.com,Paris,FR,75001,mastercard,5555,USD,1.0,15.00,0.00,3.00,18.00,VAT,20,,2026-08-15 14:22:00
+ls_abc003,1003,E-book Bundle,Complete,Carol Reader,carol@example.com,London,GB,SW1A 1AA,visa,1234,USD,1.0,49.00,5.00,8.36,52.36,VAT,19,,2026-08-20 09:05:00
