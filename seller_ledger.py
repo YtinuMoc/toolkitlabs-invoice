@@ -164,6 +164,18 @@ def monthly_pnl(rows: list[dict]) -> dict[str, dict[str, float]]:
     return dict(sorted(by_month.items()))
 
 
+def print_mapping_rules() -> None:
+    """Stdout mapping table — clone of Orion SellerLedger pre-built category rules."""
+    print("--- Category mapping (Gumroad + Stripe CSV) ---")
+    print("Gumroad sale row        → Product Revenue")
+    print("Gumroad fee (10% est.)  → Platform Fee")
+    print("Gumroad refund          → Refund")
+    print("Stripe payment row      → Product Revenue")
+    print("Stripe processing fee   → Platform Fee")
+    print("Stripe refund           → Refund")
+    print("Manual rows in ledger.csv: Ad Spend, Software, Contractors")
+
+
 def category_breakdown(rows: list[dict]) -> dict[str, dict[str, float]]:
     """Per-category counts and net totals — clone of Orion Transactions Log tab."""
     by_cat: dict[str, dict[str, float]] = defaultdict(lambda: {"count": 0, "net": 0.0})
@@ -222,6 +234,7 @@ def main() -> int:
     months = monthly_pnl(all_rows)
     cats = category_breakdown(all_rows)
     set_aside = s["net_profit"] * args.tax_rate
+    print_mapping_rules()
     print(f"Wrote {len(all_rows)} rows → {out}")
     print(f"Gross revenue:   {s['gross_revenue']:.2f}")
     print(f"Platform fees:   {s['platform_fees']:.2f}")
