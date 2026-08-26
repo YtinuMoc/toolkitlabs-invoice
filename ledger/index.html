@@ -244,6 +244,41 @@
     </div>
   </section>
 
+  <section id="auto-importer">
+    <h2>CSV auto-importer</h2>
+    <p class="lead">Clone of Orion's Gumroad <strong>Apps Script Auto-Importer</strong> module — paste your Gumroad or Stripe CSV and every transaction is categorized and logged automatically. Supported: Gumroad and Stripe (formats as of mid-2026). Our clone: point the CLI at export files — no Google dialog, no Apps Script authorization.</p>
+    <div class="grid">
+      <div class="feat">
+        <h4>Gumroad payout export</h4>
+        <p>Gumroad <strong>Settings → Payouts → Export</strong>. Sale rows → Product Revenue; estimated platform fee (10%) → separate Platform Fee row; refunds → Refund.</p>
+      </div>
+      <div class="feat">
+        <h4>Stripe payments export</h4>
+        <p>Stripe <strong>Payments → Export</strong>. Payment rows → Product Revenue; processing fee column → Platform Fee; refunded status → Refund.</p>
+      </div>
+      <div class="feat">
+        <h4>Runs offline</h4>
+        <p>Python 3 + stdlib only. Your CSV never leaves your machine — same local promise as Orion's sheet, without Google's unverified-app prompt.</p>
+      </div>
+      <div class="feat">
+        <h4>Manual fallback</h4>
+        <p>Orion's sheet works fully as a manual-entry tracker if you skip the importer. Our CLI also accepts hand-edited rows in <code>ledger.csv</code> for Ad Spend, Software, and Contractors.</p>
+      </div>
+    </div>
+    <div class="ai-note" style="margin-top:18px">
+      <strong>Example stdout (sample data):</strong><br>
+      <code>python3 seller_ledger.py gumroad-sample.csv stripe-sample.csv -o ledger.csv --tax-rate 0.28</code><br><br>
+      <pre style="margin:8px 0 0;font-size:12px;overflow-x:auto">--- CSV Auto-Importer (Gumroad + Stripe) ---
+gumroad-sample.csv (gumroad): 4 rows imported, categorized automatically
+stripe-sample.csv (stripe): 2 rows imported, categorized automatically
+Supported: Gumroad payout export + Stripe payments export (mid-2026 column shapes).</pre>
+      Walkthrough: <a href="https://dev.to/toolkitlabs/gumroad-stripe-csv-auto-importer-without-a-17-google-sheet-2lh">CSV auto-importer from export files</a>.
+    </div>
+    <div style="text-align:center;margin-top:22px">
+      <a class="buy-cta" href="https://buy.stripe.com/dRm9AUgpwb648Jg7NX5Ne0l?client_reference_id=ledger-auto-importer-v2-run46">Get SellerLedger CLI — EUR 9 →</a>
+    </div>
+  </section>
+
   <section id="category-mapping">
     <h2>Category mapping</h2>
     <p class="lead">Clone of Orion's Gumroad <strong>category mapping</strong> inside the Transactions Log and Apps Script Auto-Importer — Gumroad and Stripe CSV rows mapped to seller-friendly categories; fee rows split from revenue automatically.</p>
@@ -449,8 +484,9 @@ Manual categories (add rows in ledger.csv): Ad Spend, Software, Contractors</pre
     </div>
     <div class="capture" style="margin-top:22px">
       <h3>Seller finance walkthroughs (free)</h3>
-      <p>Twenty-two dev.to articles covering CSV → profit clarity, category mapping, categorized transactions log, monthly P&amp;L dashboard, Schedule C organizer, quarterly set-aside estimator, and the tools/templates Gumroad sellers actually use. No signup.</p>
+      <p>Twenty-three dev.to articles covering CSV → profit clarity, CSV auto-importer, category mapping, categorized transactions log, monthly P&amp;L dashboard, Schedule C organizer, quarterly set-aside estimator, and the tools/templates Gumroad sellers actually use. No signup.</p>
       <p class="mesh" style="margin-top:14px">
+        <a href="https://dev.to/toolkitlabs/gumroad-stripe-csv-auto-importer-without-a-17-google-sheet-2lh">CSV auto-importer</a> ·
         <a href="https://dev.to/toolkitlabs/gumroad-stripe-csv-auto-category-mapping-without-a-17-google-sheet-4j1k">Category mapping</a> ·
         <a href="https://dev.to/toolkitlabs/gumroad-stripe-csv-categorized-transactions-log-without-a-17-google-sheet-4hp8">Transactions log</a> ·
         <a href="https://dev.to/toolkitlabs/gumroad-stripe-seller-ledger-from-csv-real-net-profit-without-a-17-spreadsheet-46ii">Ledger walkthrough</a> ·
@@ -508,6 +544,7 @@ Manual categories (add rows in ledger.csv): Ad Spend, Software, Contractors</pre
     <a href="https://toolkitlabs.org/">Toolkit Labs</a> ·
     <a href="https://github.com/YtinuMoc/toolkitlabs-invoice">source</a>
     <p class="mesh">
+      <a href="https://dev.to/toolkitlabs/gumroad-stripe-csv-auto-importer-without-a-17-google-sheet-2lh">CSV auto-importer</a> ·
       <a href="https://dev.to/toolkitlabs/gumroad-stripe-csv-auto-category-mapping-without-a-17-google-sheet-4j1k">Category mapping</a> ·
       <a href="https://dev.to/toolkitlabs/gumroad-stripe-csv-categorized-transactions-log-without-a-17-google-sheet-4hp8">Transactions log</a> ·
       <a href="https://dev.to/toolkitlabs/gumroad-stripe-seller-ledger-from-csv-real-net-profit-without-a-17-spreadsheet-46ii">Ledger walkthrough</a> ·

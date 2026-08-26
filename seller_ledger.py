@@ -164,6 +164,17 @@ def monthly_pnl(rows: list[dict]) -> dict[str, dict[str, float]]:
     return dict(sorted(by_month.items()))
 
 
+def print_import_summary(summaries: list[dict]) -> None:
+    """Per-file import counts — clone of Orion Apps Script Auto-Importer stdout."""
+    print("--- CSV Auto-Importer (Gumroad + Stripe) ---")
+    for s in summaries:
+        print(
+            f"{s['filename']} ({s['platform']}): "
+            f"{s['rows']} rows imported, categorized automatically"
+        )
+    print("Supported: Gumroad payout export + Stripe payments export (mid-2026 column shapes).")
+
+
 def print_mapping_rules() -> None:
     """Stdout mapping table — clone of Orion SellerLedger pre-built category rules."""
     print("--- Category mapping (Gumroad + Stripe CSV) ---")
@@ -214,13 +225,18 @@ def main() -> int:
     args = p.parse_args()
 
     all_rows: list[dict] = []
+    import_summaries: list[dict] = []
     for inp in args.inputs:
         path = Path(inp)
         platform = detect_platform(path)
         if platform == "gumroad":
-            all_rows.extend(parse_gumroad(path))
+            file_rows = parse_gumroad(path)
         else:
-            all_rows.extend(parse_stripe(path))
+            file_rows = parse_stripe(path)
+        all_rows.extend(file_rows)
+        import_summaries.append(
+            {"filename": path.name, "platform": platform, "rows": len(file_rows)}
+        )
 
     all_rows.sort(key=lambda r: r["date"])
     out = Path(args.output)
@@ -234,6 +250,7 @@ def main() -> int:
     months = monthly_pnl(all_rows)
     cats = category_breakdown(all_rows)
     set_aside = s["net_profit"] * args.tax_rate
+    print_import_summary(import_summaries)
     print_mapping_rules()
     print(f"Wrote {len(all_rows)} rows → {out}")
     print(f"Gross revenue:   {s['gross_revenue']:.2f}")
