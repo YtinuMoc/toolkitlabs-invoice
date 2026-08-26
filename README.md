@@ -43,6 +43,17 @@ python3 seller_ledger.py gumroad-sample.csv stripe-sample.csv -o ledger.csv --ta
 
 **https://buy.stripe.com/dRm9AUgpwb648Jg7NX5Ne0l?client_reference_id=readme-seller-ledger-v2-run15**
 
+Walkthroughs (free, dev.to):
+
+- [Ledger walkthrough](https://dev.to/toolkitlabs/gumroad-stripe-seller-ledger-from-csv-real-net-profit-without-a-17-spreadsheet-46ii)
+- [Tax tracking](https://dev.to/toolkitlabs/solo-gumroad-seller-tax-tracking-from-csv-income-fees-quarterly-set-aside-without-a-17-sheet-4fhj)
+- [Product 4 build log](https://dev.to/toolkitlabs/product-4-on-my-gumroad-stack-a-17-income-tracker-and-the-eur-9-csv-ledger-i-use-instead-1gb6)
+- [5 tools stack](https://dev.to/toolkitlabs/5-tools-every-gumroad-seller-actually-needs-real-costs-no-referral-hype-iij)
+- [Free tools list](https://dev.to/toolkitlabs/best-free-tools-for-solo-gumroad-sellers-in-2026-tested-ranked-real-limits-1f5d)
+- [Why sellers feel broke](https://dev.to/toolkitlabs/the-real-reason-gumroad-sellers-feel-broke-after-a-good-month-its-almost-never-the-fees-37e6)
+- [5 templates](https://dev.to/toolkitlabs/5-templates-every-gumroad-seller-needs-and-why-most-skip-them-until-quarter-end-2ngo)
+- [Honest build log](https://dev.to/toolkitlabs/shipping-a-gumroad-seller-ledger-cli-in-public-honest-numbers-not-eu10kmonth-hype-5g9d)
+
 ## Generic batch CLI (EUR 9)
 
 ```bash
