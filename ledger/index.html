@@ -95,7 +95,7 @@
     <h1>Stop dreading tax season as a digital seller.</h1>
     <p class="sub">A local CLI that auto-imports your Gumroad and Stripe CSV exports, calculates real profit after fees, and estimates your quarterly tax set-aside. No spreadsheet formulas to maintain.</p>
 
-    <div class="badge">Now live · EUR 9 one-time · runs locally</div>
+    <div class="badge">Now live · EUR 9 one-time · 14-day refund · runs locally</div>
 
     <a class="buy-cta" href="https://buy.stripe.com/dRm9AUgpwb648Jg7NX5Ne0l?client_reference_id=ledger-landing-v2-run26">Get SellerLedger CLI — EUR 9 →</a>
     <p class="price-note">One-time payment. <strong>Instant zip download</strong> after Stripe checkout — same delivery shape as <a href="https://nexusai82.gumroad.com/l/kfyuh">Gumroad's instant file</a>. <a href="#whats-inside">See what's included ↓</a></p>
@@ -155,8 +155,22 @@
       <li>Anyone who needs clean categories for platform fees, refunds, and quarterly set-aside estimates</li>
       <li>Sellers who export CSVs monthly but never know net profit after fees</li>
     </ul>
+    <p class="lead" style="margin-top:18px"><strong>Not a fit:</strong> Etsy/Payhip sellers (no importer for those platforms in v1), businesses needing multi-user accounting, anyone who needs VAT or non-US tax categories.</p>
     <div class="ai-note" style="margin-top:22px">
       <strong>Honest heads-up:</strong> Built for solo Gumroad and Stripe sellers. Organizes your numbers so tax time is calmer — it doesn't file for you or replace an accountant. Planning tool only; confirm figures with a tax professional in your country.
+    </div>
+  </section>
+
+  <section id="modules">
+    <h2>What's inside</h2>
+    <p class="lead">Clone of Orion's Gumroad product modules — same promise, CLI delivery instead of Google Sheets.</p>
+    <div class="grid">
+      <div class="feat"><h4>Transactions log</h4><p>Pre-built income/expense categories for digital sellers: platform fees, processing fees, ad spend, software, contractors, refunds. Sample data included.</p></div>
+      <div class="feat"><h4>Auto-calculating P&amp;L summary</h4><p>Gross revenue, fees, and net profit printed to stdout after every run. See real margins, not just gross revenue.</p></div>
+      <div class="feat"><h4>Category mapping</h4><p>Gumroad and Stripe CSV rows mapped to seller-friendly categories — fee rows split from revenue automatically.</p></div>
+      <div class="feat"><h4>Quarterly set-aside estimator</h4><p>Pass <code>--tax-rate</code> → estimated quarterly payment. Planning tool only; consult a tax professional.</p></div>
+      <div class="feat"><h4>CSV auto-importer</h4><p>Point the CLI at Gumroad and Stripe payout exports — every transaction categorized and logged. Runs locally; your CSV never leaves your machine.</p></div>
+      <div class="feat"><h4>ledger.csv output</h4><p>Open in Google Sheets or Excel. Same end shape as Orion's sheet — unified ledger with fee rows and net amounts.</p></div>
     </div>
   </section>
 
@@ -202,6 +216,14 @@
         <a href="https://dev.to/toolkitlabs/5-templates-every-gumroad-seller-needs-and-why-most-skip-them-until-quarter-end-2ngo">5 templates</a> ·
         <a href="https://dev.to/toolkitlabs/shipping-a-gumroad-seller-ledger-cli-in-public-honest-numbers-not-eu10kmonth-hype-5g9d">Honest build log</a>
       </p>
+    </div>
+  </section>
+
+  <section id="refund">
+    <h2>Refund policy</h2>
+    <p class="lead">Clone of Orion's Gumroad refund shape — adapted for Stripe checkout + GitHub release delivery.</p>
+    <div class="ai-note">
+      <strong>14-day refund for any reason.</strong> Email <a href="mailto:support@toolkitlabs.org">support@toolkitlabs.org</a> with your Stripe receipt. Refunds processed within 48 hours. Same trust signal as <a href="https://nexusai82.gumroad.com/l/kfyuh">SellerLedger on Gumroad</a>.
     </div>
   </section>
 
