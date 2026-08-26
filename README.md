@@ -23,6 +23,7 @@ Paid converters like csv2invoice.com ship the same export → bulk invoice shape
 | Gumroad | https://ytinumoc.github.io/toolkitlabs-invoice/gumroad/ | `python3 gumroad_batch.py gumroad-sample.csv -o ./invoices/` |
 | Lemon Squeezy | https://ytinumoc.github.io/toolkitlabs-invoice/lemon/ | `python3 lemon_batch.py lemon-sample.csv -o ./invoices/` |
 | ThriveCart | https://ytinumoc.github.io/toolkitlabs-invoice/thrivecart/ | `python3 thrivecart_batch.py thrivecart-sample.csv -o ./invoices/` |
+| Shopify | https://ytinumoc.github.io/toolkitlabs-invoice/shopify/ | `python3 shopify_batch.py shopify-sample.csv -o ./invoices/` |
 
 Buy any platform batch CLI pack (one-time, no subscription):
 

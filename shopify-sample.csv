@@ -1,0 +1,4 @@
+Name,Email,Financial Status,Paid at,Fulfillment Status,Currency,Subtotal,Shipping,Taxes,Total,Lineitem quantity,Lineitem name,Lineitem price,Billing Name,Billing Address1,Billing City,Billing Province,Billing Zip,Billing Country,Created at
+#1001,anna@example.com,paid,2026-08-01 11:20:00,fulfilled,EUR,120.00,5.00,23.75,148.75,1,Organic cotton tee,120.00,Anna Schmidt,Hauptstr. 12,Berlin,BE,10115,DE,2026-08-01 11:18:00
+#1002,ops@startup.example,paid,2026-08-15 09:45:00,unfulfilled,EUR,89.00,0.00,16.91,105.91,2,Sticker pack,44.50,Startup GmbH,Industrieweg 4,Munich,BY,80331,DE,2026-08-15 09:42:00
+#1003,billing@corp.example,paid,2026-08-20 16:30:00,fulfilled,EUR,240.00,12.00,47.88,299.88,1,Annual merch bundle,240.00,Corp BV,Keizersgracht 100,Amsterdam,NH,1015 AA,NL,2026-08-20 16:28:00
