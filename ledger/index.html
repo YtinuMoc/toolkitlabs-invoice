@@ -239,6 +239,9 @@
       <div class="feat"><h4>CSV auto-importer</h4><p>Point the CLI at Gumroad and Stripe payout exports — every transaction categorized and logged. Runs locally; your CSV never leaves your machine.</p></div>
       <div class="feat"><h4>ledger.csv output</h4><p>Open in Google Sheets or Excel. Same end shape as Orion's sheet — unified ledger with fee rows and net amounts.</p></div>
     </div>
+    <div class="ai-note" id="importer-heads-up" style="margin-top:22px">
+      <strong>Importer heads-up (clone of Orion's Gumroad disclaimer):</strong> Orion's $17 sheet uses a Google Apps Script importer — Google shows <em>"This app isn't verified"</em> on first authorization; their setup PDF walks through Advanced → Go to SellerLedger. <strong>Our CLI has no Google authorization step</strong> — Python 3 + stdlib only, runs offline. If you prefer not to import real CSVs yet, use the free <a href="gumroad-sample.csv">sample files</a> above. The script is open source on <a href="https://github.com/YtinuMoc/toolkitlabs-invoice">GitHub</a> — edit categories yourself if your exports differ.
+    </div>
   </section>
 
   <section id="whats-inside">
