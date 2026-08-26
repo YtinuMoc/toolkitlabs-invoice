@@ -36,6 +36,6 @@ Add `--seller-name "Your Co"` (and address/tax if needed). Each row becomes HTML
 python3 invoice_batch.py sample.csv -o ./output/
 ```
 
-**https://buy.stripe.com/3cI4gA8X44HGgbI6JT5Ne0j?client_reference_id=npm-invoice-batch**
+**https://buy.stripe.com/dRm9AUgpwb648Jg7NX5Ne0l?client_reference_id=npm-invoice-batch**
 
 CC0 1.0 · [Toolkit Labs](https://toolkitlabs.org/)
