@@ -1,0 +1,203 @@
+#!/usr/bin/env python3
+"""Merge Gumroad + Stripe CSV exports into one seller ledger with P&L summary.
+
+Clone of SellerLedger (nexusai82.gumroad.com/l/kfyuh, $17) — same CSV → profit shape.
+Purchase CLI pack (EUR 9, one-time):
+https://buy.stripe.com/dRm9AUgpwb648Jg7NX5Ne0l?client_reference_id=seller-ledger-py
+"""
+from __future__ import annotations
+
+import argparse
+import csv
+import sys
+from collections import defaultdict
+from datetime import datetime
+from pathlib import Path
+
+FIELDS = [
+    "date",
+    "platform",
+    "transaction_id",
+    "description",
+    "category",
+    "amount",
+    "fee",
+    "net",
+    "buyer",
+    "currency",
+]
+
+
+def _parse_date(raw: str) -> str:
+    raw = (raw or "").strip()
+    if not raw:
+        return ""
+    for fmt in ("%Y-%m-%d %H:%M:%S", "%Y-%m-%d %H:%M:%S UTC", "%Y-%m-%d"):
+        try:
+            return datetime.strptime(raw.replace(" UTC", ""), fmt.replace(" UTC", "")).strftime(
+                "%Y-%m-%d"
+            )
+        except ValueError:
+            continue
+    return raw[:10]
+
+
+def _money(raw: str | float | int) -> float:
+    if raw is None or raw == "":
+        return 0.0
+    return float(str(raw).replace(",", "").replace("$", "").strip() or 0)
+
+
+def parse_gumroad(path: Path) -> list[dict]:
+    rows: list[dict] = []
+    with path.open(newline="", encoding="utf-8-sig") as f:
+        for row in csv.DictReader(f):
+            subtotal = _money(row.get("Subtotal") or row.get("Sale Price") or row.get("Sale Price ($)"))
+            tax = _money(row.get("Tax"))
+            gross = subtotal + tax if subtotal else _money(row.get("Sale Price ($)"))
+            fee = max(0.0, gross * 0.10) if gross else 0.0
+            refunded = str(row.get("Fully Refunded?", "")).lower() in {"yes", "true", "1"}
+            category = "Refund" if refunded else "Product Revenue"
+            amount = -gross if refunded else gross
+            net = amount - (0 if refunded else fee)
+            rows.append(
+                {
+                    "date": _parse_date(row.get("Sale Timestamp", "")),
+                    "platform": "gumroad",
+                    "transaction_id": row.get("ID", ""),
+                    "description": row.get("Product Name", "Gumroad sale"),
+                    "category": category,
+                    "amount": f"{amount:.2f}",
+                    "fee": f"{(0 if refunded else fee):.2f}",
+                    "net": f"{net:.2f}",
+                    "buyer": row.get("Buyer Email", row.get("Email", "")),
+                    "currency": "USD",
+                }
+            )
+            if not refunded and fee:
+                rows.append(
+                    {
+                        "date": _parse_date(row.get("Sale Timestamp", "")),
+                        "platform": "gumroad",
+                        "transaction_id": f"{row.get('ID', '')}-fee",
+                        "description": f"Gumroad fee — {row.get('Product Name', '')}",
+                        "category": "Platform Fee",
+                        "amount": f"{-fee:.2f}",
+                        "fee": "0.00",
+                        "net": f"{-fee:.2f}",
+                        "buyer": "",
+                        "currency": "USD",
+                    }
+                )
+    return rows
+
+
+def parse_stripe(path: Path) -> list[dict]:
+    rows: list[dict] = []
+    with path.open(newline="", encoding="utf-8-sig") as f:
+        for row in csv.DictReader(f):
+            gross = _money(row.get("Amount"))
+            fee = _money(row.get("Fee"))
+            net = _money(row.get("Net")) or (gross - fee)
+            refunded = _money(row.get("Amount Refunded")) > 0
+            status = (row.get("Status") or "").lower()
+            category = "Refund" if refunded or status == "refunded" else "Product Revenue"
+            amount = gross if not refunded else -gross
+            rows.append(
+                {
+                    "date": _parse_date(row.get("Created (UTC)", row.get("Created", ""))),
+                    "platform": "stripe",
+                    "transaction_id": row.get("id", row.get("ID", "")),
+                    "description": row.get("Description", "Stripe payment"),
+                    "category": category,
+                    "amount": f"{amount:.2f}",
+                    "fee": f"{fee:.2f}",
+                    "net": f"{net:.2f}",
+                    "buyer": row.get("Customer Email", ""),
+                    "currency": (row.get("Currency") or "eur").upper(),
+                }
+            )
+            if fee and not refunded:
+                rows.append(
+                    {
+                        "date": _parse_date(row.get("Created (UTC)", row.get("Created", ""))),
+                        "platform": "stripe",
+                        "transaction_id": f"{row.get('id', row.get('ID', ''))}-fee",
+                        "description": f"Stripe fee — {row.get('Description', '')}",
+                        "category": "Platform Fee",
+                        "amount": f"{-fee:.2f}",
+                        "fee": "0.00",
+                        "net": f"{-fee:.2f}",
+                        "buyer": "",
+                        "currency": (row.get("Currency") or "eur").upper(),
+                    }
+                )
+    return rows
+
+
+def detect_platform(path: Path) -> str:
+    with path.open(newline="", encoding="utf-8-sig") as f:
+        headers = {h.strip().lower() for h in (csv.reader(f).__next__() or [])}
+    if "sale timestamp" in headers or "product name" in headers:
+        return "gumroad"
+    if "created (utc)" in headers or "customer email" in headers:
+        return "stripe"
+    raise ValueError(f"unknown CSV format: {path}")
+
+
+def summarize(rows: list[dict]) -> dict[str, float]:
+    totals: dict[str, float] = defaultdict(float)
+    for row in rows:
+        cat = row["category"]
+        totals[cat] += _money(row["net"])
+    totals["net_profit"] = sum(_money(r["net"]) for r in rows if r["category"] != "Platform Fee") + sum(
+        _money(r["net"]) for r in rows if r["category"] == "Platform Fee"
+    )
+    totals["gross_revenue"] = sum(
+        _money(r["amount"]) for r in rows if r["category"] == "Product Revenue"
+    )
+    totals["platform_fees"] = abs(
+        sum(_money(r["net"]) for r in rows if r["category"] == "Platform Fee")
+    )
+    totals["net_profit"] = totals["gross_revenue"] - totals["platform_fees"] + sum(
+        _money(r["net"]) for r in rows if r["category"] == "Refund"
+    )
+    return dict(totals)
+
+
+def main() -> int:
+    p = argparse.ArgumentParser(description="Merge Gumroad/Stripe CSVs into a seller ledger.")
+    p.add_argument("inputs", nargs="+", help="Gumroad and/or Stripe CSV exports")
+    p.add_argument("-o", "--output", default="ledger.csv", help="output ledger CSV path")
+    p.add_argument("--tax-rate", type=float, default=0.28, help="set-aside rate for summary (default 0.28)")
+    args = p.parse_args()
+
+    all_rows: list[dict] = []
+    for inp in args.inputs:
+        path = Path(inp)
+        platform = detect_platform(path)
+        if platform == "gumroad":
+            all_rows.extend(parse_gumroad(path))
+        else:
+            all_rows.extend(parse_stripe(path))
+
+    all_rows.sort(key=lambda r: r["date"])
+    out = Path(args.output)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    with out.open("w", newline="", encoding="utf-8") as f:
+        w = csv.DictWriter(f, fieldnames=FIELDS)
+        w.writeheader()
+        w.writerows(all_rows)
+
+    s = summarize(all_rows)
+    set_aside = s["net_profit"] * args.tax_rate
+    print(f"Wrote {len(all_rows)} rows → {out}")
+    print(f"Gross revenue:   {s['gross_revenue']:.2f}")
+    print(f"Platform fees:   {s['platform_fees']:.2f}")
+    print(f"Net profit:      {s['net_profit']:.2f}")
+    print(f"Set-aside @{args.tax_rate:.0%}: {set_aside:.2f}")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
