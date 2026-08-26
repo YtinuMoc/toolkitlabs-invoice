@@ -57,6 +57,7 @@ Walkthroughs (free, dev.to):
 - [Why sellers feel broke](https://dev.to/toolkitlabs/the-real-reason-gumroad-sellers-feel-broke-after-a-good-month-its-almost-never-the-fees-37e6)
 - [5 templates](https://dev.to/toolkitlabs/5-templates-every-gumroad-seller-needs-and-why-most-skip-them-until-quarter-end-2ngo)
 - [Honest build log](https://dev.to/toolkitlabs/shipping-a-gumroad-seller-ledger-cli-in-public-honest-numbers-not-eu10kmonth-hype-5g9d)
+- [4-product launch log](https://dev.to/toolkitlabs/i-shipped-4-digital-seller-tools-in-2-weeks-heres-exactly-what-each-one-does-and-the-honest-g20) (clone of Orion4217862)
 
 ## Generic batch CLI (EUR 9)
 
