@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Gumroad CSV to Invoice — bulk PDF invoices from your sales export</title>
-<meta name="description" content="Upload your Gumroad sales CSV and generate bulk printable invoices. One-time EUR 9 CLI pack — no subscription. Clone workflow Gumroad creators already pay for.">
+<title>Stripe CSV to Invoice — bulk PDF invoices from your payments export</title>
+<meta name="description" content="Export Stripe payments CSV and generate bulk printable invoices. One-time EUR 9 CLI pack — no subscription. Same workflow SaaS founders already pay for.">
 <style>
-:root{--ink:#1a1a1a;--muted:#666;--line:#ddd;--accent:#1a56db;--bg:#f8f7f4;--green:#0d7a3e}
+:root{--ink:#1a1a1a;--muted:#666;--line:#ddd;--accent:#635bff;--bg:#f8f7f4;--green:#0d7a3e}
 *{box-sizing:border-box}
 body{margin:0;font:16px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;color:var(--ink);background:var(--bg)}
 .wrap{max-width:820px;margin:0 auto;padding:32px 20px 64px}
@@ -35,32 +35,32 @@ code{background:#eee;padding:2px 6px;border-radius:3px;font-size:.9em}
 </head>
 <body>
 <div class="wrap">
-<nav><a href="../index.html">Invoice generator</a> · <a href="../stripe/">Stripe CSV</a> · <a href="../receipt.html">Receipt</a> · <a href="../commercial/">Commercial</a></nav>
+<nav><a href="../index.html">Invoice generator</a> · <a href="../gumroad/">Gumroad CSV</a> · <a href="../receipt.html">Receipt</a> · <a href="../commercial/">Commercial</a></nav>
 
-<h1>Bulk convert Gumroad CSV to invoices</h1>
-<p class="lead">Gumroad records sales but does not ship formatted EU-ready invoice PDFs in bulk. Export your customers CSV, run one command, print each HTML to PDF. Same workflow creators pay subscription tools for — <strong>one-time EUR 9</strong>, no account after purchase.</p>
+<h1>Bulk convert Stripe CSV to invoices</h1>
+<p class="lead">Stripe records payments but does not ship bulk EU-ready invoice PDFs from your export. Dashboard → Payments → Export CSV, run one command, print each HTML to PDF. Same workflow SaaS founders pay subscription tools for — <strong>one-time EUR 9</strong>, no account after purchase.</p>
 
 <div class="price-box">
 <div class="amt">EUR 9 · one-time</div>
-<div class="sub">Unlimited batches · Gumroad column mapping · HTML → print PDF</div>
-<a class="cta" id="buy" href="https://buy.stripe.com/dRm9AUgpwb648Jg7NX5Ne0l?client_reference_id=gumroad-landing-v1">Get the batch CLI pack</a>
+<div class="sub">Unlimited batches · Stripe column mapping · HTML → print PDF</div>
+<a class="cta" id="buy" href="https://buy.stripe.com/dRm9AUgpwb648Jg7NX5Ne0l?client_reference_id=stripe-landing-v1">Get the batch CLI pack</a>
 </div>
 
 <div class="steps">
-<div class="step"><div class="step-num">1</div><div><h3>Export CSV from Gumroad</h3><p>Gumroad → Customers → Export → pick date range → download CSV.</p></div></div>
-<div class="step"><div class="step-num">2</div><div><h3>Run the batch script</h3><p><code>python3 gumroad_batch.py gumroad-sample.csv -o ./invoices/ --seller-name "Your Co"</code></p></div></div>
+<div class="step"><div class="step-num">1</div><div><h3>Export CSV from Stripe</h3><p>Stripe Dashboard → Payments → Export (top right) → pick date range and columns → download CSV.</p></div></div>
+<div class="step"><div class="step-num">2</div><div><h3>Run the batch script</h3><p><code>python3 stripe_batch.py stripe-sample.csv -o ./invoices/ --seller-name "Your Co"</code></p></div></div>
 <div class="step"><div class="step-num">3</div><div><h3>Add your business details once</h3><p>Name, address, VAT number — applied to every invoice in the batch.</p></div></div>
 <div class="step"><div class="step-num">4</div><div><h3>Print to PDF</h3><p>Open each HTML in a browser → Print → Save as PDF. Zip and send to your accountant.</p></div></div>
 </div>
 
 <ul class="check">
-<li>Maps Gumroad columns: Sale ID, Product Name, Subtotal, Tax, Buyer Email, Country, Refund status</li>
-<li>Sequential invoice numbers (GR-…)</li>
+<li>Maps Stripe columns: charge id, Amount, Tax, Description, Customer Email, Created (UTC)</li>
+<li>Sequential invoice numbers (ST-…)</li>
 <li>Runs locally — your CSV never leaves your machine</li>
-<li>Free <a href="../index.html">single invoice generator</a> for one-offs</li>
+<li>Also: <a href="../gumroad/">Gumroad CSV batch</a> · free <a href="../index.html">single invoice generator</a></li>
 </ul>
 
-<p class="compare">Inspired by paid Gumroad CSV converters (e.g. csv2invoice.com at €10/month). This is a one-time CLI pack with the same export → bulk invoice shape.</p>
+<p class="compare">Clone of paid Stripe CSV converters (e.g. <a href="https://www.csv2invoice.com/platform/stripe-csv-to-invoice/">csv2invoice.com</a> at €10/month). One-time CLI pack, same export → bulk invoice shape.</p>
 
 <footer>CC0 · <a href="https://toolkitlabs.org/">Toolkit Labs</a> · <a href="https://github.com/YtinuMoc/toolkitlabs-invoice">source</a></footer>
 </div>
