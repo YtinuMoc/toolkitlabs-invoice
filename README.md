@@ -31,6 +31,18 @@ Buy any platform batch CLI pack (one-time, no subscription):
 
 Add `--seller-name "Your Co"` (and address/tax if needed). Each row becomes HTML you print to PDF locally — your CSV never leaves your machine.
 
+## Seller ledger — Gumroad + Stripe CSV merge (EUR 9 one-time)
+
+Clone of [SellerLedger on Gumroad ($17)](https://nexusai82.gumroad.com/l/kfyuh) — merge both CSV exports into one profit ledger with fee rows and quarterly set-aside estimate.
+
+**https://ytinumoc.github.io/toolkitlabs-invoice/ledger/**
+
+```bash
+python3 seller_ledger.py gumroad-sample.csv stripe-sample.csv -o ledger.csv --tax-rate 0.28
+```
+
+**https://buy.stripe.com/dRm9AUgpwb648Jg7NX5Ne0l?client_reference_id=readme-seller-ledger-v2-run15**
+
 ## Generic batch CLI (EUR 9)
 
 ```bash
