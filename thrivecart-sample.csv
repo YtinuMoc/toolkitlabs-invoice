@@ -1,0 +1,4 @@
+Transaction ID,Date,Time,Customer Name,Customer Email,Product Name,Amount,Currency,Tax Amount,Shipping Amount,Discount,Affiliate Commission,Payment Processor,Payment Status,Subscription ID,Subscription Status,Country,Coupon Code,Refund Amount,Net Amount
+TC10001,2026-08-01,10:30:00,Alice Buyer,alice@example.com,Design Template Pack,49.00,EUR,9.31,0.00,0.00,0.00,Stripe,Completed,,,DE,,0.00,49.00
+TC10002,2026-08-15,14:22:00,Bob Creator,bob@example.com,Monthly Membership,29.00,EUR,5.51,0.00,5.00,2.90,Stripe,Completed,SUB001,Active,FR,SUMMER5,0.00,24.00
+TC10003,2026-08-20,09:05:00,Carol Reader,carol@example.com,E-book Bundle,99.00,EUR,18.81,0.00,0.00,9.90,Stripe,Completed,,,GB,,0.00,99.00
