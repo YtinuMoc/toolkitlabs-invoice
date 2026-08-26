@@ -244,6 +244,33 @@
     </div>
   </section>
 
+  <section id="quarterly-estimator">
+    <h2>Quarterly set-aside estimator</h2>
+    <p class="lead">Clone of Orion's Gumroad <strong>Quarterly Set-Aside Estimator</strong> module — enter net income plus a rate you configure, get an estimated quarterly payment. Planning tool only; consult a tax professional.</p>
+    <div class="grid">
+      <div class="feat">
+        <h4>Net profit from CSV</h4>
+        <p>Merge Gumroad + Stripe exports. Fee rows and refunds subtract automatically — set-aside is based on what you actually kept, not dashboard gross.</p>
+      </div>
+      <div class="feat">
+        <h4>Rate you control</h4>
+        <p><code>--tax-rate 0.28</code> (default) or any decimal. Match your accountant's combined self-employment + income tax buffer.</p>
+      </div>
+    </div>
+    <div class="ai-note" style="margin-top:18px">
+      <strong>Example (sample data):</strong><br>
+      <code>python3 seller_ledger.py gumroad-sample.csv stripe-sample.csv -o ledger.csv --tax-rate 0.28</code><br><br>
+      Net profit <strong>€104.92</strong> → set-aside @28% <strong>€29.38</strong>. Same Tax Estimator tab shape on <a href="https://nexusnetworkai-jpg.github.io/sellerledger/">Orion's gh-pages landing</a>.
+    </div>
+    <p class="lead" style="margin-top:18px"><strong>US quarterly estimated dates (2026):</strong> Apr 15 · Jun 15 · Sep 15 · Jan 15. Run after each month's CSV export.</p>
+    <div style="text-align:center;margin-top:22px">
+      <a class="buy-cta" href="https://buy.stripe.com/dRm9AUgpwb648Jg7NX5Ne0l?client_reference_id=ledger-quarterly-estimator-v2-run42">Get SellerLedger CLI — EUR 9 →</a>
+    </div>
+    <p style="text-align:center;margin-top:14px;font-size:14px;color:var(--muted)">
+      Walkthrough: <a href="https://dev.to/toolkitlabs/gumroad-stripe-net-profit-quarterly-tax-set-aside-estimate-without-a-17-google-sheet-PLACEHOLDER">quarterly set-aside from CSV</a> (dev.to)
+    </p>
+  </section>
+
   <section id="whats-inside">
     <h2>What you get</h2>
     <ul class="check">
