@@ -8,6 +8,9 @@ from datetime import date, datetime
 
 TAX_BUFFER_PCT = 25.0
 ESTIMATED_TAX_PCT = 28.0  # planning default; not tax advice
+FEE_CATEGORIES = frozenset({
+    "platform_fee", "fulfillment", "creator_commission", "ad_spend", "refund_fee",
+})
 
 QUARTERLY_DEADLINES = (
     ("Q1", "Apr 15", "Jan–Mar income"),
@@ -125,9 +128,57 @@ def print_category_breakdown(rows):
         print(f"    {cat}: ${cat_totals[cat]:,.2f} ({pct:.0f}%)")
 
 
+def load_transaction_log(path):
+    rows = []
+    with open(path, newline="", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            try:
+                amt = float(row["amount"])
+            except (KeyError, ValueError):
+                continue
+            cat = row.get("category", "other").strip().lower() or "other"
+            row_type = (row.get("type") or "").strip().lower()
+            rows.append({"type": row_type, "category": cat, "amount": amt})
+    return rows
+
+
+def summarize_1099k_reconciliation(trans_rows):
+    """l_d/5284: 1099-K gross payments vs deductible fees vs taxable net."""
+    if not trans_rows:
+        return
+    gross = sum(r["amount"] for r in trans_rows if r["amount"] > 0)
+    fee_expense = sum(
+        abs(r["amount"]) for r in trans_rows
+        if r["amount"] < 0 and r["category"] in FEE_CATEGORIES
+    )
+    other_expense = sum(
+        abs(r["amount"]) for r in trans_rows
+        if r["amount"] < 0 and r["category"] not in FEE_CATEGORIES
+    )
+    ytd_net = gross - fee_expense - other_expense
+    print()
+    print("=== 1099-K RECONCILIATION (l_d/5284 shape) ===")
+    print(f"  Gross payments (1099-K box 1 equivalent): ${gross:,.2f}")
+    print(f"  Deductible platform/fulfillment/commission/ad fees: ${fee_expense:,.2f}")
+    print(f"  Other business expenses: ${other_expense:,.2f}")
+    print(f"  Taxable net profit (gross − all expenses): ${ytd_net:,.2f}")
+    if gross > ytd_net:
+        overpay = (gross - ytd_net) * (TAX_BUFFER_PCT / 100) / 4
+        print(f"  Extra tax if you set aside on gross instead of net: ~${overpay:,.2f}/quarter habit")
+    quarterly = max(ytd_net, 0) * TAX_BUFFER_PCT / 100 / 4
+    print()
+    print(f"=== QUARTERLY TAX SET-ASIDE ({TAX_BUFFER_PCT:.0f}% of net) ===")
+    print(f"  Estimated per quarter: ${quarterly:,.2f}")
+    print("  Guide: 1099k-guide.md · 1099k-freelance-sample.csv")
+
+
 def main():
+    if len(sys.argv) >= 3 and sys.argv[1] == "--1099k":
+        summarize_1099k_reconciliation(load_transaction_log(sys.argv[2]))
+        return
     if len(sys.argv) < 3:
         print("Usage: python3 freelance_finance_os.py invoice-log.csv expense-log.csv [subscriptions.csv] [bills.csv] [debt.csv]")
+        print("       python3 freelance_finance_os.py --1099k 1099k-freelance-sample.csv")
         sys.exit(1)
 
     invoices = load_invoices(sys.argv[1])

@@ -1,0 +1,11 @@
+date,type,category,description,amount
+2026-01-05,income,marketplace_sales,Gumroad gross digital sales month 1,6200.00
+2026-01-06,expense,platform_fee,Gumroad 10% + Stripe processing,-372.00
+2026-01-08,income,client_invoice,Acme Corp retainer (also on 1099-NEC),2500.00
+2026-01-10,expense,software,Adobe Creative Cloud,-54.99
+2026-02-05,income,marketplace_sales,Gumroad gross digital sales month 2,7800.00
+2026-02-06,expense,platform_fee,Gumroad 10% + Stripe processing,-468.00
+2026-02-06,expense,ad_spend,Meta ads for template launch,-320.00
+2026-03-05,income,marketplace_sales,Gumroad gross digital sales month 3,9100.00
+2026-03-06,expense,platform_fee,Gumroad 10% + Stripe processing,-546.00
+2026-03-06,expense,refund_fee,Chargeback admin fee,-25.00
