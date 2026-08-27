@@ -13,7 +13,9 @@ PLATFORM_FEES = {
     "payhip": lambda g: g * 0.05,
     "other": lambda g: 0.0,
 }
-TAX_SET_ASIDE_PCT = 25.0
+SE_TAX_RATE = 0.153
+SE_TAXABLE_RATIO = 0.9235
+INCOME_TAX_RESERVE_PCT = 12.0
 
 
 def parse_fee_override(notes):
@@ -154,18 +156,37 @@ def print_launch_tracker(rows):
         print(f"    30-day: {len(w30):2d} sales  gross ${gross30:8,.2f}  net ${net30:8,.2f}")
 
 
+def quarterly_tax_lines(net):
+    se_base = net * SE_TAXABLE_RATIO
+    se_tax = se_base * SE_TAX_RATE
+    income_reserve = net * (INCOME_TAX_RESERVE_PCT / 100)
+    payment = se_tax + income_reserve
+    return se_tax, income_reserve, payment
+
+
 def print_tax_summary(rows):
     quarterly = defaultdict(float)
     for r in rows:
         quarterly[quarter_key(r["date"])] += r["net"]
-    print("\n=== TAX & ANNUAL SUMMARY (25% set-aside default) ===")
+    print("\n=== TAX & ANNUAL SUMMARY (PattyBun tab 6 — SE + income reserve) ===")
     ytd_net = sum(r["net"] for r in rows)
+    ytd_se = ytd_income = ytd_payment = 0.0
     print(f"  YTD net revenue: ${ytd_net:,.2f}")
+    print(f"  Defaults: SE {SE_TAX_RATE * 100:.1f}% on {SE_TAXABLE_RATIO * 100:.2f}% of net · income reserve {INCOME_TAX_RESERVE_PCT:.0f}%")
+    print("\n  Quarter        net revenue   SE tax est.   income reserve   suggested payment")
     for q in sorted(quarterly):
         net = quarterly[q]
-        reserve = net * (TAX_SET_ASIDE_PCT / 100)
-        print(f"  {q}: net ${net:,.2f}  suggested set-aside (${TAX_SET_ASIDE_PCT}%): ${reserve:,.2f}")
-    print(f"  Annual reserve total: ${ytd_net * (TAX_SET_ASIDE_PCT / 100):,.2f}")
+        se_tax, income_reserve, payment = quarterly_tax_lines(net)
+        ytd_se += se_tax
+        ytd_income += income_reserve
+        ytd_payment += payment
+        print(
+            f"  {q:12s}  ${net:10,.2f}  ${se_tax:10,.2f}  ${income_reserve:14,.2f}  ${payment:16,.2f}"
+        )
+    print(
+        f"\n  YTD totals: SE tax ${ytd_se:,.2f} · income reserve ${ytd_income:,.2f} · "
+        f"suggested payments ${ytd_payment:,.2f}"
+    )
 
 
 def main():

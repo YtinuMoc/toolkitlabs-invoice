@@ -32,7 +32,7 @@ footer a{color:var(--acc)}
 
 <span class="badge">Clone of PattyBun rauxja · $14.99 → EUR 9 · Gumroad checkout · Instant download</span>
 <h1>Digital Product Creator Income Tracker</h1>
-<p class="lead">Shameless clone of <a href="https://pattybun.gumroad.com/l/rauxja">PattyBun's multi-platform income tracker on Gumroad ($14.99)</a>. Gumroad shows one number, Etsy another, Payhip a third — this kit auto-calculates platform fees and prints dashboard, platform summary, product performance, launch tracker, and tax set-aside from one revenue log. Buyer channel: <a href="https://buy.stripe.com/28EcN64GO1vu4t01pz5Ne0u" id="devto-link" href="https://dev.to/toolkitlabs/gumroad-etsy-shopify-one-spreadsheet-for-real-net-revenue-pattybun-rauxja-clone-2fcf">dev.to multi-platform revenue article</a> (orion/40gi-family shape).</p>
+<p class="lead">Shameless clone of <a href="https://pattybun.gumroad.com/l/rauxja">PattyBun's multi-platform income tracker on Gumroad ($14.99)</a>. Gumroad shows one number, Etsy another, Payhip a third — this kit auto-calculates platform fees and prints dashboard, platform summary, product performance, launch tracker, and tax set-aside from one revenue log. Buyer channel: <a href="https://buy.stripe.com/28EcN64GO1vu4t01pz5Ne0u" id="devto-link" href="https://dev.to/toolkitlabs/gumroad-etsy-shopify-one-spreadsheet-for-real-net-revenue-pattybun-rauxja-clone-2fcf">dev.to multi-platform revenue article</a> (orion/40gi-family shape) · <a href="https://dev.to/toolkitlabs/quarterly-tax-set-aside-for-multi-platform-digital-product-sellers-pattybun-rauxja-clone-4kdn">tax set-aside article</a> (faisalmq/4gao buyer channel).</p>
 
 <div class="price-box">
 <div class="amt">EUR 9 · one-time</div>
@@ -46,7 +46,11 @@ footer a{color:var(--acc)}
 <div class="mod"><h3>🏪 Platform Summary</h3><p>Side-by-side Gumroad, Etsy, Shopify, Payhip net by month — clone of tab 3.</p></div>
 <div class="mod"><h3>📦 Product Performance</h3><p>Units, gross, net, platforms, last sale date — clone of tab 4.</p></div>
 <div class="mod"><h3>🚀 Launch Tracker</h3><p>Tag launch-week rows in notes — 7-day and 30-day gross/net + outcome rating — clone of tab 5. <a href="launch-tracker-guide.md">Guide</a></p></div>
-<div class="mod"><h3>🧾 Tax &amp; Annual Summary</h3><p>Quarterly net + 25% set-aside estimate — clone of tab 6 (US default).</p></div>
+<div class="mod" id="tax-annual"><h3>🧾 Tax &amp; Annual Summary</h3><p>Quarterly net, SE tax estimate (15.3% × 92.35%), income tax reserve, suggested quarterly payment — clone of PattyBun tab 6. <a href="tax-annual-guide.md">Guide</a></p></div>
+
+<div class="peek">=== TAX &amp; ANNUAL SUMMARY (PattyBun tab 6) ===
+  Quarter        net revenue   SE tax est.   income reserve   suggested payment
+  2026-Q1        $    197.27  $     27.88  $         23.67  $          51.55</div>
 
 <div class="peek">=== DASHBOARD (PattyBun rauxja clone) ===
   YTD gross: $226.00
@@ -62,7 +66,7 @@ footer a{color:var(--acc)}
 <div class="mod"><h3>Other platforms besides Gumroad, Etsy, Shopify, Payhip?</h3><p>Yes — use platform <code>other</code> and set <code>fee=12.34</code> in notes.</p></div>
 <div class="mod"><h3>Auto-sync from Gumroad/Etsy?</h3><p>No — manual entry. The tracker does fee math (same as PattyBun).</p></div>
 <div class="mod"><h3>More products or platforms?</h3><p>Append rows to the revenue log — no CLI row cap.</p></div>
-<div class="mod"><h3>VAT or international tax?</h3><p>25% US set-aside default. Edit <code>TAX_SET_ASIDE_PCT</code> in the CLI for your jurisdiction. <a href="faq.md">Full FAQ</a></p></div>
+<div class="mod"><h3>VAT or international tax?</h3><p>US SE tax + income reserve defaults in tab 6. Edit <code>SE_TAX_RATE</code> and <code>INCOME_TAX_RESERVE_PCT</code> in the CLI. <a href="tax-annual-guide.md">Tax guide</a> · <a href="faq.md">Full FAQ</a></p></div>
 </div>
 <footer><a href="../builder-public/tools.html">All Toolkit Labs products</a></footer>
 </body>
