@@ -254,6 +254,72 @@ def summarize_debt(path, ytd_net=None):
     print("  Guide: bills-debt-guide.md · debt-sample.csv")
 
 
+def months_to_goal(target, initial, monthly, annual_rate_pct):
+    if target <= initial:
+        return 0, 0.0, 0.0, initial
+    if monthly <= 0:
+        return None, 0.0, 0.0, initial
+    rate = annual_rate_pct / 100 / 12
+    balance = initial
+    months = 0
+    contributed = 0.0
+    while balance < target and months < 1200:
+        balance += monthly
+        contributed += monthly
+        if rate > 0:
+            balance *= 1 + rate
+        months += 1
+    if balance < target:
+        return None, contributed, 0.0, balance
+    interest = balance - initial - contributed
+    return months, contributed, interest, balance
+
+
+def summarize_savings_calculator(path):
+    """tatelyman/4kcj: goal + monthly + starting balance + APR → time to target."""
+    rows = []
+    with open(path, newline="", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            try:
+                target = float(row["target"])
+                initial = float(row.get("initial_balance", 0) or 0)
+                monthly = float(row.get("monthly_contribution", 0) or 0)
+                rate = float(row.get("annual_interest_rate", 0) or 0)
+            except (KeyError, ValueError):
+                continue
+            rows.append({
+                "goal": row.get("goal", "").strip(),
+                "target": target,
+                "initial": initial,
+                "monthly": monthly,
+                "rate": rate,
+            })
+    if not rows:
+        return
+    print("\n=== SAVINGS GOAL CALCULATOR (tatelyman/4kcj shape) ===")
+    for r in rows:
+        months, contributed, interest, final = months_to_goal(
+            r["target"], r["initial"], r["monthly"], r["rate"],
+        )
+        label = r["goal"] or "Goal"
+        if months is None:
+            print(
+                f"  {label}: ${r['target']:,.2f} target — unreachable at "
+                f"${r['monthly']:,.2f}/mo from ${r['initial']:,.2f} "
+                f"({r['rate']:.1f}% APR)"
+            )
+            continue
+        yrs = months // 12
+        rem = months % 12
+        when = f"{months} months" if yrs == 0 else f"{yrs}y {rem}m ({months} months)"
+        print(f"  {label}: ${r['target']:,.2f} goal · ${r['initial']:,.2f} starting · ${r['monthly']:,.2f}/mo · {r['rate']:.1f}% APR")
+        print(f"    Time to goal: {when}")
+        print(f"    Total contributed: ${contributed:,.2f}")
+        print(f"    Interest earned: ${interest:,.2f}")
+        print(f"    Final balance: ${final:,.2f}")
+    print("  Guide: savings-calculator-guide.md · savings-calculator-sample.csv")
+
+
 def summarize_savings(path):
     rows = []
     with open(path, newline="", encoding="utf-8") as f:
@@ -608,6 +674,9 @@ def main():
     if len(sys.argv) >= 3 and sys.argv[1] == "--savings-goals":
         summarize_savings(sys.argv[2])
         return
+    if len(sys.argv) >= 3 and sys.argv[1] == "--savings-calculator":
+        summarize_savings_calculator(sys.argv[2])
+        return
     if len(sys.argv) >= 3 and sys.argv[1] == "--self-assessment":
         summarize_self_assessment(sys.argv[2])
         return
@@ -642,6 +711,7 @@ def main():
         print("       python3 freelance_finance_os.py --1099k 1099k-freelance-sample.csv")
         print("       python3 freelance_finance_os.py --bills-debt bills-sample.csv debt-sample.csv")
         print("       python3 freelance_finance_os.py --savings-goals savings-sample.csv")
+        print("       python3 freelance_finance_os.py --savings-calculator savings-calculator-sample.csv")
         print("       python3 freelance_finance_os.py --self-assessment self-assessment-sample.csv")
         print("       python3 freelance_finance_os.py --spreadsheet-system invoice-log.csv expense-log.csv")
         print("       python3 freelance_finance_os.py --six-month-reveal invoice-log.csv expense-log.csv client-hours.csv [subscriptions.csv]")
