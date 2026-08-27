@@ -1,0 +1,2 @@
+date,platform,booking_id,guest_nights,gross_usd,platform_fees,cleaning_fee,other_expenses,net_usd,notes
+2026-01-15,airbnb,HM123,3,450.00,67.50,85.00,12.00,285.50,example row — delete before use
