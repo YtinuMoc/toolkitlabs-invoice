@@ -1,0 +1,13 @@
+vendor,invoice_date,amount,description
+Acme Corp,8/3/26,"$1,234.56",Monthly hosting
+ACME CORPORATION,08/03/2026,1234.56,Monthly hosting
+Beta LLC,2026-01-15,500.00,Logo design
+Gamma Studio,1/20/2026,$800.00,Brand audit
+Gamma Studio,2026-01-20,800.00,Brand audit
+Delta Inc,2026-02-01,"2,100.00",Retainer
+DELTA INC.,02/01/26,2100,Retainer
+Echo Co,2026-02-10,$450.50,Support hours
+Foxtrot Ltd,2/15/26,invalid-amount,Bad row
+Hotel Partners,2026-02-18,675.00,Consulting
+India Supply,2026-02-20,"$1,050.75",Inventory
+India Supply,2026-02-20,1050.75,Inventory

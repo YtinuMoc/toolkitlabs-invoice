@@ -304,6 +304,104 @@ def summarize_cash_runway(
     print("  Guide: cash-runway-guide.md · agentchip/33mm buyer channel clone")
 
 
+def _normalize_vendor(name):
+    n = name.strip().upper()
+    for suffix in (" CORPORATION", " CORP", " INC.", " INC", " LTD.", " LTD", " LLC"):
+        if n.endswith(suffix):
+            n = n[: -len(suffix)].strip()
+    return n
+
+
+def _parse_dirty_amount(raw):
+    if raw is None:
+        raise ValueError("empty amount")
+    s = str(raw).strip().replace("$", "").replace(",", "")
+    if not s or s.lower() in ("invalid-amount", "n/a"):
+        raise ValueError(f"unparseable amount: {raw}")
+    return float(s)
+
+
+def _parse_dirty_date(raw):
+    s = (raw or "").strip()
+    if not s:
+        raise ValueError("empty date")
+    for fmt in ("%Y-%m-%d", "%m/%d/%Y", "%m/%d/%y", "%d/%m/%Y"):
+        try:
+            return datetime.strptime(s, fmt).date().isoformat()
+        except ValueError:
+            continue
+    raise ValueError(f"unparseable date: {raw}")
+
+
+def clean_dirty_invoices(path):
+    """agentchip/47ag: deterministic CSV cleaning — dedupe, normalize, no AI guesses."""
+    rows_in = []
+    with open(path, newline="", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            rows_in.append(row)
+
+    clean = []
+    errors = []
+    seen = set()
+
+    for i, row in enumerate(rows_in, start=2):
+        vendor_raw = row.get("vendor", row.get("client", "")).strip()
+        if not vendor_raw:
+            errors.append({"row": i, "reason": "missing vendor", "raw": row})
+            continue
+        try:
+            amount = _parse_dirty_amount(row.get("amount", ""))
+            inv_date = _parse_dirty_date(row.get("invoice_date", row.get("date", "")))
+        except ValueError as exc:
+            errors.append({"row": i, "reason": str(exc), "raw": row})
+            continue
+        vendor = _normalize_vendor(vendor_raw)
+        desc = row.get("description", "").strip()
+        key = (vendor, inv_date, round(amount, 2), desc.lower())
+        if key in seen:
+            continue
+        seen.add(key)
+        clean.append({
+            "vendor": vendor,
+            "invoice_date": inv_date,
+            "amount": amount,
+            "description": desc,
+        })
+
+    return clean, errors, len(rows_in)
+
+
+def summarize_invoice_reconciliation(path):
+    """agentchip/47ag: CSV in, reconciliation out — nightly copy-paste ritual killer."""
+    clean, errors, raw_count = clean_dirty_invoices(path)
+    dupes_removed = raw_count - len(clean) - len(errors)
+    by_vendor = defaultdict(float)
+    by_month = defaultdict(float)
+    for row in clean:
+        by_vendor[row["vendor"]] += row["amount"]
+        by_month[row["invoice_date"][:7]] += row["amount"]
+
+    print("\n=== INVOICE CSV RECONCILIATION (agentchip/47ag shape) ===")
+    print("  Deterministic parsing — no AI guesses. Unparseable rows go to errors, not invented.")
+    print(f"  Rows in: {raw_count} · clean: {len(clean)} · duplicates removed: {max(dupes_removed, 0)} · errors: {len(errors)}")
+    if errors:
+        print("  Unparsed rows (fix manually — never silently dropped):")
+        for e in errors[:5]:
+            print(f"    line {e['row']}: {e['reason']}")
+        if len(errors) > 5:
+            print(f"    … {len(errors) - 5} more")
+    if by_vendor:
+        print("  Totals by vendor:")
+        for vendor, total in sorted(by_vendor.items(), key=lambda x: -x[1]):
+            print(f"    {vendor:20} ${total:,.2f}")
+    if by_month:
+        print("  Totals by month:")
+        for month, total in sorted(by_month.items()):
+            print(f"    {month}: ${total:,.2f}")
+    print(f"  Grand total (clean): ${sum(by_vendor.values()):,.2f}")
+    print("  Guide: invoice-reconciliation-guide.md · dirty-invoices-sample.csv")
+
+
 def print_bundle_stack(manifest_path=None):
     """agentchip/2dgn: separate tools priced individually → one connected workbook stack."""
     modules = [
@@ -367,10 +465,14 @@ def print_report(clients, invoices, payments):
 
 
 def main():
+    if len(sys.argv) >= 3 and sys.argv[1] == "--reconcile":
+        summarize_invoice_reconciliation(sys.argv[2])
+        return
     if len(sys.argv) < 4:
         print(
             "Usage: freelancer_invoice_tracker.py clients.csv invoices.csv payments.csv "
-            "[subscriptions.csv] [bills.csv] [debt.csv]",
+            "[subscriptions.csv] [bills.csv] [debt.csv]\n"
+            "       freelancer_invoice_tracker.py --reconcile dirty-invoices.csv",
             file=sys.stderr,
         )
         sys.exit(1)
