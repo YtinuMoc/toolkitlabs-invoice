@@ -103,7 +103,7 @@ def print_category_breakdown(rows):
 
 def main():
     if len(sys.argv) < 3:
-        print("Usage: python3 freelance_finance_os.py invoice-log.csv expense-log.csv")
+        print("Usage: python3 freelance_finance_os.py invoice-log.csv expense-log.csv [subscriptions.csv]")
         sys.exit(1)
 
     invoices = load_invoices(sys.argv[1])
@@ -188,6 +188,79 @@ def main():
     print("  4. Quarterly estimator [this run]")
     print_command_center(len(invoices), collected, overdue_cnt, overdue_amt, expense_total, net_profit)
     print_bundle_strategy()
+    if len(sys.argv) >= 4 and sys.argv[3]:
+        summarize_subscription_audit(sys.argv[3])
+
+
+def _parse_iso_date(s):
+    s = (s or "").strip()
+    if not s:
+        return None
+    try:
+        return datetime.strptime(s, "%Y-%m-%d").date()
+    except ValueError:
+        return None
+
+
+def _subscription_status(renewal_date, cancel_by, today):
+    """agentchip/52g8 four-state judgment from renewal + cancel-by dates."""
+    if renewal_date and today > renewal_date:
+        return "EXPIRED"
+    if cancel_by and today >= cancel_by:
+        return "RENEW NOW"
+    if cancel_by:
+        days_to_cancel = (cancel_by - today).days
+        if 0 <= days_to_cancel <= 30:
+            return "Renew soon"
+    return "Active"
+
+
+def summarize_subscription_audit(path):
+    """agentchip/52g8: freelance SaaS auto-renewal creep — track cancel-by, not renewal."""
+    rows = []
+    today = date.today()
+    with open(path, newline="", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            try:
+                monthly = float(row.get("monthly_usd", row.get("amount", 0)))
+            except (KeyError, ValueError):
+                continue
+            renewal = _parse_iso_date(row.get("renewal_date", ""))
+            cancel_by = _parse_iso_date(row.get("cancel_by", ""))
+            status = (row.get("status") or "").strip() or _subscription_status(
+                renewal, cancel_by, today
+            )
+            rows.append({
+                "contract": row.get("contract", "").strip(),
+                "vendor": row.get("vendor", row.get("bill", "")).strip(),
+                "monthly": monthly,
+                "cancel_by": cancel_by,
+                "status": status,
+            })
+    if not rows:
+        return
+    monthly_load = sum(r["monthly"] for r in rows)
+    urgent = [r for r in rows if r["status"] in ("RENEW NOW", "Renew soon", "EXPIRED")]
+    zombie = [r for r in rows if r["monthly"] >= 50 and r["status"] == "RENEW NOW"]
+    print("\n=== SUBSCRIPTION AUTO-RENEWAL AUDIT (agentchip/52g8 shape) ===")
+    print("  Track cancel-by deadlines — calendar renewal reminders arrive too late.")
+    print(f"  Contracts tracked: {len(rows)} · est. monthly load: ${monthly_load:,.2f}")
+    print("  contract   vendor          monthly  cancel_by    status")
+    for r in rows:
+        cancel = r["cancel_by"].isoformat() if r["cancel_by"] else "—"
+        print(
+            f"  {r['contract'] or '—':10} {r['vendor'][:14]:14} "
+            f"${r['monthly']:>6.2f}  {cancel:10}  {r['status']}"
+        )
+    if urgent:
+        print(f"  Action needed: {len(urgent)} contract(s) in renew/cancel window")
+    if zombie:
+        wasted = sum(r["monthly"] for r in zombie)
+        print(
+            f"  Zombie SaaS check: ${wasted:,.2f}/mo flagged RENEW NOW "
+            "(unused tools still billing — agentchip/52g8 audit pays for itself)"
+        )
+    print("  Guide: subscription-audit-guide.md · subscriptions-sample.csv")
 
 
 def print_bundle_strategy():
