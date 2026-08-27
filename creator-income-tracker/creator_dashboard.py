@@ -126,12 +126,24 @@ def print_product_performance(rows):
         p["platforms"].add(r["platform"])
         if p["last"] is None or r["date"] > p["last"]:
             p["last"] = r["date"]
-    print("\n=== PRODUCT PERFORMANCE ===")
-    for product in sorted(perf, key=lambda k: perf[k]["net"], reverse=True):
+    anchor = max(r["date"] for r in rows) if rows else None
+    ranked = sorted(perf, key=lambda k: perf[k]["net"], reverse=True)
+    print("\n=== PRODUCT PERFORMANCE (PattyBun tab 4) ===")
+    for rank, product in enumerate(ranked, 1):
         p = perf[product]
         plats = ",".join(sorted(p["platforms"]))
         last = p["last"].strftime("%Y-%m-%d") if p["last"] else "n/a"
-        print(f"  {product:22s}  units {p['units']:3d}  gross ${p['gross']:8,.2f}  net ${p['net']:8,.2f}  platforms [{plats}]  last {last}")
+        margin = (p["net"] / p["gross"] * 100) if p["gross"] else 0.0
+        days_ago = (anchor - p["last"]).days if anchor and p["last"] else None
+        stale = f"  ({days_ago}d ago)" if days_ago is not None else ""
+        print(
+            f"  #{rank} {product:20s}  units {p['units']:3d}  gross ${p['gross']:8,.2f}  "
+            f"net ${p['net']:8,.2f}  margin {margin:5.1f}%  platforms [{plats}]  last {last}{stale}"
+        )
+    if len(ranked) >= 2:
+        top, bottom = ranked[0], ranked[-1]
+        t, b = perf[top], perf[bottom]
+        print(f"\n  Top earner: {top} (${t['net']:,.2f} net) · Lowest net: {bottom} (${b['net']:,.2f})")
 
 
 def launch_window_totals(sales, start, days):
