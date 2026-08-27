@@ -37,3 +37,5 @@ Full kit adds bills/debt/invoices trackers + 150-row template. Clone of [Quillen
 - [Debt minimums guide](debt-guide.md)
 - [Bills sample CSV](bills-sample.csv)
 - [Debt sample CSV](debt-sample.csv)
+- [Savings goals guide](savings-goals-guide.md)
+- [Savings sample CSV](savings-sample.csv)

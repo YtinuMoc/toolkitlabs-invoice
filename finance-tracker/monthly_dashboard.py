@@ -109,6 +109,43 @@ def summarize_debt(path, ytd_net=None):
             print(f"  YTD net covers minimums: NO — short ${gap:,.2f} (net profit < debt minimums)")
 
 
+def summarize_savings(path):
+    rows = []
+    with open(path, newline="", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            try:
+                target = float(row["target"])
+                saved = float(row.get("saved", 0) or 0)
+                weekly = float(row.get("weekly_target", 0) or 0)
+            except (KeyError, ValueError):
+                continue
+            rows.append({
+                "goal": row.get("goal", "").strip(),
+                "target": target,
+                "saved": saved,
+                "weekly_target": weekly,
+                "status": row.get("status", "active").strip().lower() or "active",
+            })
+    if not rows:
+        return
+    print("\n=== SAVINGS GOALS (stephane/5629 + Quillenhart savings tab) ===")
+    total_target = total_saved = 0.0
+    for r in rows:
+        pct = (r["saved"] / r["target"] * 100) if r["target"] > 0 else 0.0
+        remaining = max(0.0, r["target"] - r["saved"])
+        weeks_left = (remaining / r["weekly_target"]) if r["weekly_target"] > 0 else 0.0
+        print(
+            f"  {r['goal']}: ${r['saved']:,.2f} / ${r['target']:,.2f} "
+            f"({pct:.0f}% complete, ${remaining:,.2f} left"
+            + (f", ~{weeks_left:.0f} weeks at ${r['weekly_target']:,.0f}/wk" if weeks_left else "")
+            + ")"
+        )
+        total_target += r["target"]
+        total_saved += r["saved"]
+    overall = (total_saved / total_target * 100) if total_target > 0 else 0.0
+    print(f"  Portfolio: ${total_saved:,.2f} / ${total_target:,.2f} ({overall:.0f}% across {len(rows)} goals)")
+
+
 def summarize_invoices(path):
     rows = []
     with open(path, newline="", encoding="utf-8") as f:
@@ -215,6 +252,7 @@ def main():
     invoice_path = sys.argv[2] if len(sys.argv) > 2 else None
     bills_path = sys.argv[3] if len(sys.argv) > 3 else None
     debt_path = sys.argv[4] if len(sys.argv) > 4 else None
+    savings_path = sys.argv[5] if len(sys.argv) > 5 else None
     rows = load_rows(path)
     if not rows:
         print("No transactions found.", file=sys.stderr)
@@ -237,6 +275,8 @@ def main():
         summarize_bills(bills_path)
     if debt_path:
         summarize_debt(debt_path, ytd_net=ytd_net)
+    if savings_path:
+        summarize_savings(savings_path)
 
 
 if __name__ == "__main__":
