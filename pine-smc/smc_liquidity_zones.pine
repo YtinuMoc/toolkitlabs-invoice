@@ -1,0 +1,46 @@
+// © Toolkit Labs 2026 — clone of Orion SMC Liquidity Zones (nexusai82.gumroad.com/l/pine-smc)
+//@version=5
+indicator("SMC Liquidity Zones — Toolkit Labs", overlay=true, max_lines_count=200, max_labels_count=200)
+
+lookback    = input.int(50, "Swing lookback", minval=10, maxval=200, group="Settings")
+minSwingAtr = input.float(0.5, "Min swing distance (× ATR)", minval=0.1, step=0.1, group="Settings")
+showBsl     = input.bool(true, "Buy-side liquidity (equal highs)", group="Display")
+showSsl     = input.bool(true, "Sell-side liquidity (equal lows)", group="Display")
+showSweeps  = input.bool(true, "Mark sweep events", group="Display")
+bslCol      = input.color(color.new(#ef5350, 30), "BSL colour", group="Colours")
+sslCol      = input.color(color.new(#26a69a, 30), "SSL colour", group="Colours")
+atrLen      = input.int(14, "ATR length", group="Settings")
+
+atr = ta.atr(atrLen)
+swingHigh = ta.pivothigh(high, lookback, lookback)
+swingLow  = ta.pivotlow(low, lookback, lookback)
+
+var float lastHigh = na
+var float lastLow  = na
+var line bslLine = na
+var line sslLine = na
+
+if not na(swingHigh)
+    if not na(lastHigh) and math.abs(swingHigh - lastHigh) < atr * minSwingAtr and showBsl
+        if not na(bslLine)
+            line.delete(bslLine)
+        bslLine := line.new(bar_index - lookback, swingHigh, bar_index + 20, swingHigh, color=bslCol, width=2)
+        label.new(bar_index - lookback, swingHigh, "BSL", style=label.style_label_down, color=bslCol, textcolor=color.white, size=size.tiny)
+    lastHigh := swingHigh
+
+if not na(swingLow)
+    if not na(lastLow) and math.abs(swingLow - lastLow) < atr * minSwingAtr and showSsl
+        if not na(sslLine)
+            line.delete(sslLine)
+        sslLine := line.new(bar_index - lookback, swingLow, bar_index + 20, swingLow, color=sslCol, width=2)
+        label.new(bar_index - lookback, swingLow, "SSL", style=label.style_label_up, color=sslCol, textcolor=color.white, size=size.tiny)
+    lastLow := swingLow
+
+// Sweep: wick through prior swing then close back inside
+sweptHigh = not na(lastHigh) and high > lastHigh and close < lastHigh
+sweptLow  = not na(lastLow) and low < lastLow and close > lastLow
+plotshape(showSweeps and sweptHigh, title="BSL sweep", style=shape.xcross, location=location.abovebar, color=color.red, size=size.small)
+plotshape(showSweeps and sweptLow, title="SSL sweep", style=shape.xcross, location=location.belowbar, color=color.green, size=size.small)
+
+alertcondition(sweptHigh, "BSL sweep", "Buy-side liquidity swept")
+alertcondition(sweptLow, "SSL sweep", "Sell-side liquidity swept")

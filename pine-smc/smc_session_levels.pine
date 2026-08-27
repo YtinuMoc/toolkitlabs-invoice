@@ -1,0 +1,58 @@
+// © Toolkit Labs 2026 — session high/low liquidity levels (5th indicator in Orion pine-smc suite)
+//@version=5
+indicator("SMC Session Levels — Toolkit Labs", overlay=true, max_lines_count=100)
+
+showAsia    = input.bool(true, "Asia session", group="Sessions")
+showLondon  = input.bool(true, "London session", group="Sessions")
+showNy      = input.bool(true, "New York session", group="Sessions")
+extendBars  = input.int(40, "Extend lines (bars)", minval=5, group="Display")
+asiaCol     = input.color(color.new(#58a6ff, 40), "Asia", group="Colours")
+londonCol   = input.color(color.new(#f0b429, 40), "London", group="Colours")
+nyCol       = input.color(color.new(#3fb950, 40), "New York", group="Colours")
+
+inAsia   = not na(time(timeframe.period, "1800-0300"))
+inLondon = not na(time(timeframe.period, "0300-1200"))
+inNy     = not na(time(timeframe.period, "1330-2200"))
+
+var float asiaHi = na
+var float asiaLo = na
+var float lonHi  = na
+var float lonLo  = na
+var float nyHi   = na
+var float nyLo   = na
+var bool wasAsia = false
+var bool wasLon  = false
+var bool wasNy   = false
+
+if inAsia
+    asiaHi := na(asiaHi) ? high : math.max(asiaHi, high)
+    asiaLo := na(asiaLo) ? low : math.min(asiaLo, low)
+    wasAsia := true
+else if wasAsia and showAsia
+    line.new(bar_index - 1, asiaHi, bar_index + extendBars, asiaHi, color=asiaCol, width=1)
+    line.new(bar_index - 1, asiaLo, bar_index + extendBars, asiaLo, color=asiaCol, width=1)
+    asiaHi := na
+    asiaLo := na
+    wasAsia := false
+
+if inLondon
+    lonHi := na(lonHi) ? high : math.max(lonHi, high)
+    lonLo := na(lonLo) ? low : math.min(lonLo, low)
+    wasLon := true
+else if wasLon and showLondon
+    line.new(bar_index - 1, lonHi, bar_index + extendBars, lonHi, color=londonCol, width=1)
+    line.new(bar_index - 1, lonLo, bar_index + extendBars, lonLo, color=londonCol, width=1)
+    lonHi := na
+    lonLo := na
+    wasLon := false
+
+if inNy
+    nyHi := na(nyHi) ? high : math.max(nyHi, high)
+    nyLo := na(nyLo) ? low : math.min(nyLo, low)
+    wasNy := true
+else if wasNy and showNy
+    line.new(bar_index - 1, nyHi, bar_index + extendBars, nyHi, color=nyCol, width=1)
+    line.new(bar_index - 1, nyLo, bar_index + extendBars, nyLo, color=nyCol, width=1)
+    nyHi := na
+    nyLo := na
+    wasNy := false

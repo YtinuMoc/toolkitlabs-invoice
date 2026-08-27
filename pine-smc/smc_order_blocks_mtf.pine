@@ -1,0 +1,55 @@
+// © Toolkit Labs 2026 — clone of Orion SMC Order Blocks MTF (nexusai82.gumroad.com/l/pine-smc)
+//@version=5
+indicator("SMC Order Blocks MTF — Toolkit Labs", overlay=true, max_boxes_count=150)
+
+htfTf       = input.timeframe("240", "Higher timeframe", group="MTF")
+impulseAtr  = input.float(1.5, "Min impulse size (× ATR)", minval=0.5, step=0.1, group="Filters")
+showBullOb  = input.bool(true, "Bullish order blocks", group="Display")
+showBearOb  = input.bool(true, "Bearish order blocks", group="Display")
+showHtfOb   = input.bool(true, "HTF order blocks overlay", group="MTF")
+bullCol     = input.color(color.new(#26a69a, 70), "Bull OB", group="Colours")
+bearCol     = input.color(color.new(#ef5350, 70), "Bear OB", group="Colours")
+atrLen      = input.int(14, "ATR length", group="Filters")
+
+atr = ta.atr(atrLen)
+
+// Bearish OB: last up-candle before bearish impulse
+bearImpulse = close < open and (open - close) > atr * impulseAtr
+bullImpulse = close > open and (close - open) > atr * impulseAtr
+wasUp       = close[1] > open[1]
+wasDown     = close[1] < open[1]
+
+var box[] obs = array.new_box()
+var label[] tags = array.new_label()
+
+if bearImpulse and wasUp and showBearOb
+    top = high[1]
+    bot = low[1]
+    score = math.round((open[1] - close) / atr * 10) / 10
+    b = box.new(bar_index - 1, bot, bar_index + 25, top, bgcolor=bearCol, border_color=color.new(#ef5350, 30))
+    array.push(obs, b)
+    array.push(tags, label.new(bar_index - 1, top, "Bear OB " + str.tostring(score), style=label.style_label_down, color=bearCol, textcolor=color.white, size=size.tiny))
+
+if bullImpulse and wasDown and showBullOb
+    top = high[1]
+    bot = low[1]
+    score = math.round((close - open[1]) / atr * 10) / 10
+    b = box.new(bar_index - 1, bot, bar_index + 25, top, bgcolor=bullCol, border_color=color.new(#26a69a, 30))
+    array.push(obs, b)
+    array.push(tags, label.new(bar_index - 1, bot, "Bull OB " + str.tostring(score), style=label.style_label_up, color=bullCol, textcolor=color.white, size=size.tiny))
+
+// HTF OB signal overlay
+htfBearOb = request.security(syminfo.tickerid, htfTf, bearImpulse and wasUp, barmerge.gaps_off, barmerge.lookahead_off)
+htfBullOb = request.security(syminfo.tickerid, htfTf, bullImpulse and wasDown, barmerge.gaps_off, barmerge.lookahead_off)
+plotshape(showHtfOb and htfBearOb, title="HTF Bear OB", style=shape.diamond, location=location.abovebar, color=color.red, size=size.tiny)
+plotshape(showHtfOb and htfBullOb, title="HTF Bull OB", style=shape.diamond, location=location.belowbar, color=color.green, size=size.tiny)
+
+// Mark tested OBs when price returns
+for i = 0 to array.size(obs) - 1
+    b = array.get(obs, i)
+    if close >= box.get_bottom(b) and close <= box.get_top(b)
+        box.set_bgcolor(b, color.new(color.gray, 85))
+
+while array.size(obs) > 80
+    box.delete(array.shift(obs))
+    label.delete(array.shift(tags))

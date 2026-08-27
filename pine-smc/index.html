@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Orion SMC Suite — 5 Pine Script indicators for TradingView</title>
+<meta name="description" content="Clone of Orion nexusai82 SMC Suite ($29 Gumroad pine-smc). FVG Pro, Liquidity Zones, Order Blocks MTF + Lite. EUR 9 instant zip.">
+<meta property="og:title" content="Orion SMC Suite — Pine Script v5">
+<meta property="og:description" content="5 SMC indicators for TradingView. Clone of nexusai82.gumroad.com/l/pine-smc. EUR 9 one-time.">
+<style>
+:root{--ink:#0f1720;--panel:#18222e;--text:#e6edf3;--mut:#93a1b0;--acc:#3fb950;--acc2:#58a6ff;--line:#243040}
+*{box-sizing:border-box}
+body{margin:0;font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;color:var(--text);background:var(--ink)}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 64px}
+nav{font-size:.9rem;margin-bottom:24px}
+nav a{color:var(--acc2);text-decoration:none}
+h1{font-size:1.9rem;line-height:1.25;margin:0 0 12px;color:#fff}
+.lead{color:var(--mut);font-size:1.05rem;margin:0 0 28px}
+.price-box{background:var(--panel);border:2px solid var(--acc);border-radius:10px;padding:24px;margin:28px 0;text-align:center}
+.price-box .amt{font-size:2rem;font-weight:700;color:#fff}
+.cta{display:inline-block;margin-top:16px;padding:14px 28px;background:var(--acc);color:#04260d;text-decoration:none;border-radius:8px;font-weight:700;font-size:1.05rem}
+.mod{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:16px 18px;margin-bottom:12px}
+.mod h3{margin:0 0 6px;font-size:1rem;color:#fff}
+.mod p{margin:0;color:var(--mut);font-size:.95rem}
+ul.check{margin:20px 0;padding-left:0;list-style:none}
+ul.check li{padding:6px 0 6px 28px;position:relative}
+ul.check li::before{content:"✓";position:absolute;left:0;color:var(--acc);font-weight:700}
+.cross{background:#1a2a1f;border:1px solid #2d5a3a;border-radius:8px;padding:18px;margin:28px 0;font-size:.95rem}
+.cross a{color:var(--acc2);font-weight:600}
+.refund{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:18px;margin:28px 0;font-size:.95rem}
+.badge{display:inline-block;background:#1a3d28;color:var(--acc);padding:4px 10px;border-radius:4px;font-size:.8rem;font-weight:600;margin-bottom:12px}
+.preview{background:#121820;border:1px solid var(--line);border-radius:8px;padding:14px;font-family:monospace;font-size:.78rem;overflow-x:auto;color:#a8d4a0;max-height:200px}
+footer{margin-top:40px;font-size:.85rem;color:var(--mut);text-align:center}
+footer a{color:var(--acc2)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav><a href="../builder-public/">Build in public</a> · <a href="../ledger/">SellerLedger</a> · <a href="../weekend-micro-saas/">Micro-SaaS</a> · <a href="https://github.com/YtinuMoc/toolkitlabs-invoice">source</a></nav>
+
+<span class="badge">Clone of Orion pine-smc · $29 → EUR 9</span>
+<h1>Orion SMC Suite — Pine Script v5</h1>
+<p class="lead">Shameless clone of <a href="https://nexusai82.gumroad.com/l/pine-smc" style="color:var(--acc2)">Orion's SMC Suite on Gumroad ($29)</a>. Five TradingView indicators for Smart Money Concepts: Fair Value Gaps, Liquidity Zones, Order Blocks MTF, and session levels. Paste into Pine Editor — instant download after Stripe checkout.</p>
+
+<div class="price-box">
+<div class="amt">EUR 9 · one-time</div>
+<p style="color:var(--mut);margin:8px 0 0">5 × .pine files · instant zip · 30-day refund</p>
+<a class="cta" id="buy-cta" href="https://buy.stripe.com/5kQdRac9gfmk5x48S15Ne0o">Get the suite →</a>
+<p style="margin:14px 0 0;font-size:.9rem;color:var(--mut)">Free preview: <a href="https://dev.to/toolkitlabs/3-pine-script-smc-indicators-i-cloned-from-orions-29-gumroad-suite-free-fvg-lite-code-inside-d3h" style="color:var(--acc2)">dev.to walkthrough</a> includes FVG Lite code you can copy now</p>
+</div>
+
+<h2>What's in the zip (5 indicators)</h2>
+<div class="mod"><h3>SMC FVG Lite</h3><p>Fair Value Gap detector — mitigation, lookback, alerts. Same free-tier shape Orion posts on dev.to.</p></div>
+<div class="mod"><h3>SMC FVG Pro</h3><p>HTF overlay, ATR gap filter, strength classification (S/M/L), partial mitigation midlines, alert conditions.</p></div>
+<div class="mod"><h3>SMC Liquidity Zones</h3><p>Buy-side / sell-side liquidity at equal highs/lows. Marks sweep events when price wicks through and reverses.</p></div>
+<div class="mod"><h3>SMC Order Blocks MTF</h3><p>Last up/down candle before impulse. HTF overlay, fresh vs tested zones, OB strength score.</p></div>
+<div class="mod"><h3>SMC Session Levels</h3><p>Asia / London / New York session high-low lines for liquidity context.</p></div>
+
+<h2>Free FVG Lite preview</h2>
+<div class="preview">//@version=5
+indicator("SMC FVG Lite", overlay=true)
+isBullFVG = low[0] > high[2]
+isBearFVG = high[0] < low[2]
+// Full code in zip + dev.to article</div>
+
+<h2>Who it's for</h2>
+<ul class="check">
+<li>TradingView users who trade SMC (FVG, order blocks, liquidity sweeps)</li>
+<li>Traders tired of $40/mo indicator subscriptions who want one-time files they own</li>
+<li>Anyone who read Orion's dev.to breakdown and wants the full suite cheaper</li>
+</ul>
+
+<h2>Honest heads-up</h2>
+<div class="refund">
+<p>These indicators <strong>mark zones</strong> — they do not generate entry signals or guarantee profits. We don't trade live accounts. Clone of Orion nexusai82 buyer channel shape (dev.to → Gumroad CTA).</p>
+<p><strong>30-day money-back guarantee.</strong> Email support@toolkitlabs.org with your Stripe receipt.</p>
+</div>
+
+<div class="cross">
+<strong>Stack with Orion's other clones:</strong>
+<a href="../ledger/">SellerLedger CLI</a> ·
+<a href="../landing-playbook/">Landing Page Playbook</a> ·
+<a href="../weekend-micro-saas/">Weekend Micro-SaaS Kit</a> ·
+<a href="../builder-public/tools.html">All products</a>
+</div>
+
+<footer>CC0 · <a href="https://toolkitlabs.org">Toolkit Labs</a> · clone of <a href="https://nexusai82.gumroad.com/l/pine-smc">Orion pine-smc</a></footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,53 @@
+// © Toolkit Labs 2026 — clone of Orion SMC FVG Pro (nexusai82.gumroad.com/l/pine-smc)
+//@version=5
+indicator("SMC FVG Pro — Toolkit Labs", overlay=true, max_boxes_count=300)
+
+htfTf       = input.timeframe("240", "Higher timeframe overlay", group="MTF")
+minGapAtr   = input.float(0.15, "Min gap size (× ATR)", minval=0.05, step=0.05, group="Filters")
+showHtf     = input.bool(true, "Plot HTF gaps on chart", group="MTF")
+showStrength= input.bool(true, "Classify gap strength", group="Display")
+bullCol     = input.color(color.new(#26a69a, 75), "Bullish", group="Colours")
+bearCol     = input.color(color.new(#ef5350, 75), "Bearish", group="Colours")
+atrLen      = input.int(14, "ATR length", group="Filters")
+
+atr = ta.atr(atrLen)
+
+isBullFVG = low > high[2]
+isBearFVG = high < low[2]
+bullGap   = low - high[2]
+bearGap   = low[2] - high
+bullOk    = isBullFVG and bullGap >= atr * minGapAtr
+bearOk    = isBearFVG and bearGap >= atr * minGapAtr
+
+strength(float gap) =>
+    gap < atr * 0.5 ? "S" : gap < atr * 1.5 ? "M" : "L"
+
+var box[] boxes = array.new_box()
+var line[] midlines = array.new_line()
+
+if bullOk
+    col = showStrength ? (strength(bullGap) == "L" ? color.new(#26a69a, 60) : strength(bullGap) == "M" ? bullCol : color.new(#26a69a, 88)) : bullCol
+    b = box.new(bar_index - 2, low, bar_index + 30, high[2], bgcolor=col, border_color=color.new(#26a69a, 20))
+    array.push(boxes, b)
+    mid = (low + high[2]) / 2
+    array.push(midlines, line.new(bar_index - 2, mid, bar_index + 30, mid, color=color.new(#26a69a, 40), style=line.style_dashed))
+    alert("Bullish FVG Pro: price entering gap zone", alert.freq_once_per_bar)
+
+if bearOk
+    col = showStrength ? (strength(bearGap) == "L" ? color.new(#ef5350, 60) : strength(bearGap) == "M" ? bearCol : color.new(#ef5350, 88)) : bearCol
+    b = box.new(bar_index - 2, low[2], bar_index + 30, high, bgcolor=col, border_color=color.new(#ef5350, 20))
+    array.push(boxes, b)
+    mid = (low[2] + high) / 2
+    array.push(midlines, line.new(bar_index - 2, mid, bar_index + 30, mid, color=color.new(#ef5350, 40), style=line.style_dashed))
+    alert("Bearish FVG Pro: price entering gap zone", alert.freq_once_per_bar)
+
+// HTF overlay via request.security
+htfBull = request.security(syminfo.tickerid, htfTf, low > high[2], barmerge.gaps_off, barmerge.lookahead_off)
+htfBear = request.security(syminfo.tickerid, htfTf, high < low[2], barmerge.gaps_off, barmerge.lookahead_off)
+plotshape(showHtf and htfBull, title="HTF Bull FVG", style=shape.triangleup, location=location.belowbar, color=color.new(#26a69a, 0), size=size.tiny)
+plotshape(showHtf and htfBear, title="HTF Bear FVG", style=shape.triangledown, location=location.abovebar, color=color.new(#ef5350, 0), size=size.tiny)
+
+while array.size(boxes) > 100
+    box.delete(array.shift(boxes))
+while array.size(midlines) > 100
+    line.delete(array.shift(midlines))

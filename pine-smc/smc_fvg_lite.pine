@@ -1,0 +1,53 @@
+// This Pine Script® code is subject to the terms of the Mozilla Public License 2.0
+// © Toolkit Labs 2026 — clone of Orion SMC FVG Lite (dev.to/4219970)
+//@version=5
+indicator("SMC FVG Lite [Free] — Toolkit Labs", overlay=true, max_boxes_count=200)
+
+lookback    = input.int(100, "Lookback candles", minval=10, maxval=500, group="Settings")
+showBull    = input.bool(true, "Show bullish FVGs", group="Settings")
+showBear    = input.bool(true, "Show bearish FVGs", group="Settings")
+bullCol     = input.color(color.new(color.green, 80), "Bullish FVG colour", group="Settings")
+bearCol     = input.color(color.new(color.red, 80), "Bearish FVG colour", group="Settings")
+mitigated   = input.bool(true, "Remove when mitigated", group="Settings")
+
+isRecent  = last_bar_index - bar_index <= lookback
+isBullFVG = low[0] > high[2] and isRecent
+isBearFVG = high[0] < low[2] and isRecent
+
+var box[] bullBoxes = array.new_box()
+var box[] bearBoxes = array.new_box()
+
+if isBullFVG and showBull
+    b = box.new(bar_index - 2, low[0], bar_index, high[2], border_color=na, bgcolor=bullCol)
+    array.push(bullBoxes, b)
+
+if isBearFVG and showBear
+    b = box.new(bar_index - 2, low[2], bar_index, high[0], border_color=na, bgcolor=bearCol)
+    array.push(bearBoxes, b)
+
+for b in bullBoxes
+    box.set_right(b, bar_index)
+for b in bearBoxes
+    box.set_right(b, bar_index)
+
+if mitigated and array.size(bullBoxes) > 0
+    for i = array.size(bullBoxes) - 1 to 0
+        b = array.get(bullBoxes, i)
+        if close >= box.get_bottom(b) and close <= box.get_top(b)
+            box.delete(b)
+            array.remove(bullBoxes, i)
+
+if mitigated and array.size(bearBoxes) > 0
+    for i = array.size(bearBoxes) - 1 to 0
+        b = array.get(bearBoxes, i)
+        if close >= box.get_bottom(b) and close <= box.get_top(b)
+            box.delete(b)
+            array.remove(bearBoxes, i)
+
+while array.size(bullBoxes) > lookback
+    box.delete(array.shift(bullBoxes))
+while array.size(bearBoxes) > lookback
+    box.delete(array.shift(bearBoxes))
+
+alertcondition(isBullFVG, "Bullish FVG", "Bullish FVG detected")
+alertcondition(isBearFVG, "Bearish FVG", "Bearish FVG detected")
