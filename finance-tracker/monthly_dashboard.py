@@ -545,6 +545,43 @@ def summarize_monthly_dashboard(rows, month=None):
     print(f"  Other months in log: {months_available}")
 
 
+def summarize_month_switching(rows, month=None):
+    """Quillenhart one-click month switching + hemantdev/1iae complete workbook shape."""
+    by_month = defaultdict(lambda: {"income": 0.0, "expense": 0.0})
+    for r in rows:
+        key = r["date"].strftime("%Y-%m")
+        if r["type"] == "income" or r["amount"] > 0:
+            by_month[key]["income"] += abs(r["amount"])
+        else:
+            by_month[key]["expense"] += abs(r["amount"])
+    months = sorted(by_month)
+    if not months:
+        return
+    selected = month or months[-1]
+    print("\n=== ONE-CLICK MONTH SWITCHING (Quillenhart qaduu core feature) ===")
+    print("  Gumroad: pick any month from dropdown — dashboard updates instantly")
+    print("  CLI: FINANCE_MONTH=YYYY-MM python3 monthly_dashboard.py <log.csv>")
+    print(f"  Available months ({len(months)}): {', '.join(months)}")
+    print(f"  Active month: {selected}")
+    for m in months:
+        net = by_month[m]["income"] - by_month[m]["expense"]
+        marker = " ← selected" if m == selected else ""
+        print(f"    {m}  net ${net:,.2f}{marker}")
+    print("\n=== COMPLETE WORKBOOK (hemantdev/1iae — Excel, no Notion) ===")
+    print("  Six connected views — one file, offline, no subscription:")
+    views = [
+        ("Dashboard", "month switch + P&L", selected),
+        ("Transactions", "master income/expense log", f"{len(rows)} rows"),
+        ("Bills · Debt · Savings", "recurring trackers", "load CSV args"),
+        ("Invoices", "accounts receivable", "invoices CSV"),
+        ("Tax Estimator", "quarterly set-aside", f"{TAX_SET_ASIDE_PCT:.0f}% of net"),
+        ("Annual Summary", "YTD + chart", "see YTD block"),
+    ]
+    for name, desc, status in views:
+        print(f"    {name:22} {desc:28} [{status}]")
+    print("  Guide: complete-system-guide.md")
+
+
 def print_annual_income_expense_chart(by_month, width=20):
     """Quillenhart qaduu Annual Summary tab: 12-month income vs expenses chart."""
     if not by_month:
@@ -884,6 +921,7 @@ def main():
     summarize_transactions_log(rows)
     summarize_ytd_totals(rows)
     summarize_monthly_dashboard(rows, month=month_arg)
+    summarize_month_switching(rows, month=month_arg)
     summarize(rows)
     summarize_category_breakdown(rows)
     summarize_tax_withholding(rows)
