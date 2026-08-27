@@ -172,13 +172,92 @@ def summarize_1099k_reconciliation(trans_rows):
     print("  Guide: 1099k-guide.md · 1099k-freelance-sample.csv")
 
 
+def summarize_bills(path):
+    rows = []
+    with open(path, newline="", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            try:
+                amt = float(row["amount"])
+            except (KeyError, ValueError):
+                continue
+            status = row.get("status", "pending").strip().lower() or "pending"
+            rows.append({
+                "bill": row.get("bill", "").strip(),
+                "amount": amt,
+                "frequency": row.get("frequency", "monthly").strip().lower(),
+                "status": status,
+            })
+    if not rows:
+        return
+    paid = [r for r in rows if r["status"] == "paid"]
+    pending = [r for r in rows if r["status"] != "paid"]
+    monthly_equiv = 0.0
+    for r in rows:
+        freq = r["frequency"]
+        if freq == "monthly":
+            monthly_equiv += r["amount"]
+        elif freq == "quarterly":
+            monthly_equiv += r["amount"] / 3
+        elif freq == "yearly":
+            monthly_equiv += r["amount"] / 12
+        else:
+            monthly_equiv += r["amount"]
+    print("\n=== RECURRING BILLS (By the Loop expense tab + crazychief/jg5 shape) ===")
+    print(f"  Bills tracked: {len(rows)}")
+    print(f"  Marked paid this cycle: {len(paid)} (${sum(r['amount'] for r in paid):,.2f})")
+    print(f"  Still pending: {len(pending)} (${sum(r['amount'] for r in pending):,.2f})")
+    print(f"  Est. monthly fixed load: ${monthly_equiv:,.2f}")
+    print("  Guide: bills-debt-guide.md · bills-sample.csv")
+
+
+def summarize_debt(path, ytd_net=None):
+    rows = []
+    with open(path, newline="", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            try:
+                cur = float(row["current_balance"])
+                min_p = float(row.get("min_payment", 0) or 0)
+            except (KeyError, ValueError):
+                continue
+            rows.append({
+                "creditor": row.get("creditor", "").strip(),
+                "current_balance": cur,
+                "min_payment": min_p,
+                "apr": row.get("apr", "").strip(),
+            })
+    if not rows:
+        return
+    total_balance = sum(r["current_balance"] for r in rows)
+    total_min = sum(r["min_payment"] for r in rows)
+    print("\n=== DEBT MINIMUMS (crazychief/jg5 shape) ===")
+    print(f"  Accounts tracked: {len(rows)}")
+    print(f"  Total current balance: ${total_balance:,.2f}")
+    print(f"  Total minimum payments: ${total_min:,.2f}/month")
+    for r in rows:
+        apr = f" @ {r['apr']}%" if r["apr"] else ""
+        print(f"    {r['creditor']}: ${r['current_balance']:,.2f} (min ${r['min_payment']:,.2f}{apr})")
+    if ytd_net is not None:
+        if ytd_net >= total_min:
+            surplus = ytd_net - total_min
+            print(f"  YTD net covers minimums: yes — ${surplus:,.2f} surplus after min payments")
+        else:
+            gap = total_min - ytd_net
+            print(f"  YTD net covers minimums: NO — short ${gap:,.2f} (net profit < debt minimums)")
+    print("  Guide: bills-debt-guide.md · debt-sample.csv")
+
+
 def main():
     if len(sys.argv) >= 3 and sys.argv[1] == "--1099k":
         summarize_1099k_reconciliation(load_transaction_log(sys.argv[2]))
         return
+    if len(sys.argv) >= 4 and sys.argv[1] == "--bills-debt":
+        summarize_bills(sys.argv[2])
+        summarize_debt(sys.argv[3])
+        return
     if len(sys.argv) < 3:
         print("Usage: python3 freelance_finance_os.py invoice-log.csv expense-log.csv [subscriptions.csv] [bills.csv] [debt.csv]")
         print("       python3 freelance_finance_os.py --1099k 1099k-freelance-sample.csv")
+        print("       python3 freelance_finance_os.py --bills-debt bills-sample.csv debt-sample.csv")
         sys.exit(1)
 
     invoices = load_invoices(sys.argv[1])
@@ -270,6 +349,10 @@ def main():
     debt_path = extra[2] if len(extra) >= 3 and extra[2] else None
     if subs_path:
         summarize_subscription_audit(subs_path)
+    if bills_path:
+        summarize_bills(bills_path)
+    if debt_path:
+        summarize_debt(debt_path, ytd_net=net_profit)
     summarize_cash_runway(invoices, expense_rows, bills_path, debt_path)
 
 
