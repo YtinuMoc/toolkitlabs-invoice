@@ -51,6 +51,91 @@ def load_rows(path):
     return rows
 
 
+def bills_monthly_load(path):
+    rows = []
+    with open(path, newline="", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            try:
+                amt = float(row["amount"])
+            except (KeyError, ValueError):
+                continue
+            rows.append({
+                "amount": amt,
+                "frequency": row.get("frequency", "monthly").strip().lower(),
+            })
+    monthly_equiv = 0.0
+    for r in rows:
+        freq = r["frequency"]
+        if freq == "monthly":
+            monthly_equiv += r["amount"]
+        elif freq == "quarterly":
+            monthly_equiv += r["amount"] / 3
+        elif freq == "yearly":
+            monthly_equiv += r["amount"] / 12
+        else:
+            monthly_equiv += r["amount"]
+    return monthly_equiv, len(rows)
+
+
+def debt_monthly_minimum(path):
+    rows = []
+    with open(path, newline="", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            try:
+                min_p = float(row.get("min_payment", 0) or 0)
+            except (KeyError, ValueError):
+                continue
+            rows.append(min_p)
+    return sum(rows), len(rows)
+
+
+def summarize_net_income_visibility(
+    ytd_income,
+    ytd_expense,
+    ytd_net,
+    months_logged,
+    bills_monthly=0.0,
+    debt_min=0.0,
+):
+    """faisalmq/5797: payment lands — how much is actually yours to spend?"""
+    if ytd_income <= 0 and ytd_net <= 0:
+        return
+    tax_reserve_ytd = max(0.0, ytd_net * (TAX_SET_ASIDE_PCT / 100))
+    months_logged = max(1, months_logged)
+    monthly_net_avg = ytd_net / months_logged
+    monthly_tax = tax_reserve_ytd / months_logged
+    monthly_obligations = bills_monthly + debt_min + monthly_tax
+    reserve_rate = TAX_SET_ASIDE_PCT / 100
+    breakeven_gross = (
+        monthly_obligations / (1 - reserve_rate) if monthly_obligations > 0 and reserve_rate < 1 else 0.0
+    )
+    spendable_monthly = max(0.0, monthly_net_avg - bills_monthly - debt_min - monthly_tax)
+    print("\n=== NET INCOME VISIBILITY (faisalmq/5797 shape) ===")
+    print("  Payment landed → is it for taxes, subscriptions, or profit you can spend?")
+    print(f"  YTD gross deposits: ${ytd_income:,.2f}")
+    print(f"  YTD business expenses: ${ytd_expense:,.2f}")
+    print(f"  YTD net profit: ${ytd_net:,.2f}")
+    print(
+        f"  Tax reserve ({TAX_SET_ASIDE_PCT:.0f}% of net): "
+        f"${tax_reserve_ytd:,.2f} (${monthly_tax:,.2f}/mo avg)"
+    )
+    print(f"  Monthly subscription load: ${bills_monthly:,.2f}/mo")
+    print(f"  Monthly debt minimums: ${debt_min:,.2f}/mo")
+    print(f"  Monthly obligations (tax + bills + debt): ${monthly_obligations:,.2f}/mo")
+    if breakeven_gross > 0:
+        print(
+            f"  Break-even monthly revenue (cover obligations at {TAX_SET_ASIDE_PCT:.0f}% reserve): "
+            f"${breakeven_gross:,.2f}/mo"
+        )
+    print(f"  Est. spendable after obligations (monthly avg): ${spendable_monthly:,.2f}/mo")
+    if ytd_income > 0:
+        print(
+            f"  Financial fog check: ${ytd_income:,.2f} gross deposits ≠ "
+            f"~${spendable_monthly:,.2f}/mo actually spendable"
+        )
+    print("  Guide: net-income-visibility-guide.md · faisalmq/5797 buyer channel clone")
+
+
 def summarize_bills(path):
     rows = []
     with open(path, newline="", encoding="utf-8") as f:
@@ -738,6 +823,19 @@ def main():
     if calculators_path:
         summarize_finance_calculators(calculators_path)
     summarize_command_center(rows, invoice_path=invoice_path)
+    bills_monthly = debt_min = 0.0
+    if bills_path:
+        bills_monthly, _ = bills_monthly_load(bills_path)
+    if debt_path:
+        debt_min, _ = debt_monthly_minimum(debt_path)
+    summarize_net_income_visibility(
+        ytd_income,
+        ytd_expense,
+        ytd_net,
+        len(by_month),
+        bills_monthly=bills_monthly,
+        debt_min=debt_min,
+    )
 
 
 if __name__ == "__main__":
