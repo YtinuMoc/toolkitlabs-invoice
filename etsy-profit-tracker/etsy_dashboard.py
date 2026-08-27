@@ -27,11 +27,11 @@ def calc_fees(gross, qty, offsite, high_volume):
         offsite_fee = gross * rate
     total = listing + transaction + processing + offsite_fee
     return {
-        "listing": round(listing, 2),
-        "transaction": round(transaction, 2),
-        "processing": round(processing, 2),
-        "offsite": round(offsite_fee, 2),
-        "total": round(total, 2),
+        "listing_fee": round(listing, 2),
+        "transaction_fee": round(transaction, 2),
+        "processing_fee": round(processing, 2),
+        "offsite_fee": round(offsite_fee, 2),
+        "total_fees": round(total, 2),
         "net": round(gross - total, 2),
     }
 
@@ -63,7 +63,7 @@ def load_sales(path):
 
 def print_dashboard(rows):
     gross = sum(r["gross"] for r in rows)
-    fees = sum(r["total"] for r in rows)
+    fees = sum(r["total_fees"] for r in rows)
     net = sum(r["net"] for r in rows)
     margin = (net / gross * 100) if gross else 0.0
     print("\n=== DASHBOARD (PattyBun ejmzqy clone) ===")
@@ -80,7 +80,7 @@ def print_monthly_summary(rows):
         mk = r["date"].strftime("%Y-%m")
         m = monthly[mk]
         m["gross"] += r["gross"]
-        m["fees"] += r["total"]
+        m["fees"] += r["total_fees"]
         m["net"] += r["net"]
         m["count"] += 1
     print("\n=== MONTHLY SUMMARY (PattyBun tab 3 — 24 months) ===")
@@ -99,7 +99,7 @@ def print_listing_performance(rows):
         p = perf[r["listing"]]
         p["units"] += r["qty"]
         p["gross"] += r["gross"]
-        p["fees"] += r["total"]
+        p["fees"] += r["total_fees"]
         p["net"] += r["net"]
     ranked = sorted(perf, key=lambda k: perf[k]["net"], reverse=True)
     print("\n=== LISTING PERFORMANCE (PattyBun tab 4) ===")
@@ -117,11 +117,11 @@ def print_fee_calculator(price, qty=1, offsite=False, high_volume=False):
     f = calc_fees(gross, qty, offsite, high_volume)
     print("\n=== FEE CALCULATOR (PattyBun tab 5 — what-if) ===")
     print(f"  Sale price ${price:.2f} × qty {qty} = gross ${gross:.2f}")
-    print(f"  Listing fee:      ${f['listing']:.2f}")
-    print(f"  Transaction (6.5%): ${f['transaction']:.2f}")
-    print(f"  Processing (3%+$0.25): ${f['processing']:.2f}")
-    print(f"  Offsite ads:      ${f['offsite']:.2f}")
-    print(f"  Total fees:       ${f['total']:.2f}")
+    print(f"  Listing fee:      ${f['listing_fee']:.2f}")
+    print(f"  Transaction (6.5%): ${f['transaction_fee']:.2f}")
+    print(f"  Processing (3%+$0.25): ${f['processing_fee']:.2f}")
+    print(f"  Offsite ads:      ${f['offsite_fee']:.2f}")
+    print(f"  Total fees:       ${f['total_fees']:.2f}")
     print(f"  NET PROFIT:       ${f['net']:.2f}")
     margin = (f["net"] / gross * 100) if gross else 0.0
     print(f"  Margin:           {margin:.1f}%")
@@ -145,8 +145,8 @@ def print_sales_log(rows):
     for r in sorted(rows, key=lambda x: x["date"]):
         print(
             f"  {r['date'].strftime('%Y-%m-%d')}  {r['listing'][:22]:22s}  "
-            f"${r['gross']:6.2f}  ${r['listing']:4.2f}  ${r['transaction']:5.2f}  "
-            f"${r['processing']:5.2f}  ${r['offsite']:6.2f}  ${r['total']:5.2f}  ${r['net']:6.2f}"
+            f"${r['gross']:6.2f}  ${r['listing_fee']:4.2f}  ${r['transaction_fee']:5.2f}  "
+            f"${r['processing_fee']:5.2f}  ${r['offsite_fee']:6.2f}  ${r['total_fees']:5.2f}  ${r['net']:6.2f}"
         )
 
 
