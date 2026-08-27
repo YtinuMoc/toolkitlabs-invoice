@@ -939,6 +939,29 @@ def summarize_command_center(rows, invoice_path=None):
     print("  Guide: command-center-guide.md · timmothybuilder/4e81 buyer channel clone")
 
 
+def summarize_all_in_one_replacement(rows, invoice_path=None, bills_path=None, savings_path=None):
+    """Quillenhart replaces 4 apps + faisalmq/54h7 five-minute weekly check-in."""
+    tx_count = len(rows)
+    has_invoices = bool(invoice_path)
+    has_bills = bool(bills_path)
+    has_savings = bool(savings_path)
+    months = len({r["date"].strftime("%Y-%m") for r in rows})
+    print("\n=== ALL-IN-ONE REPLACEMENT (Quillenhart qaduu — nothing extra to buy) ===")
+    print("  One file replaces four paid tools — faisalmq/54h7 five-minute weekly check-in:")
+    replacements = [
+        ("Bookkeeping app", "$15–30/mo", "Transactions + Dashboard", tx_count > 0),
+        ("Budget planner", "$8–15/mo", "Bills + Savings tabs", has_bills or has_savings),
+        ("Invoice tracker", "$15–25/mo", "Invoices receivable", has_invoices),
+        ("P&L report", "ad hoc", "Monthly P&L + Annual Summary", months >= 1),
+    ]
+    for app, cost, tab, active in replacements:
+        status = "active" if active else "add data"
+        print(f"    {app:20} ({cost:>10}) → {tab:28} [{status}]")
+    weekly_mins = 5
+    print(f"  Weekly ritual: log transactions (2m) · mark bills (1m) · run dashboard ({weekly_mins - 3}m)")
+    print("  Guide: all-in-one-guide.md · faisalmq/54h7 buyer channel clone")
+
+
 def summarize_spreadsheet_system(rows):
     """crazychief/52ge: book principles → transaction log vessel → hardened behavior."""
     months = sorted({r["date"].strftime("%Y-%m") for r in rows})
@@ -977,6 +1000,12 @@ def main():
         sys.exit(1)
     summarize_setup_readme()
     summarize_beginner_friendly(rows)
+    summarize_all_in_one_replacement(
+        rows,
+        invoice_path=invoice_path,
+        bills_path=bills_path,
+        savings_path=savings_path,
+    )
     summarize_colorways()
     summarize_transactions_log(rows)
     summarize_ytd_totals(rows)
