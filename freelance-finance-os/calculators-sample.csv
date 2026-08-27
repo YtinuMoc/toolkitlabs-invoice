@@ -1,0 +1,6 @@
+calculator,label,principal,monthly_contribution,annual_rate,years,annual_spending,withdrawal_rate,target_income,hours_per_week,admin_pct,benefits_pct,target,initial
+compound,Freelance surplus index fund,5000,400,7,20,,,,,,,
+fire,Contractor FIRE path,80000,1500,7,,35000,4,,,,,
+freelance,Freelance floor rate,,,,,,,90000,28,25,15,,
+dca,Monthly brokerage DCA,0,300,8,15,,,,,,,
+savings,Emergency fund (3 mo),,400,4.5,,,,,,,12000,2500
