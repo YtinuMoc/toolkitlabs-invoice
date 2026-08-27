@@ -4,7 +4,7 @@ import csv
 import os
 import sys
 from collections import defaultdict
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 
 TAX_BUFFER_PCT = 25.0
 
@@ -371,6 +371,78 @@ def clean_dirty_invoices(path):
     return clean, errors, len(rows_in)
 
 
+FOLLOW_UP_CADENCE_DAYS = (1, 3, 7, 14, 30)
+
+
+def summarize_payment_follow_up(invoices_path, payments_path=None):
+    """agentchip/11n6: overdue invoice follow-up cadence preview — no email send."""
+    invoices = load_invoices(invoices_path)
+    payments = load_payments(payments_path) if payments_path else {}
+    today = date.today()
+    cadence = []
+    for inv in invoices:
+        if inv["status"] == "paid":
+            continue
+        due = inv.get("due_date", "").strip()
+        if not due:
+            continue
+        try:
+            due_d = datetime.strptime(due, "%Y-%m-%d").date()
+        except ValueError:
+            continue
+        if due_d >= today:
+            continue
+        balance = max(inv["total"] - payments.get(inv["invoice_id"], 0.0), 0.0)
+        if balance <= 0:
+            continue
+        days_late = (today - due_d).days
+        touchpoints = []
+        for day in FOLLOW_UP_CADENCE_DAYS:
+            touch_date = due_d + timedelta(days=day)
+            if touch_date <= today:
+                touchpoints.append((day, touch_date, "DUE" if touch_date == today else "OVERDUE"))
+            elif touch_date == today + timedelta(days=1):
+                touchpoints.append((day, touch_date, "TOMORROW"))
+        next_due = None
+        for day in FOLLOW_UP_CADENCE_DAYS:
+            touch_date = due_d + timedelta(days=day)
+            if touch_date >= today:
+                next_due = (day, touch_date)
+                break
+        cadence.append({
+            "invoice_id": inv["invoice_id"],
+            "client": inv["client"],
+            "balance": balance,
+            "days_late": days_late,
+            "due_date": due,
+            "touchpoints": touchpoints,
+            "next_due": next_due,
+        })
+
+    print("\n=== PAYMENT FOLLOW-UP CADENCE (agentchip/11n6 shape) ===")
+    print("  Preview only — no emails sent. Fixed 1/3/7/14/30-day rhythm after due date.")
+    print(f"  Overdue unpaid invoices: {len(cadence)}")
+    if not cadence:
+        print("  No overdue balances — cadence idle.")
+        return
+    for row in sorted(cadence, key=lambda x: -x["days_late"]):
+        print(f"\n  {row['invoice_id']} · {row['client']} · ${row['balance']:,.2f} · {row['days_late']}d late (due {row['due_date']})")
+        if row["touchpoints"]:
+            due_now = [t for t in row["touchpoints"] if t[2] in ("DUE", "OVERDUE")]
+            if due_now:
+                latest = max(due_now, key=lambda t: t[0])
+                print(f"    → Follow up NOW (touch #{FOLLOW_UP_CADENCE_DAYS.index(latest[0]) + 1} · day +{latest[0]})")
+            for day, touch_date, status in row["touchpoints"]:
+                flag = "← action" if status in ("DUE", "OVERDUE") else status.lower()
+                print(f"    touch +{day}d ({touch_date}): {flag}")
+        if row["next_due"]:
+            day, touch_date = row["next_due"]
+            print(f"    next touch: +{day}d on {touch_date}")
+    print("\n  Template (copy/paste — you send, not this script):")
+    print('    "Hi {{client}} — checking in on invoice {{invoice_id}} (${{balance}}). Let me know if you need anything from my side."')
+    print("  Guide: payment-follow-up-guide.md · agentchip/11n6 buyer channel clone")
+
+
 def summarize_invoice_reconciliation(path):
     """agentchip/47ag: CSV in, reconciliation out — nightly copy-paste ritual killer."""
     clean, errors, raw_count = clean_dirty_invoices(path)
@@ -406,6 +478,7 @@ def print_bundle_stack(manifest_path=None):
     """agentchip/2dgn: separate tools priced individually → one connected workbook stack."""
     modules = [
         ("Invoice + overdue flags", "agentchip/2b11", 15),
+        ("Payment follow-up cadence", "agentchip/11n6", 10),
         ("Subscription auto-renewal audit", "agentchip/52g8", 12),
         ("Cash runway forecast", "agentchip/33mm", 12),
         ("Client dashboard rollup", "built-in", 0),
@@ -468,11 +541,16 @@ def main():
     if len(sys.argv) >= 3 and sys.argv[1] == "--reconcile":
         summarize_invoice_reconciliation(sys.argv[2])
         return
+    if len(sys.argv) >= 3 and sys.argv[1] == "--follow-up":
+        payments_path = sys.argv[3] if len(sys.argv) >= 4 else None
+        summarize_payment_follow_up(sys.argv[2], payments_path)
+        return
     if len(sys.argv) < 4:
         print(
             "Usage: freelancer_invoice_tracker.py clients.csv invoices.csv payments.csv "
             "[subscriptions.csv] [bills.csv] [debt.csv]\n"
-            "       freelancer_invoice_tracker.py --reconcile dirty-invoices.csv",
+            "       freelancer_invoice_tracker.py --reconcile dirty-invoices.csv\n"
+            "       freelancer_invoice_tracker.py --follow-up invoices.csv [payments.csv]",
             file=sys.stderr,
         )
         sys.exit(1)
