@@ -539,6 +539,37 @@ def print_annual_income_expense_chart(by_month, width=20):
     )
 
 
+def summarize_category_breakdown(rows):
+    """raxxostudios/5a8i + Quillenhart qaduu: category-by-category breakdown every month."""
+    print("\n=== CATEGORY BREAKDOWN BY MONTH (raxxostudios/5a8i + Quillenhart qaduu) ===")
+    print("  12 categories is the sweet spot — fewer and the P&L is useless")
+    by_month_cat = defaultdict(lambda: defaultdict(float))
+    cat_totals = defaultdict(float)
+    for r in rows:
+        if r["type"] == "income" or r["amount"] > 0:
+            continue
+        key = r["date"].strftime("%Y-%m")
+        cat = r["category"]
+        amt = abs(r["amount"])
+        by_month_cat[key][cat] += amt
+        cat_totals[cat] += amt
+    if not by_month_cat:
+        print("  No expense rows yet — log negative amounts with category tags")
+        return
+    for month in sorted(by_month_cat):
+        cats = by_month_cat[month]
+        total = sum(cats.values())
+        print(f"\n  {month} — expenses ${total:,.2f}")
+        for cat in sorted(cats, key=lambda c: -cats[c]):
+            pct = (cats[cat] / total * 100) if total else 0
+            print(f"    {cat}: ${cats[cat]:,.2f} ({pct:.0f}%)")
+    annual = sum(cat_totals.values())
+    print(f"\n  YTD expense categories (${annual:,.2f} total):")
+    for cat in sorted(cat_totals, key=lambda c: -cat_totals[c]):
+        pct = (cat_totals[cat] / annual * 100) if annual else 0
+        print(f"    {cat}: ${cat_totals[cat]:,.2f} ({pct:.0f}%)")
+
+
 def summarize(rows):
     by_month = defaultdict(lambda: {"income": 0.0, "expense": 0.0})
     by_cat = defaultdict(float)
@@ -787,6 +818,7 @@ def main():
     summarize_transactions_log(rows)
     summarize_monthly_dashboard(rows, month=month_arg)
     summarize(rows)
+    summarize_category_breakdown(rows)
     summarize_spreadsheet_system(rows)
     ytd_net = None
     by_month = defaultdict(lambda: {"income": 0.0, "expense": 0.0})
