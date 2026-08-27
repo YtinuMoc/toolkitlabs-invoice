@@ -146,6 +146,71 @@ def summarize_savings(path):
     print(f"  Portfolio: ${total_saved:,.2f} / ${total_target:,.2f} ({overall:.0f}% across {len(rows)} goals)")
 
 
+def months_to_goal(target, initial, monthly, annual_rate_pct):
+    if target <= initial:
+        return 0, 0.0, 0.0, initial
+    if monthly <= 0:
+        return None, 0.0, 0.0, initial
+    rate = annual_rate_pct / 100 / 12
+    balance = initial
+    months = 0
+    contributed = 0.0
+    while balance < target and months < 1200:
+        balance += monthly
+        contributed += monthly
+        if rate > 0:
+            balance *= 1 + rate
+        months += 1
+    if balance < target:
+        return None, contributed, 0.0, balance
+    interest = balance - initial - contributed
+    return months, contributed, interest, balance
+
+
+def summarize_savings_calculator(path):
+    rows = []
+    with open(path, newline="", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            try:
+                target = float(row["target"])
+                initial = float(row.get("initial_balance", 0) or 0)
+                monthly = float(row.get("monthly_contribution", 0) or 0)
+                rate = float(row.get("annual_interest_rate", 0) or 0)
+            except (KeyError, ValueError):
+                continue
+            rows.append({
+                "goal": row.get("goal", "").strip(),
+                "target": target,
+                "initial": initial,
+                "monthly": monthly,
+                "rate": rate,
+            })
+    if not rows:
+        return
+    print("\n=== SAVINGS GOAL CALCULATOR (tatelyman/4kcj shape) ===")
+    for r in rows:
+        months, contributed, interest, final = months_to_goal(
+            r["target"], r["initial"], r["monthly"], r["rate"],
+        )
+        label = r["goal"] or "Goal"
+        if months is None:
+            print(
+                f"  {label}: ${r['target']:,.2f} target — unreachable at "
+                f"${r['monthly']:,.2f}/mo from ${r['initial']:,.2f} "
+                f"({r['rate']:.1f}% APR)"
+            )
+            continue
+        yrs = months // 12
+        rem = months % 12
+        when = f"{months} months" if yrs == 0 else f"{yrs}y {rem}m ({months} months)"
+        print(f"  {label}: ${r['target']:,.2f} goal · ${r['initial']:,.2f} starting · ${r['monthly']:,.2f}/mo · {r['rate']:.1f}% APR")
+        print(f"    Time to goal: {when}")
+        print(f"    Total contributed: ${contributed:,.2f}")
+        print(f"    Interest earned: ${interest:,.2f}")
+        print(f"    Final balance: ${final:,.2f}")
+
+
 def summarize_invoices(path):
     rows = []
     with open(path, newline="", encoding="utf-8") as f:
@@ -253,6 +318,7 @@ def main():
     bills_path = sys.argv[3] if len(sys.argv) > 3 else None
     debt_path = sys.argv[4] if len(sys.argv) > 4 else None
     savings_path = sys.argv[5] if len(sys.argv) > 5 else None
+    calc_path = sys.argv[6] if len(sys.argv) > 6 else None
     rows = load_rows(path)
     if not rows:
         print("No transactions found.", file=sys.stderr)
@@ -276,7 +342,14 @@ def main():
     if debt_path:
         summarize_debt(debt_path, ytd_net=ytd_net)
     if savings_path:
-        summarize_savings(savings_path)
+        with open(savings_path, newline="", encoding="utf-8") as f:
+            hdr = csv.DictReader(f).fieldnames or []
+        if "monthly_contribution" in hdr:
+            summarize_savings_calculator(savings_path)
+        else:
+            summarize_savings(savings_path)
+    if calc_path:
+        summarize_savings_calculator(calc_path)
 
 
 if __name__ == "__main__":

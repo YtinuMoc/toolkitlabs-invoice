@@ -39,3 +39,5 @@ Full kit adds bills/debt/invoices trackers + 150-row template. Clone of [Quillen
 - [Debt sample CSV](debt-sample.csv)
 - [Savings goals guide](savings-goals-guide.md)
 - [Savings sample CSV](savings-sample.csv)
+- [Savings calculator guide](savings-calculator-guide.md)
+- [Savings calculator sample CSV](savings-calculator-sample.csv)
