@@ -187,6 +187,27 @@ def main():
     print("  3. Rate calculator     [open rate-calculator.html]")
     print("  4. Quarterly estimator [this run]")
     print_command_center(len(invoices), collected, overdue_cnt, overdue_amt, expense_total, net_profit)
+    print_bundle_strategy()
+
+
+def print_bundle_strategy():
+    """wedgemethoddev/4hgi: individual template SKUs → one bundle at value gap."""
+    tools = (
+        ("Invoice tracker", "$12–29/yr", "Did that client pay? Overdue flags"),
+        ("Expense + tax buffer", "$9–15/yr", "How much to set aside?"),
+        ("Rate calculator", "$5–15", "Am I charging enough?"),
+        ("Quarterly tax estimator", "$10–20", "What to send each quarter?"),
+    )
+    print()
+    print("=== BUNDLE STRATEGY (wedgemethoddev/4hgi + By the Loop $5 OS) ===")
+    print("  Four freelancer pains → one download instead of four subscriptions:")
+    for name, ala_carte, pain in tools:
+        print(f"    {name:24} {ala_carte:12} — {pain}")
+    print("  À la carte floor:      ~$36–79/yr across separate tools + blank-page setup")
+    print("  By the Loop bundle:    $5 one-time (4 xlsx + PDF) — freelance-finance-os")
+    print("  Our clone:             EUR 9 one-time (CSV + CLI + rate calculator HTML)")
+    print("  Bundle math:           perceived value gap — one OS beats four logins")
+    print("  Guide: bundle-strategy-guide.md · wedgemethoddev/4hgi buyer channel clone")
 
 
 def print_command_center(inv_count, collected, overdue_cnt, overdue_amt, expense_total, net_profit):
