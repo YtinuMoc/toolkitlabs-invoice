@@ -615,6 +615,52 @@ def summarize_setup_readme():
     print("    4. Log first month → 5. Run this script → 6. Mark bills in bills-tracker.md")
 
 
+def summarize_transactions_log(rows):
+    """Quillenhart Transactions tab + orion_operator/40gi single-source-of-truth."""
+    months = sorted({r["date"].strftime("%Y-%m") for r in rows})
+    income_rows = [r for r in rows if r["type"] == "income" or r["amount"] > 0]
+    expense_rows = [r for r in rows if r["type"] != "income" and r["amount"] < 0]
+    categories = len({r["category"] for r in rows})
+    span = f"{months[0]} … {months[-1]}" if months else "—"
+    print("\n=== TRANSACTIONS LOG (Quillenhart tab 3 + orion/40gi single source) ===")
+    print(f"  Rows logged: {len(rows)} (template supports 150+)")
+    print(f"  Months covered: {len(months)} ({span})")
+    print(f"  Income events: {len(income_rows)} · Expense events: {len(expense_rows)}")
+    print(f"  Categories in use: {categories}")
+    print("  Rule: one row per money event — dashboard, annual, tax set-aside all pull from here")
+    print("  Guide: transactions-log-guide.md · template: transaction-log-template.csv")
+
+
+def summarize_command_center(rows, invoice_path=None):
+    """timmothybuilder/4e81: five-template stack ending in unified command center."""
+    overdue_total = 0.0
+    overdue_count = 0
+    if invoice_path:
+        with open(invoice_path, newline="", encoding="utf-8") as f:
+            for row in csv.DictReader(f):
+                status = row.get("status", "Pending").strip().lower()
+                if status == "overdue":
+                    try:
+                        overdue_total += float(row["amount"])
+                        overdue_count += 1
+                    except (KeyError, ValueError):
+                        pass
+    tx_count = len(rows)
+    print("\n=== FREELANCER FINANCIAL COMMAND CENTER (timmothybuilder/4e81 shape) ===")
+    print("  Five templates every freelancer needs — #5 unifies the rest:")
+    print(f"  1. Personal finance tracker → transaction log + savings [{('active' if tx_count else 'add rows')}]")
+    print("  2. Client / proposal tracker → invoices receivable module [see AR block if loaded]")
+    print("  3. Content calendar → outside kit [use your own calendar]")
+    print(f"  4. Daily productivity dashboard → monthly dashboard tab [{('active' if tx_count else 'add rows')}]")
+    print(f"  5. Financial command center → full 9-tab Quillenhart system [{('active' if tx_count else 'add rows')}]")
+    if overdue_total > 0:
+        print(
+            f"  Uncollected overdue invoices: ${overdue_total:,.2f} ({overdue_count}) — "
+            "template #5 pays for itself when you find these"
+        )
+    print("  Guide: command-center-guide.md · timmothybuilder/4e81 buyer channel clone")
+
+
 def summarize_spreadsheet_system(rows):
     """crazychief/52ge: book principles → transaction log vessel → hardened behavior."""
     months = sorted({r["date"].strftime("%Y-%m") for r in rows})
@@ -653,6 +699,7 @@ def main():
         sys.exit(1)
     summarize_setup_readme()
     summarize_colorways()
+    summarize_transactions_log(rows)
     summarize_monthly_dashboard(rows, month=month_arg)
     summarize(rows)
     summarize_spreadsheet_system(rows)
@@ -690,6 +737,7 @@ def main():
             summarize_savings_calculator(calc_path)
     if calculators_path:
         summarize_finance_calculators(calculators_path)
+    summarize_command_center(rows, invoice_path=invoice_path)
 
 
 if __name__ == "__main__":
