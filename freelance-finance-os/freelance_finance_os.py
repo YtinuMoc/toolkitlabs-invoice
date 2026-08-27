@@ -77,6 +77,27 @@ def load_expense_rows(path):
     return rows
 
 
+def summarize_accounts_receivable(invoices):
+    """agentchip/2b11 buyer channel — paid vs outstanding vs overdue split."""
+    if not invoices:
+        return
+    paid = [r for r in invoices if r["status"] == "paid"]
+    unpaid = [r for r in invoices if r["status"] not in ("paid", "cancelled")]
+    overdue = [r for r in unpaid if r["overdue"]]
+    paid_total = sum(r["amount"] for r in paid)
+    outstanding_total = sum(r["amount"] for r in unpaid)
+    overdue_total = sum(r["amount"] for r in overdue)
+    print()
+    print("=== ACCOUNTS RECEIVABLE (agentchip/2b11 shape) ===")
+    print(f"  Invoices tracked: {len(invoices)}")
+    print(f"  Paid: {len(paid)} (${paid_total:,.2f})")
+    print(f"  Outstanding: {len(unpaid)} (${outstanding_total:,.2f})")
+    if overdue:
+        print(f"  Overdue: {len(overdue)} (${overdue_total:,.2f}) — chase these first")
+    else:
+        print("  Overdue: 0 — no flagged late invoices")
+
+
 def print_category_breakdown(rows):
     """raxxostudios/5a8i + By the Loop expense tab: category-by-category every month."""
     print("\n=== CATEGORY BREAKDOWN BY MONTH (raxxostudios/5a8i + By the Loop) ===")
@@ -140,6 +161,7 @@ def main():
     print(f"  Collected (paid):    ${collected:,.2f}")
     print(f"  Awaiting payment:    ${awaiting:,.2f}")
     print(f"  Overdue (sent+late): {overdue_cnt} invoices · ${overdue_amt:,.2f}")
+    summarize_accounts_receivable(invoices)
     print()
     print("=== EXPENSE + TAX BUFFER ===")
     print(f"  Expenses YTD:        ${expense_total:,.2f}")
