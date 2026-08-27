@@ -16,6 +16,7 @@ python3 monthly_dashboard.py sample-transactions.csv
 |------|---------|
 | `start-here.md` | Setup in 5 minutes |
 | `spreadsheet-system-guide.md` | crazychief/52ge principles → vessel guide |
+| `tax-stack-guide.md` | tatelyman/3427384 five-layer tax stack guide |
 | `transaction-log-template.csv` | Master income & expense log |
 | `monthly_dashboard.py` | Auto P&L, tax set-aside, category breakdown |
 | `bills-tracker.md` | Recurring bills 12-month grid |

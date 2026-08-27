@@ -18,6 +18,15 @@ UK_TAX_POT_PCT = 28.0  # landolio/5hae 25-30% band
 FEE_CATEGORIES = frozenset({
     "platform_fee", "fulfillment", "creator_commission", "ad_spend", "refund_fee",
 })
+DEDUCTION_CATEGORIES = {
+    "home_office": "Home office",
+    "software": "Software subscriptions",
+    "internet_phone": "Internet/phone (business %)",
+    "health_insurance": "Health insurance premiums",
+    "professional_dev": "Professional development",
+    "mileage": "Mileage",
+    "equipment": "Equipment (Section 179)",
+}
 
 
 def load_rows(path):
@@ -500,6 +509,38 @@ def summarize(rows):
         print(f"  Effective reserve rate on gross: {(reserve_total / ytd_income * 100):.1f}%")
 
 
+def summarize_tax_stack(rows, ytd_net):
+    """tatelyman/3427384: freelancer tax stack checklist + deduction totals."""
+    by_cat = defaultdict(float)
+    for r in rows:
+        if r["type"] != "income" and r["amount"] < 0:
+            by_cat[r["category"]] += abs(r["amount"])
+    print("\n=== FREELANCER TAX STACK (tatelyman/3427384 shape) ===")
+    print("  1. Quarterly estimates → QUARTERLY TAX SET-ASIDE block above")
+    print("  2. Invoice tracking → invoices-tracker.md + ACCOUNTS RECEIVABLE block")
+    print("  3. Rate calculation → take-home-guide.md + TAKE-HOME ESTIMATE block")
+    print("  4. Deduction categories logged in transaction CSV:")
+    logged = False
+    for key, label in DEDUCTION_CATEGORIES.items():
+        amt = by_cat.get(key, 0.0)
+        if amt > 0:
+            print(f"     {label}: ${amt:,.2f}")
+            logged = True
+    other = sum(
+        amt for cat, amt in by_cat.items()
+        if cat not in DEDUCTION_CATEGORIES and cat not in FEE_CATEGORIES
+    )
+    if other > 0:
+        print(f"     Other business expenses: ${other:,.2f}")
+        logged = True
+    if not logged:
+        print("     (none yet — use category keys from tax-stack-guide.md)")
+    print("  5. Retirement — SEP-IRA planning (outside CSV; confirm with CPA)")
+    if ytd_net and ytd_net > 0:
+        se = ytd_net * SE_TAX_RATE
+        print(f"  Stack check: YTD net ${ytd_net:,.2f} · SE tax component ${se:,.2f}")
+
+
 def summarize_spreadsheet_system(rows):
     """crazychief/52ge: book principles → transaction log vessel → hardened behavior."""
     months = sorted({r["date"].strftime("%Y-%m") for r in rows})
@@ -550,6 +591,7 @@ def main():
     ytd_income = sum(m["income"] for m in by_month.values())
     ytd_expense = sum(m["expense"] for m in by_month.values())
     ytd_net = ytd_income - ytd_expense
+    summarize_tax_stack(rows, ytd_net)
     if invoice_path:
         summarize_invoices(invoice_path)
     if bills_path:
