@@ -136,6 +136,42 @@ def summarize_net_income_visibility(
     print("  Guide: net-income-visibility-guide.md · faisalmq/5797 buyer channel clone")
 
 
+def summarize_tax_withholding(rows):
+    """faisalmq/4gao: per-payment tax earmark when deposit lands."""
+    income_rows = [
+        r for r in rows
+        if r["type"] == "income" or r["amount"] > 0
+    ]
+    if not income_rows:
+        return
+    rate = TAX_SET_ASIDE_PCT / 100
+    total_gross = 0.0
+    total_withhold = 0.0
+    print("\n=== TAX WITHHOLDING CALCULATOR (faisalmq/4gao shape) ===")
+    print(
+        f"  Deposit landed → earmark {TAX_SET_ASIDE_PCT:.0f}% for taxes "
+        "(Quillenhart quarterly set-aside promise)"
+    )
+    print("  date       | gross      | withhold   | spendable est.")
+    for r in sorted(income_rows, key=lambda x: x["date"]):
+        gross = abs(r["amount"])
+        withhold = gross * rate
+        spendable = gross - withhold
+        total_gross += gross
+        total_withhold += withhold
+        desc = (r["description"] or r["category"])[:28]
+        print(
+            f"  {r['date'].strftime('%Y-%m-%d')} | ${gross:>9,.2f} | "
+            f"${withhold:>9,.2f} | ${spendable:>9,.2f}  ({desc})"
+        )
+    quarters = max(1, len({r["date"].strftime("%Y-%m") for r in income_rows}) / 3)
+    print(f"\n  Total income logged: ${total_gross:,.2f}")
+    print(f"  Total earmarked ({TAX_SET_ASIDE_PCT:.0f}%): ${total_withhold:,.2f}")
+    print(f"  Est. quarterly set-aside: ${total_withhold / quarters:,.2f}")
+    print("  Habit: transfer withhold to tax-only account same day as deposit")
+    print("  Guide: tax-withholding-guide.md · faisalmq/4gao buyer channel clone")
+
+
 def summarize_bills(path):
     rows = []
     with open(path, newline="", encoding="utf-8") as f:
@@ -819,6 +855,7 @@ def main():
     summarize_monthly_dashboard(rows, month=month_arg)
     summarize(rows)
     summarize_category_breakdown(rows)
+    summarize_tax_withholding(rows)
     summarize_spreadsheet_system(rows)
     ytd_net = None
     by_month = defaultdict(lambda: {"income": 0.0, "expense": 0.0})
