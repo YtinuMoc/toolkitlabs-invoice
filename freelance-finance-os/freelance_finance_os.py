@@ -410,6 +410,42 @@ def summarize_dashboard_setup(invoice_path, expense_path, reserve_pct=TAX_BUFFER
     print("  Guide: dashboard-setup-guide.md · invoice-log-template.csv · expense-log-template.csv")
 
 
+def summarize_portable(invoice_path, expense_path, reserve_pct=TAX_BUFFER_PCT):
+    """faisalmq/3gcp: portable freelance finance tracker — single source of truth, any device."""
+    invoices = load_invoices(invoice_path)
+    expense_total, by_cat = load_expenses(expense_path)
+    collected = sum(r["amount"] for r in invoices if r["status"] == "paid")
+    awaiting = sum(r["amount"] for r in invoices if r["status"] == "sent")
+    net_profit = collected - expense_total
+    tax_set_aside = max(net_profit, 0) * reserve_pct / 100
+    take_home = max(net_profit - tax_set_aside, 0)
+    inv_rows = len(invoices)
+    exp_rows = len(load_expense_rows(expense_path))
+    print("=== PORTABLE FREELANCE FINANCE TRACKER (faisalmq/3gcp shape) ===")
+    print("  Vessel: plain CSV logs — sync via Dropbox/iCloud/Git; no Google account.")
+    print("  Update from phone (any CSV editor) or desktop (Excel, Numbers, CLI).")
+    print("  Single source of truth — stop winging it with mental math.")
+    print()
+    print("  Four metrics that matter:")
+    print(f"    Income tracking:     ${collected:,.2f} collected ({inv_rows} invoice rows)")
+    print(f"    Expense categories:  ${expense_total:,.2f} ({exp_rows} expense rows)")
+    if by_cat:
+        top_cats = sorted(by_cat.items(), key=lambda x: -x[1])[:4]
+        for cat, amt in top_cats:
+            print(f"      · {cat}: ${amt:,.2f}")
+    print(f"    Tax estimation:      ${tax_set_aside:,.2f} set aside ({reserve_pct:.0f}% of net)")
+    print(f"    Net profit view:     ${net_profit:,.2f} → take-home ${take_home:,.2f}")
+    if awaiting > 0:
+        print(f"    Awaiting payment:    ${awaiting:,.2f} (logged, not spendable)")
+    print()
+    print("  Portability checklist:")
+    print("    [x] Plain-text CSV — opens everywhere")
+    print("    [x] No subscription — one-time kit")
+    print("    [x] Offline CLI preview — python3 freelance_finance_os.py --portable …")
+    print("    [x] Expandable — duplicate template rows as you grow")
+    print("  Guide: portable-tracker-guide.md · invoice-log-sample.csv · expense-log-sample.csv")
+
+
 def summarize_take_home(invoice_path, expense_path, reserve_pct=TAKE_HOME_RESERVE_PCT):
     """marginmap/14ag: gross → net → SE tax component → reserve → take-home."""
     invoices = load_invoices(invoice_path)
@@ -489,6 +525,10 @@ def main():
         pct = float(sys.argv[4]) if len(sys.argv) >= 5 else TAX_BUFFER_PCT
         summarize_dashboard_setup(sys.argv[2], sys.argv[3], reserve_pct=pct)
         return
+    if len(sys.argv) >= 4 and sys.argv[1] == "--portable":
+        pct = float(sys.argv[4]) if len(sys.argv) >= 5 else TAX_BUFFER_PCT
+        summarize_portable(sys.argv[2], sys.argv[3], reserve_pct=pct)
+        return
     if len(sys.argv) < 3:
         print("Usage: python3 freelance_finance_os.py invoice-log.csv expense-log.csv [subscriptions.csv] [bills.csv] [debt.csv] [savings.csv]")
         print("       python3 freelance_finance_os.py --1099k 1099k-freelance-sample.csv")
@@ -498,6 +538,7 @@ def main():
         print("       python3 freelance_finance_os.py --six-month-reveal invoice-log.csv expense-log.csv client-hours.csv [subscriptions.csv]")
         print("       python3 freelance_finance_os.py --take-home invoice-log.csv expense-log.csv [reserve_pct]")
         print("       python3 freelance_finance_os.py --dashboard invoice-log.csv expense-log.csv [reserve_pct]")
+        print("       python3 freelance_finance_os.py --portable invoice-log.csv expense-log.csv [reserve_pct]")
         sys.exit(1)
 
     invoices = load_invoices(sys.argv[1])
