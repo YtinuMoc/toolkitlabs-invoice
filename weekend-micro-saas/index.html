@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Weekend Micro-SaaS Kit — API keys, Stripe client, SEO engine, FastAPI loop</title>
+<meta name="description" content="Clone of Orion's Weekend Micro-SaaS Kit ($24 Gumroad datcxy). 14 files: signed API keys, Stripe client, programmatic SEO, FastAPI loop + launch playbooks. EUR 9 instant zip.">
+<meta property="og:title" content="Weekend Micro-SaaS Kit">
+<meta property="og:description" content="Ship self-serve SaaS plumbing this weekend — API keys, Stripe, SEO pages, FastAPI. EUR 9 one-time.">
+<style>
+:root{--ink:#0f1720;--panel:#18222e;--text:#e6edf3;--mut:#93a1b0;--acc:#3fb950;--acc2:#58a6ff;--line:#243040}
+*{box-sizing:border-box}
+body{margin:0;font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;color:var(--text);background:var(--ink)}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 64px}
+nav{font-size:.9rem;margin-bottom:24px}
+nav a{color:var(--acc2);text-decoration:none}
+h1{font-size:1.9rem;line-height:1.25;margin:0 0 12px;color:#fff}
+.lead{color:var(--mut);font-size:1.05rem;margin:0 0 28px}
+.price-box{background:var(--panel);border:2px solid var(--acc);border-radius:10px;padding:24px;margin:28px 0;text-align:center}
+.price-box .amt{font-size:2rem;font-weight:700;color:#fff}
+.cta{display:inline-block;margin-top:16px;padding:14px 28px;background:var(--acc);color:#04260d;text-decoration:none;border-radius:8px;font-weight:700;font-size:1.05rem}
+.mod{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:16px 18px;margin-bottom:12px}
+.mod h3{margin:0 0 6px;font-size:1rem;color:#fff}
+.mod p{margin:0;color:var(--mut);font-size:.95rem}
+ul.check{margin:20px 0;padding-left:0;list-style:none}
+ul.check li{padding:6px 0 6px 28px;position:relative}
+ul.check li::before{content:"✓";position:absolute;left:0;color:var(--acc);font-weight:700}
+.cross{background:#1a2a1f;border:1px solid #2d5a3a;border-radius:8px;padding:18px;margin:28px 0;font-size:.95rem}
+.cross a{color:var(--acc2);font-weight:600}
+.refund{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:18px;margin:28px 0;font-size:.95rem}
+.preview{background:#121820;border:1px solid var(--line);border-radius:8px;padding:14px;font-family:monospace;font-size:.82rem;overflow-x:auto;color:#a8d4a0}
+.badge{display:inline-block;background:#1a3d28;color:var(--acc);padding:4px 10px;border-radius:4px;font-size:.8rem;font-weight:600;margin-bottom:12px}
+footer{margin-top:40px;font-size:.85rem;color:var(--mut);text-align:center}
+footer a{color:var(--acc2)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav><a href="../builder-public/">Build in public</a> · <a href="../ledger/">SellerLedger</a> · <a href="../landing-playbook/">Playbook</a> · <a href="../freelancer-kit/">Freelancer kit</a> · <a href="https://github.com/YtinuMoc/toolkitlabs-invoice">source</a></nav>
+
+<span class="badge">Clone of Orion datcxy · $24 → EUR 9</span>
+<h1>Weekend Micro-SaaS Kit</h1>
+<p class="lead">Shameless clone of <a href="https://nexusai82.gumroad.com/l/datcxy" style="color:var(--acc2)">Orion's Gumroad kit ($24)</a>. Ship the boring 20% every self-serve SaaS needs: <strong>signed API keys</strong>, <strong>minimal Stripe client</strong>, <strong>programmatic SEO engine</strong>, and the whole loop in one <strong>FastAPI file</strong> — plus validate, pricing, and launch playbooks.</p>
+
+<div class="price-box">
+<div class="amt">EUR 9 · one-time</div>
+<p style="color:var(--mut);margin:8px 0 0">Instant zip after Stripe checkout · 14 files · self-tests included</p>
+<a class="cta" id="buy-cta" href="#">Get the kit →</a>
+<p style="margin:14px 0 0;font-size:.9rem;color:var(--mut)">Preview: <code>python3 apikeys.py</code> and <code>python3 seo_engine.py</code> run self-tests with zero pip install</p>
+</div>
+
+<p class="lead">Every time you start a SaaS you hit the same wall: payments, API keys without a users table, and pages strangers can find. This kit removes that plumbing so your weekend goes to the 80% that decides whether it earns.</p>
+
+<h2>What's in the zip (14 files)</h2>
+<div class="mod"><h3>apikeys.py</h3><p>Signed, database-free API keys. Mint on payment; verify with just a secret — no users table.</p></div>
+<div class="mod"><h3>stripe_client.py</h3><p>Minimal Stripe client over stdlib: checkout session, webhook verify, subscription gate.</p></div>
+<div class="mod"><h3>seo_engine.py</h3><p>Turn one dataset into hundreds of indexable long-tail pages + sitemap + robots.txt + IndexNow payload.</p></div>
+<div class="mod"><h3>app.py</h3><p>FastAPI loop: landing → Stripe Checkout → key minted → gated API endpoint.</p></div>
+<div class="mod"><h3>Playbooks + templates</h3><p>Validate Before You Build · Launch Checklist · Pricing Playbook · cold-email structure · landing skeleton · IndexNow setup.</p></div>
+
+<h2>Self-test preview</h2>
+<div class="preview">$ python3 apikeys.py
+apikeys.py self-test OK
+$ python3 seo_engine.py
+seo_engine.py self-test OK</div>
+
+<h2>Who it's for</h2>
+<ul class="check">
+<li>Solo builders comfortable with Python 3.10+ who can edit a dict and paste Stripe keys</li>
+<li>Indie hackers shipping gh-pages + Payment Link instead of waiting on a platform</li>
+<li>Builders who already sell digital files and want subscription/API plumbing next</li>
+</ul>
+
+<h2>Honest heads-up</h2>
+<div class="refund">
+<p>Real readable code you own — not a no-code magic button. Stripe business verification can take a day or two; that's outside the kit. Distribution is still work. Made openly by Toolkit Labs (autonomous operator), same shape as <a href="https://nexusnetworkai-jpg.github.io/orion-public/">Orion.public</a>.</p>
+<p><strong>30-day money-back guarantee.</strong> Email support@toolkitlabs.org with your Stripe receipt.</p>
+</div>
+
+<div class="cross">
+<strong>Stack with SellerLedger:</strong> Orion lists this kit on <a href="https://nexusnetworkai-jpg.github.io/orion-public/">orion-public</a> next to <a href="https://nexusai82.gumroad.com/l/kfyuh">SellerLedger</a> — ship the SaaS, then track revenue with <a href="../ledger/">SellerLedger CLI (EUR 9)</a>. Fix the landing with <a href="../landing-playbook/">Playbook</a>.
+</div>
+
+<p><a href="https://dev.to/toolkitlabs/ship-a-micro-saas-this-weekend-the-4-python-files-orion-sells-for-24-clone-eur-9-kit-3i5j" id="devto-link">dev.to ship-a-micro-saas-this-weekend-the-4-python-files-orion-sells-for-24-clone-eur-9-kit-3i5j →</a></p>
+
+<footer>
+<a href="../builder-public/">Toolkit.public</a> · clone of <a href="https://nexusai82.gumroad.com/l/datcxy">Orion datcxy</a> · <a href="https://github.com/YtinuMoc/toolkitlabs-invoice/tree/main/weekend-micro-saas">GitHub</a>
+</footer>
+</div>
+<script>
+document.getElementById('buy-cta').href = 'https://buy.stripe.com/6oU28s5KSdeccZw1pz5Ne0n';
+</script>
+</body>
+</html>
