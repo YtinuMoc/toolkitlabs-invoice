@@ -45,7 +45,7 @@ footer a{color:var(--acc)}
 <div class="mod"><h3>📋 Revenue Log</h3><p>Single CSV: date, platform, product, gross. Fee math runs in CLI — clone of tab 2.</p></div>
 <div class="mod"><h3>🏪 Platform Summary</h3><p>Side-by-side Gumroad, Etsy, Shopify, Payhip net by month — clone of tab 3.</p></div>
 <div class="mod"><h3>📦 Product Performance</h3><p>Units, gross, net, platforms, last sale date — clone of tab 4.</p></div>
-<div class="mod"><h3>🚀 Launch Tracker</h3><p>Tag launch-week rows in notes — first-window gross/net — clone of tab 5.</p></div>
+<div class="mod"><h3>🚀 Launch Tracker</h3><p>Tag launch-week rows in notes — 7-day and 30-day gross/net + outcome rating — clone of tab 5. <a href="launch-tracker-guide.md">Guide</a></p></div>
 <div class="mod"><h3>🧾 Tax &amp; Annual Summary</h3><p>Quarterly net + 25% set-aside estimate — clone of tab 6 (US default).</p></div>
 
 <div class="peek">=== DASHBOARD (PattyBun rauxja clone) ===
@@ -56,6 +56,13 @@ footer a{color:var(--acc)}
   Best product (net):  Finance Tracker ($50.30)</div>
 
 <p style="font-size:.95rem;color:var(--muted)">Original seller: <a href="https://pattybun.gumroad.com/l/rauxja">pattybun.gumroad.com/l/rauxja</a> · $14.99 one-time · Works in Google Sheets on Gumroad · our clone ships CSV + CLI for machine delivery.</p>
+
+<h2 style="margin-top:36px;font-size:1.25rem;color:var(--ink)">FAQ</h2>
+<div class="mod"><h3>Do I need special software?</h3><p>No. CSV + Python CLI (stdlib). PattyBun's original works free in Google Sheets and opens in Excel.</p></div>
+<div class="mod"><h3>Other platforms besides Gumroad, Etsy, Shopify, Payhip?</h3><p>Yes — use platform <code>other</code> and set <code>fee=12.34</code> in notes.</p></div>
+<div class="mod"><h3>Auto-sync from Gumroad/Etsy?</h3><p>No — manual entry. The tracker does fee math (same as PattyBun).</p></div>
+<div class="mod"><h3>More products or platforms?</h3><p>Append rows to the revenue log — no CLI row cap.</p></div>
+<div class="mod"><h3>VAT or international tax?</h3><p>25% US set-aside default. Edit <code>TAX_SET_ASIDE_PCT</code> in the CLI for your jurisdiction. <a href="faq.md">Full FAQ</a></p></div>
 </div>
 <footer><a href="../builder-public/tools.html">All Toolkit Labs products</a></footer>
 </body>

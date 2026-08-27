@@ -4,7 +4,7 @@ import csv
 import re
 import sys
 from collections import defaultdict
-from datetime import datetime
+from datetime import datetime, timedelta
 
 PLATFORM_FEES = {
     "gumroad": lambda g: g * 0.10 + 0.50,
@@ -117,9 +117,25 @@ def print_product_performance(rows):
         print(f"  {product:22s}  units {p['units']:3d}  gross ${p['gross']:8,.2f}  net ${p['net']:8,.2f}  platforms [{plats}]  last {last}")
 
 
+def launch_window_totals(sales, start, days):
+    end = start + timedelta(days=days - 1)
+    window = [s for s in sales if start <= s["date"] <= end]
+    return window, sum(s["gross"] for s in window), sum(s["net"] for s in window)
+
+
+def launch_outcome(net_7d):
+    if net_7d >= 200:
+        return "strong"
+    if net_7d >= 50:
+        return "ok"
+    if net_7d > 0:
+        return "weak"
+    return "no traction"
+
+
 def print_launch_tracker(rows):
     launches = [r for r in rows if r["launch"]]
-    print("\n=== LAUNCH TRACKER (rows with 'launch' in notes) ===")
+    print("\n=== LAUNCH TRACKER (PattyBun tab 5 — 7-day + 30-day windows) ===")
     if not launches:
         print("  No launch-tagged rows. Add 'launch' to notes on first-week sales.")
         return
@@ -127,11 +143,15 @@ def print_launch_tracker(rows):
     for r in launches:
         by_product[r["product"]].append(r)
     for product, sales in sorted(by_product.items()):
-        gross = sum(s["gross"] for s in sales)
-        net = sum(s["net"] for s in sales)
-        dates = [s["date"] for s in sales]
-        span = (max(dates) - min(dates)).days + 1
-        print(f"  {product}: {len(sales)} sales in {span}d  gross ${gross:,.2f}  net ${net:,.2f}")
+        sales.sort(key=lambda s: s["date"])
+        start = sales[0]["date"]
+        w7, gross7, net7 = launch_window_totals(sales, start, 7)
+        w30, gross30, net30 = launch_window_totals(sales, start, 30)
+        promo = next((s["notes"] for s in sales if s["notes"] and "launch" not in s["notes"].lower()), "")
+        print(f"  {product}:")
+        print(f"    launch start: {start.strftime('%Y-%m-%d')}  promo: {promo or 'n/a'}")
+        print(f"    7-day:  {len(w7):2d} sales  gross ${gross7:8,.2f}  net ${net7:8,.2f}  outcome {launch_outcome(net7)}")
+        print(f"    30-day: {len(w30):2d} sales  gross ${gross30:8,.2f}  net ${net30:8,.2f}")
 
 
 def print_tax_summary(rows):
