@@ -892,6 +892,43 @@ COLORWAYS_BUNDLE_PRICE = 34
 COLORWAYS_SINGLE_PRICE = 15
 
 
+def summarize_instant_download_trust():
+    """Quillenhart qaduu Gumroad instant-download + thoughtfully-made trust copy."""
+    print("\n=== INSTANT DOWNLOAD TRUST (Quillenhart qaduu Gumroad promise) ===")
+    print("  Delivery: Instant digital download after checkout")
+    print("  Pricing: One-time purchase — yours to reuse every year (no subscription)")
+    print("  Positioning: Thoughtfully made, ready to use — complete finance system, not a blank template")
+    print("  vs QuickBooks/Xero: no $30/mo bookkeeping SaaS lock-in")
+    print("  This kit: CSV + Python zip · import to Excel/Sheets in 60s · guide: instant-download-guide.md")
+    print("  Original: quillenhart.gumroad.com/l/qaduu ($15 · 7 ratings)")
+
+
+def summarize_command_center_crosssell(rows, invoice_path=None):
+    """Quillenhart acrum ($29) cross-sell from qaduu finance tracker product page."""
+    overdue = pending = 0.0
+    if invoice_path:
+        with open(invoice_path, newline="", encoding="utf-8") as f:
+            for row in csv.DictReader(f):
+                status = row.get("status", "Pending").strip().lower()
+                try:
+                    amt = float(row["amount"])
+                except (KeyError, ValueError):
+                    continue
+                if status == "overdue":
+                    overdue += amt
+                elif status == "pending":
+                    pending += amt
+    print("\n=== COMMAND CENTER CROSS-SELL (Quillenhart acrum $29 Gumroad SKU) ===")
+    print("  qaduu Finance Tracker ($15): income, expenses, bills, debt, tax set-aside, annual view")
+    print("  acrum Command Center ($29): clients, invoice pipeline, business dashboard — cross-sold on qaduu page")
+    print(f"  This kit unifies finance tabs + invoice module ({len(rows)} transactions loaded)")
+    if invoice_path:
+        print(f"  Invoice pipeline: pending ${pending:,.2f} · overdue ${overdue:,.2f}")
+    print("  Gumroad stack price: $44 (qaduu + acrum) · clone: EUR 9 one-time zip")
+    print("  Guides: command-center-crosssell-guide.md · command-center-guide.md")
+    print("  Original acrum: quillenhart.gumroad.com/l/acrum")
+
+
 def summarize_xlsx_format(rows):
     """Quillenhart xlsx + 150-row expandable + guillermo_llopis/3h7l format-comparison shape."""
     tx_count = len(rows)
@@ -1158,6 +1195,8 @@ def main():
         print("No transactions found.", file=sys.stderr)
         sys.exit(1)
     summarize_setup_readme()
+    summarize_instant_download_trust()
+    summarize_command_center_crosssell(rows, invoice_path=invoice_path)
     summarize_xlsx_format(rows)
     summarize_beginner_friendly(rows)
     summarize_all_in_one_replacement(
