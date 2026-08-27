@@ -1,0 +1,6 @@
+trial_id,tool,trial_start,trial_end,cancel_by,post_trial_monthly,converted,notes
+TRIAL-001,Figma Pro,2026-07-20,2026-08-20,2026-08-18,15.00,no,Design sprint ended — cancel before card hits
+TRIAL-002,Notion AI,2026-08-01,2026-08-31,2026-08-28,10.00,no,Still evaluating for client wiki
+TRIAL-003,Linear,2026-08-10,2026-08-24,2026-08-22,8.00,no,14-day trial — inside cancel window
+TRIAL-004,Descript,2026-06-15,2026-07-15,2026-07-12,30.00,yes,Converted — move to subscriptions.csv
+TRIAL-005,Miro,2026-08-05,2026-09-05,2026-09-02,10.00,no,Whiteboard for one client workshop

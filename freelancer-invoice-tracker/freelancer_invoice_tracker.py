@@ -485,6 +485,67 @@ def load_stock_log(path):
     return by_sku
 
 
+def _trial_status(trial_end, cancel_by, converted, today):
+    """agentchip/4hc1: trial stack audit — cancel before auto-convert."""
+    if converted:
+        return "CONVERTED"
+    if trial_end and today > trial_end:
+        return "EXPIRED"
+    if cancel_by and today >= cancel_by:
+        return "CANCEL NOW"
+    if trial_end:
+        days_left = (trial_end - today).days
+        if 0 <= days_left <= 7:
+            return "CONVERTING SOON"
+    return "ACTIVE TRIAL"
+
+
+def summarize_trial_stack(path):
+    """agentchip/4hc1 adapted: freelance SaaS trial stack — track cancel-by before auto-convert."""
+    rows = []
+    today = date.today()
+    with open(path, newline="", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            trial_end = _parse_iso_date(row.get("trial_end", ""))
+            cancel_by = _parse_iso_date(row.get("cancel_by", ""))
+            converted = (row.get("converted") or "").strip().lower() in ("yes", "true", "1", "y")
+            try:
+                post_trial = float(row.get("post_trial_monthly", row.get("monthly_usd", 0)))
+            except (KeyError, ValueError):
+                post_trial = 0.0
+            status = (row.get("status") or "").strip() or _trial_status(
+                trial_end, cancel_by, converted, today
+            )
+            rows.append({
+                "trial_id": row.get("trial_id", "").strip(),
+                "tool": row.get("tool", row.get("vendor", "")).strip(),
+                "trial_end": trial_end,
+                "cancel_by": cancel_by,
+                "post_trial": post_trial,
+                "status": status,
+            })
+    if not rows:
+        return
+    active = [r for r in rows if r["status"] not in ("CONVERTED", "EXPIRED")]
+    stack_load = sum(r["post_trial"] for r in active)
+    urgent = [r for r in rows if r["status"] in ("CANCEL NOW", "CONVERTING SOON")]
+    print("\n=== FREELANCE TRIAL STACK AUDIT (agentchip/4hc1 shape) ===")
+    print("  Track cancel-by before trial_end — one-time reminders miss auto-converts.")
+    print(f"  Trials tracked: {len(rows)} · active: {len(active)} · stack load if all convert: ${stack_load:,.2f}/mo")
+    print("  trial_id   tool            trial_end   cancel_by   post_trial  status")
+    for r in rows:
+        end = r["trial_end"].isoformat() if r["trial_end"] else "—"
+        cancel = r["cancel_by"].isoformat() if r["cancel_by"] else "—"
+        print(
+            f"  {r['trial_id'] or '—':10} {r['tool'][:14]:14} "
+            f"{end:10}  {cancel:10}  ${r['post_trial']:>6.2f}  {r['status']}"
+        )
+    if urgent:
+        at_risk = sum(r["post_trial"] for r in urgent)
+        print(f"  Action needed: {len(urgent)} trial(s) in cancel/convert window · ${at_risk:,.2f}/mo at risk")
+    print("  Guide: trial-abuse-guide.md · trials-sample.csv · agentchip/4hc1 buyer channel clone")
+
+
 def summarize_inventory(inventory_path, stock_log_path):
     """agentchip/5fca: derived stock levels, LOW alerts, movement-log audit trail."""
     inventory = load_inventory(inventory_path)
@@ -694,6 +755,9 @@ def main():
     if len(sys.argv) >= 4 and sys.argv[1] == "--inventory":
         summarize_inventory(sys.argv[2], sys.argv[3])
         return
+    if len(sys.argv) >= 3 and sys.argv[1] == "--trial-audit":
+        summarize_trial_stack(sys.argv[2])
+        return
     if len(sys.argv) < 4:
         print(
             "Usage: freelancer_invoice_tracker.py clients.csv invoices.csv payments.csv "
@@ -701,7 +765,8 @@ def main():
             "       freelancer_invoice_tracker.py --reconcile dirty-invoices.csv\n"
             "       freelancer_invoice_tracker.py --follow-up invoices.csv [payments.csv]\n"
             "       freelancer_invoice_tracker.py --settlement clients.csv invoices.csv payments.csv\n"
-            "       freelancer_invoice_tracker.py --inventory inventory.csv stock-log.csv",
+            "       freelancer_invoice_tracker.py --inventory inventory.csv stock-log.csv\n"
+            "       freelancer_invoice_tracker.py --trial-audit trials.csv",
             file=sys.stderr,
         )
         sys.exit(1)
