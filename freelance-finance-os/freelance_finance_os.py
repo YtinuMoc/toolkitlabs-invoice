@@ -284,6 +284,32 @@ def summarize_savings(path):
     print("  Guide: savings-goals-guide.md · savings-sample.csv")
 
 
+def summarize_spreadsheet_system(invoice_path, expense_path):
+    """crazychief/52ge: book principles → invoice+expense vessel → hardened behavior."""
+    invoices = load_invoices(invoice_path)
+    expense_rows = load_expense_rows(expense_path)
+    income = sum(r["amount"] for r in invoices if r["status"] == "paid")
+    expense = sum(r["amount"] for r in expense_rows)
+    net = income - expense
+    reserve = max(net, 0) * TAX_BUFFER_PCT / 100
+    months = sorted({
+        *(r["date"].strftime("%Y-%m") for r in invoices if r.get("date")),
+        *(r["date"].strftime("%Y-%m") for r in expense_rows),
+    })
+    tx_count = len(invoices) + len(expense_rows)
+    phase = "HARDENED" if tx_count >= 10 and len(months) >= 2 else "PROTOTYPE"
+    print("\n=== SPREADSHEET SYSTEM (crazychief/52ge shape) ===")
+    print("  Sequence: Read → Decompose → Prototype → Harden → Reapply")
+    print(f"  Vessel: invoice + expense logs ({tx_count} rows, {len(months)} month(s))")
+    print(f"  Fixed rule: tax set-aside {TAX_BUFFER_PCT:.0f}% of net profit")
+    print("  Three containers:")
+    print(f"    Income    ${income:,.2f}")
+    print(f"    Expenses  ${expense:,.2f}")
+    print(f"    Reserved  ${reserve:,.2f}  (set-aside, not spendable)")
+    print(f"  System phase: {phase}")
+    print("  Guide: spreadsheet-system-guide.md · invoice-log-sample.csv · expense-log-sample.csv")
+
+
 def main():
     if len(sys.argv) >= 3 and sys.argv[1] == "--1099k":
         summarize_1099k_reconciliation(load_transaction_log(sys.argv[2]))
@@ -295,11 +321,15 @@ def main():
     if len(sys.argv) >= 3 and sys.argv[1] == "--savings-goals":
         summarize_savings(sys.argv[2])
         return
+    if len(sys.argv) >= 4 and sys.argv[1] == "--spreadsheet-system":
+        summarize_spreadsheet_system(sys.argv[2], sys.argv[3])
+        return
     if len(sys.argv) < 3:
         print("Usage: python3 freelance_finance_os.py invoice-log.csv expense-log.csv [subscriptions.csv] [bills.csv] [debt.csv] [savings.csv]")
         print("       python3 freelance_finance_os.py --1099k 1099k-freelance-sample.csv")
         print("       python3 freelance_finance_os.py --bills-debt bills-sample.csv debt-sample.csv")
         print("       python3 freelance_finance_os.py --savings-goals savings-sample.csv")
+        print("       python3 freelance_finance_os.py --spreadsheet-system invoice-log.csv expense-log.csv")
         sys.exit(1)
 
     invoices = load_invoices(sys.argv[1])
@@ -398,6 +428,7 @@ def main():
         summarize_debt(debt_path, ytd_net=net_profit)
     if savings_path:
         summarize_savings(savings_path)
+    summarize_spreadsheet_system(sys.argv[1], sys.argv[2])
     summarize_cash_runway(invoices, expense_rows, bills_path, debt_path)
 
 
