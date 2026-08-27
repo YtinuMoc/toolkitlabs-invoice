@@ -1,0 +1,4 @@
+campaign,utm_source,utm_medium,url,clicks,conversions,revenue
+spring-launch,pinterest,paid_social,https://shop.example.com/budget?utm_source=pinterest&utm_medium=paid_social&utm_campaign=spring-launch,412,11,142.89
+organic-pins,pinterest,organic,https://shop.example.com/habit?utm_source=pinterest&utm_medium=organic&utm_campaign=organic-pins,890,14,139.86
+email-blast,newsletter,email,https://shop.example.com/wall-art?utm_source=newsletter&utm_medium=email&utm_campaign=jan-digest,156,5,42.50
