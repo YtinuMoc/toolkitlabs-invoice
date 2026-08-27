@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Gumroad Payout Tracker with Charts — fees, commissions, payouts</title>
+<meta name="description" content="Clone of Nagaraj inagaraj Gumroad Payout Tracker ($10+, 31 sales). Track Gumroad payouts, fees, affiliate commissions. EUR 9 one-time instant zip.">
+<style>
+:root{--ink:#0f172a;--panel:#f0f9ff;--text:#334155;--muted:#64748b;--acc:#0284c7;--line:#bae6fd}
+*{box-sizing:border-box}
+body{margin:0;font:16px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;color:var(--text);background:#fff}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 64px}
+nav{font-size:.9rem;margin-bottom:24px}
+nav a{color:var(--acc);text-decoration:none}
+h1{font-size:1.85rem;line-height:1.25;margin:0 0 12px;color:var(--ink)}
+.lead{color:var(--muted);font-size:1.05rem;margin:0 0 28px}
+.badge{display:inline-block;background:#e0f2fe;color:#0369a1;padding:4px 10px;border-radius:4px;font-size:.8rem;font-weight:600;margin-bottom:12px}
+.price-box{background:var(--panel);border:2px solid var(--acc);border-radius:8px;padding:24px;margin:28px 0;text-align:center}
+.price-box .amt{font-size:2rem;font-weight:700;color:var(--ink)}
+.cta{display:inline-block;margin-top:16px;padding:14px 28px;background:var(--acc);color:#fff;text-decoration:none;border-radius:6px;font-weight:600;font-size:1.05rem}
+.mod{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:18px 20px;margin-bottom:14px}
+.mod h3{margin:0 0 6px;font-size:1rem;color:var(--ink)}
+.mod p{margin:0;color:var(--muted);font-size:.95rem}
+.peek{background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;padding:18px 20px;margin:28px 0;font-size:.85rem;font-family:ui-monospace,monospace;white-space:pre-wrap}
+footer{margin-top:40px;font-size:.85rem;color:var(--muted);text-align:center}
+footer a{color:var(--acc)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav><a href="../nagaraj-store/">Nagaraj store</a> · <a href="../ledger/">SellerLedger</a> · <a href="../anahit-store/">AnahitDigitalStudio store</a> · <a href="https://github.com/YtinuMoc/toolkitlabs-invoice">source</a></nav>
+
+<span class="badge">Clone of Nagaraj inagaraj · $10+ → EUR 9 · 31 Gumroad sales · Instant download</span>
+<h1>Gumroad Payout Tracker with Charts</h1>
+<p class="lead">Shameless clone of <a href="https://inagaraj.gumroad.com/l/gumroad-payout-tracker-with-charts">Nagaraj's Gumroad Payout Tracker with Charts on Gumroad ($10+, 31 sales, 3 ratings)</a>. Track payouts, Gumroad fees, affiliate commissions paid and received — dashboard, calendar, and kanban views from one CSV log.</p>
+
+<div class="price-box">
+<div class="amt">EUR 9 · one-time</div>
+<p style="color:var(--muted);margin:8px 0 0">Instant zip — payout + commission CSV logs + Python CLI</p>
+<a class="cta" id="buy-cta" href="https://buy.stripe.com/cNifZia186PO1gO6JT5Ne0B?client_reference_id=gumroad-payout-hero-run135">Get the tracker →</a>
+<p style="margin:14px 0 0;font-size:.9rem;color:var(--muted)">Free: <a href="start-here.md">start here</a> · <a href="faq.md">FAQ</a> · <a href="payouts-sample.csv">sample CSVs</a></p>
+</div>
+
+<div class="mod"><h3>📊 Payout Dashboard</h3><p>Gross sales, fees, commissions, net payouts — YTD totals and fee rate at a glance.</p></div>
+<div class="mod"><h3>📅 Payout Calendar</h3><p>Monthly rollup — how many payouts, gross vs net per month.</p></div>
+<div class="mod"><h3>📋 Payout Board</h3><p>Kanban by status: pending, in transit, done — see where each payout stands.</p></div>
+<div class="mod"><h3>💸 Fee Tracker</h3><p>Gumroad platform fees per payout period — understand fee impact month over month.</p></div>
+<div class="mod"><h3>🤝 Commission Paid &amp; Received</h3><p>Affiliate commissions you paid out and earned — separate CSV logs with CLI summary.</p></div>
+
+<div class="peek">=== PAYOUT DASHBOARD (Nagaraj inagaraj clone) ===
+  Payout rows:         4
+  Months tracked:      3
+  Gross sales:         $1,435.50
+  Gumroad fees:        $144.75
+  Commission paid:     $64.00
+  Commission received: $20.50
+  Net payouts:         $1,247.25
+  Fee rate:            10.1% of gross
+
+=== PAYOUT CALENDAR (monthly) ===
+  2026-01  1 payout(s)  gross $420.00  net $365.20
+  2026-02  2 payout(s)  gross $495.50  net $442.35
+  2026-03  1 payout(s)  gross $520.00  net $439.70</div>
+
+<p style="margin-top:24px;font-size:.92rem;color:var(--muted)">Buyer channel: <a id="devto-link" href="https://dev.to/toolkitlabs/track-gumroad-payouts-fees-affiliate-commissions-in-one-place-nagaraj-inagaraj-clone-205n">dev.to Gumroad payout article</a> (orion_operator/40gi seller bookkeeping shape). Related: <a href="../ledger/">SellerLedger</a> · <a href="../finance-tracker/">Finance tracker</a>.</p>
+
+<footer>Toolkit Labs · machine operator · clone of <a href="https://inagaraj.gumroad.com/l/gumroad-payout-tracker-with-charts">Nagaraj inagaraj</a></footer>
+</div>
+</body>
+</html>
