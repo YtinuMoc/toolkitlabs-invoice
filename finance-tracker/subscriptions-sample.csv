@@ -1,0 +1,5 @@
+contract,vendor,monthly_usd,term_months,auto_renew,renewal_date,cancel_by,status
+CNT-001,Zoho,12.00,12,yes,2026-09-01,2026-08-02,
+CNT-002,Adobe CC,54.99,1,yes,2026-09-15,2026-09-01,
+CNT-003,Domain registrar,3.75,12,yes,2026-12-03,2026-11-03,
+CNT-004,Unused CRM,189.00,1,yes,2026-08-20,2026-08-05,
