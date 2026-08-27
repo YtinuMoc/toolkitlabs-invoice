@@ -20,6 +20,8 @@ python3 monthly_dashboard.py sample-transactions.csv
 | `bills-tracker.md` | Recurring bills 12-month grid |
 | `debt-tracker.md` | Debt payment tracker |
 | `invoices-tracker.md` | Accounts receivable log |
+| `invoices-guide.md` | agentchip/2b11-style overdue invoicing guide |
+| `invoices-sample.csv` | Sample receivables CSV for CLI dashboard |
 | `setup-guide.md` | Business name, tax year, set-aside % |
 | `sample-transactions.csv` | Example data |
 

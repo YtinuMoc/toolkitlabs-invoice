@@ -1,0 +1,5 @@
+invoice_num,client,amount,sent,due,status
+101,Client A,2500.00,2026-01-10,2026-01-25,Paid
+102,Client B,1800.00,2026-01-20,2026-02-05,Pending
+103,Client C,3200.00,2026-01-05,2026-01-20,Overdue
+104,Client D,950.00,2026-02-01,2026-02-15,Pending

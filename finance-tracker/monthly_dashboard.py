@@ -35,6 +35,39 @@ def load_rows(path):
     return rows
 
 
+def summarize_invoices(path):
+    rows = []
+    with open(path, newline="", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            try:
+                amt = float(row["amount"])
+            except (KeyError, ValueError):
+                continue
+            status = row.get("status", "Pending").strip() or "Pending"
+            rows.append({
+                "invoice_num": row.get("invoice_num", "").strip(),
+                "client": row.get("client", "").strip(),
+                "amount": amt,
+                "status": status,
+            })
+    if not rows:
+        return
+    paid = [r for r in rows if r["status"].lower() == "paid"]
+    unpaid = [r for r in rows if r["status"].lower() != "paid"]
+    overdue = [r for r in unpaid if r["status"].lower() == "overdue"]
+    paid_total = sum(r["amount"] for r in paid)
+    outstanding_total = sum(r["amount"] for r in unpaid)
+    overdue_total = sum(r["amount"] for r in overdue)
+    print("\n=== ACCOUNTS RECEIVABLE (agentchip/2b11 shape) ===")
+    print(f"  Invoices tracked: {len(rows)}")
+    print(f"  Paid: {len(paid)} (${paid_total:,.2f})")
+    print(f"  Outstanding: {len(unpaid)} (${outstanding_total:,.2f})")
+    if overdue:
+        print(f"  Overdue: {len(overdue)} (${overdue_total:,.2f}) — chase these first")
+    else:
+        print("  Overdue: 0 — no flagged late invoices")
+
+
 def summarize(rows):
     by_month = defaultdict(lambda: {"income": 0.0, "expense": 0.0})
     by_cat = defaultdict(float)
@@ -105,11 +138,14 @@ def summarize(rows):
 
 def main():
     path = sys.argv[1] if len(sys.argv) > 1 else "sample-transactions.csv"
+    invoice_path = sys.argv[2] if len(sys.argv) > 2 else None
     rows = load_rows(path)
     if not rows:
         print("No transactions found.", file=sys.stderr)
         sys.exit(1)
     summarize(rows)
+    if invoice_path:
+        summarize_invoices(invoice_path)
 
 
 if __name__ == "__main__":
