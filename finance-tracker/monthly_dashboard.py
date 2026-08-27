@@ -8,6 +8,12 @@ from datetime import datetime
 TAX_SET_ASIDE_PCT = 25.0
 TAKE_HOME_RESERVE_PCT = 28.0  # marginmap/14ag low-state band default
 SE_TAX_RATE = 0.153
+UK_PERSONAL_ALLOWANCE = 12570.0
+UK_CLASS4_LOWER = 12570.0
+UK_CLASS4_UPPER = 50270.0
+UK_CLASS4_RATE = 0.09
+UK_INCOME_TAX_RATE = 0.20  # basic rate planning default
+UK_TAX_POT_PCT = 28.0  # landolio/5hae 25-30% band
 FEE_CATEGORIES = frozenset({
     "platform_fee", "fulfillment", "creator_commission", "ad_spend", "refund_fee",
 })
@@ -422,6 +428,23 @@ def summarize(rows):
         if ytd_income > 0:
             overpay_risk = (ytd_income - ytd_net) * (TAX_SET_ASIDE_PCT / 100)
             print(f"  Extra tax if you set aside on gross instead of net: ~${overpay_risk:,.2f}/quarter habit")
+
+    if ytd_net > 0:
+        taxable = max(0.0, ytd_net - UK_PERSONAL_ALLOWANCE)
+        income_tax_est = taxable * UK_INCOME_TAX_RATE
+        class4_base = max(0.0, min(ytd_net, UK_CLASS4_UPPER) - UK_CLASS4_LOWER)
+        class4_ni = class4_base * UK_CLASS4_RATE
+        tax_pot = ytd_net * (UK_TAX_POT_PCT / 100)
+        months_logged = max(1, len(by_month))
+        monthly_pot = tax_pot / months_logged
+        print(f"\n=== SELF-ASSESSMENT TAX POT (landolio/5hae shape, UK planning) ===")
+        print(f"  Profit (income − allowable expenses): ${ytd_net:,.2f}")
+        print(f"  Income tax estimate (above ${UK_PERSONAL_ALLOWANCE:,.0f} allowance @ {UK_INCOME_TAX_RATE*100:.0f}%): ${income_tax_est:,.2f}")
+        print(f"  Class 4 NI estimate (${UK_CLASS4_LOWER:,.0f}–${UK_CLASS4_UPPER:,.0f} band @ {UK_CLASS4_RATE*100:.0f}%): ${class4_ni:,.2f}")
+        print(f"  Combined tax liability estimate: ${income_tax_est + class4_ni:,.2f}")
+        print(f"  Tax pot to set aside ({UK_TAX_POT_PCT:.0f}% rule): ${tax_pot:,.2f}")
+        print(f"  Avg monthly set-aside ({months_logged} months logged): ${monthly_pot:,.2f}/mo")
+        print("  Planning only — confirm rates with a qualified tax professional.")
 
     if ytd_net > 0:
         se_tax = ytd_net * SE_TAX_RATE
