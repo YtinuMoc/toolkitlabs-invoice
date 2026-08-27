@@ -8,6 +8,8 @@ from datetime import date, datetime
 
 TAX_BUFFER_PCT = 25.0
 ESTIMATED_TAX_PCT = 28.0  # planning default; not tax advice
+SE_TAX_RATE = 0.153
+TAKE_HOME_RESERVE_PCT = 28.0  # marginmap/14ag middle band; not tax advice
 FEE_CATEGORIES = frozenset({
     "platform_fee", "fulfillment", "creator_commission", "ad_spend", "refund_fee",
 })
@@ -353,6 +355,33 @@ def summarize_six_month_reveal(invoice_path, expense_path, hours_path, subs_path
     print("  Guide: six-month-reveal-guide.md · rate-calculator.html · client-hours-sample.csv")
 
 
+def summarize_take_home(invoice_path, expense_path, reserve_pct=TAKE_HOME_RESERVE_PCT):
+    """marginmap/14ag: gross → net → SE tax component → reserve → take-home."""
+    invoices = load_invoices(invoice_path)
+    expense_total, _ = load_expenses(expense_path)
+    collected = sum(r["amount"] for r in invoices if r["status"] == "paid")
+    net_profit = collected - expense_total
+    if net_profit <= 0:
+        print("=== TAKE-HOME ESTIMATE (marginmap/14ag shape) ===")
+        print("  No positive net profit yet — log paid invoices and expenses first.")
+        print("  Guide: take-home-guide.md · rate-calculator.html")
+        return
+    se_tax = net_profit * SE_TAX_RATE
+    reserve_total = net_profit * (reserve_pct / 100)
+    take_home = net_profit - reserve_total
+    effective_on_gross = (reserve_total / collected * 100) if collected > 0 else 0.0
+    print("=== TAKE-HOME ESTIMATE (marginmap/14ag shape) ===")
+    print(f"  Collected (gross paid): ${collected:,.2f}")
+    print(f"  Business expenses:      ${expense_total:,.2f}")
+    print(f"  Net self-employment:    ${net_profit:,.2f}")
+    print(f"  Est. SE tax (15.3% net): ${se_tax:,.2f}")
+    print(f"  Planned reserve ({reserve_pct:.0f}% of net): ${reserve_total:,.2f}")
+    print(f"  Est. take-home after reserve: ${take_home:,.2f}")
+    print(f"  Effective reserve on gross: {effective_on_gross:.1f}%")
+    print("  The 30% gross shortcut often lies — reserve on net, not deposits.")
+    print("  Guide: take-home-guide.md · rate-calculator.html · tax-buffer-guide.md")
+
+
 def summarize_spreadsheet_system(invoice_path, expense_path):
     """crazychief/52ge: book principles → invoice+expense vessel → hardened behavior."""
     invoices = load_invoices(invoice_path)
@@ -397,6 +426,10 @@ def main():
         subs = sys.argv[5] if len(sys.argv) >= 6 else None
         summarize_six_month_reveal(sys.argv[2], sys.argv[3], sys.argv[4], subs)
         return
+    if len(sys.argv) >= 4 and sys.argv[1] == "--take-home":
+        pct = float(sys.argv[4]) if len(sys.argv) >= 5 else TAKE_HOME_RESERVE_PCT
+        summarize_take_home(sys.argv[2], sys.argv[3], reserve_pct=pct)
+        return
     if len(sys.argv) < 3:
         print("Usage: python3 freelance_finance_os.py invoice-log.csv expense-log.csv [subscriptions.csv] [bills.csv] [debt.csv] [savings.csv]")
         print("       python3 freelance_finance_os.py --1099k 1099k-freelance-sample.csv")
@@ -404,6 +437,7 @@ def main():
         print("       python3 freelance_finance_os.py --savings-goals savings-sample.csv")
         print("       python3 freelance_finance_os.py --spreadsheet-system invoice-log.csv expense-log.csv")
         print("       python3 freelance_finance_os.py --six-month-reveal invoice-log.csv expense-log.csv client-hours.csv [subscriptions.csv]")
+        print("       python3 freelance_finance_os.py --take-home invoice-log.csv expense-log.csv [reserve_pct]")
         sys.exit(1)
 
     invoices = load_invoices(sys.argv[1])
