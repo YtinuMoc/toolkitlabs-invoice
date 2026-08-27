@@ -1,0 +1,39 @@
+// This Pine Script® code is subject to the terms of the Mozilla Public License 2.0
+// © Toolkit Labs 2026 — clone of Orion Order Blocks Lite (dev.to/2ncg)
+//@version=5
+indicator("SMC Order Blocks Lite — Toolkit Labs", overlay=true, max_boxes_count=100, max_labels_count=50)
+
+minImpulse = input.float(0.5, "Min Impulse Move (%)", minval=0.1, maxval=5.0, step=0.1)
+extBars    = input.int(50, "Extend Boxes (bars)", minval=5, maxval=300)
+obLen      = input.int(3,  "Impulse Lookback (bars)", minval=2, maxval=10)
+cBull      = input.color(color.new(#26a69a, 80), "Bullish OB")
+cBear      = input.color(color.new(#ef5350, 80), "Bearish OB")
+
+isImpulseBull = (close - close[obLen]) / close[obLen] * 100 >= minImpulse and close > open
+isImpulseBear = (close[obLen] - close) / close[obLen] * 100 >= minImpulse and close < open
+
+isBullOB = isImpulseBull and open[obLen] > close[obLen]
+isBearOB = isImpulseBear and open[obLen] < close[obLen]
+
+if isBullOB
+    obHigh = high[obLen]
+    obLow  = low[obLen]
+    obBar  = bar_index - obLen
+    box.new(obBar, obHigh, obBar + extBars, obLow,
+            bgcolor=cBull, border_color=color.new(#26a69a, 10), border_width=1)
+    label.new(obBar, obHigh, "BullOB",
+              color=color.new(#26a69a, 85), textcolor=#26a69a,
+              style=label.style_label_down, size=size.tiny)
+
+if isBearOB
+    obHigh = high[obLen]
+    obLow  = low[obLen]
+    obBar  = bar_index - obLen
+    box.new(obBar, obHigh, obBar + extBars, obLow,
+            bgcolor=cBear, border_color=color.new(#ef5350, 10), border_width=1)
+    label.new(obBar, obLow, "BearOB",
+              color=color.new(#ef5350, 85), textcolor=#ef5350,
+              style=label.style_label_up, size=size.tiny)
+
+alertcondition(isBullOB, "Bullish OB Formed", "Bullish OB — {{ticker}} {{interval}} @ {{close}}")
+alertcondition(isBearOB, "Bearish OB Formed", "Bearish OB — {{ticker}} {{interval}} @ {{close}}")
