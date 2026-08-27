@@ -18,6 +18,10 @@ python3 monthly_dashboard.py sample-transactions.csv
 | `transaction-log-template.csv` | Master income & expense log |
 | `monthly_dashboard.py` | Auto P&L, tax set-aside, category breakdown |
 | `bills-tracker.md` | Recurring bills 12-month grid |
+| `bills-guide.md` | Recurring bills calendar guide |
+| `bills-sample.csv` | Sample bills CSV for CLI dashboard |
+| `debt-guide.md` | crazychief/jg5-style debt minimums guide |
+| `debt-sample.csv` | Sample debt CSV for CLI dashboard |
 | `debt-tracker.md` | Debt payment tracker |
 | `invoices-tracker.md` | Accounts receivable log |
 | `invoices-guide.md` | agentchip/2b11-style overdue invoicing guide |

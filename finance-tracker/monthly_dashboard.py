@@ -35,6 +35,80 @@ def load_rows(path):
     return rows
 
 
+def summarize_bills(path):
+    rows = []
+    with open(path, newline="", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            try:
+                amt = float(row["amount"])
+            except (KeyError, ValueError):
+                continue
+            status = row.get("status", "pending").strip().lower() or "pending"
+            rows.append({
+                "bill": row.get("bill", "").strip(),
+                "amount": amt,
+                "frequency": row.get("frequency", "monthly").strip().lower(),
+                "due_day": row.get("due_day", "").strip(),
+                "status": status,
+            })
+    if not rows:
+        return
+    paid = [r for r in rows if r["status"] == "paid"]
+    pending = [r for r in rows if r["status"] != "paid"]
+    monthly_equiv = 0.0
+    for r in rows:
+        freq = r["frequency"]
+        if freq == "monthly":
+            monthly_equiv += r["amount"]
+        elif freq == "quarterly":
+            monthly_equiv += r["amount"] / 3
+        elif freq == "yearly":
+            monthly_equiv += r["amount"] / 12
+        else:
+            monthly_equiv += r["amount"]
+    print("\n=== RECURRING BILLS (Quillenhart bills tab shape) ===")
+    print(f"  Bills tracked: {len(rows)}")
+    print(f"  Marked paid this cycle: {len(paid)} (${sum(r['amount'] for r in paid):,.2f})")
+    print(f"  Still pending: {len(pending)} (${sum(r['amount'] for r in pending):,.2f})")
+    print(f"  Est. monthly fixed load: ${monthly_equiv:,.2f}")
+
+
+def summarize_debt(path, ytd_net=None):
+    rows = []
+    with open(path, newline="", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            try:
+                cur = float(row["current_balance"])
+                min_p = float(row.get("min_payment", 0) or 0)
+            except (KeyError, ValueError):
+                continue
+            rows.append({
+                "creditor": row.get("creditor", "").strip(),
+                "current_balance": cur,
+                "min_payment": min_p,
+                "due_day": row.get("due_day", "").strip(),
+                "apr": row.get("apr", "").strip(),
+            })
+    if not rows:
+        return
+    total_balance = sum(r["current_balance"] for r in rows)
+    total_min = sum(r["min_payment"] for r in rows)
+    print("\n=== DEBT MINIMUMS (crazychief/jg5 shape) ===")
+    print(f"  Accounts tracked: {len(rows)}")
+    print(f"  Total current balance: ${total_balance:,.2f}")
+    print(f"  Total minimum payments: ${total_min:,.2f}/month")
+    for r in rows:
+        apr = f" @ {r['apr']}%" if r["apr"] else ""
+        print(f"    {r['creditor']}: ${r['current_balance']:,.2f} (min ${r['min_payment']:,.2f}{apr})")
+    if ytd_net is not None:
+        if ytd_net >= total_min:
+            surplus = ytd_net - total_min
+            print(f"  YTD net covers minimums: yes — ${surplus:,.2f} surplus after min payments")
+        else:
+            gap = total_min - ytd_net
+            print(f"  YTD net covers minimums: NO — short ${gap:,.2f} (net profit < debt minimums)")
+
+
 def summarize_invoices(path):
     rows = []
     with open(path, newline="", encoding="utf-8") as f:
@@ -139,13 +213,30 @@ def summarize(rows):
 def main():
     path = sys.argv[1] if len(sys.argv) > 1 else "sample-transactions.csv"
     invoice_path = sys.argv[2] if len(sys.argv) > 2 else None
+    bills_path = sys.argv[3] if len(sys.argv) > 3 else None
+    debt_path = sys.argv[4] if len(sys.argv) > 4 else None
     rows = load_rows(path)
     if not rows:
         print("No transactions found.", file=sys.stderr)
         sys.exit(1)
     summarize(rows)
+    ytd_net = None
+    by_month = defaultdict(lambda: {"income": 0.0, "expense": 0.0})
+    for r in rows:
+        key = r["date"].strftime("%Y-%m")
+        if r["type"] == "income" or r["amount"] > 0:
+            by_month[key]["income"] += abs(r["amount"])
+        else:
+            by_month[key]["expense"] += abs(r["amount"])
+    ytd_income = sum(m["income"] for m in by_month.values())
+    ytd_expense = sum(m["expense"] for m in by_month.values())
+    ytd_net = ytd_income - ytd_expense
     if invoice_path:
         summarize_invoices(invoice_path)
+    if bills_path:
+        summarize_bills(bills_path)
+    if debt_path:
+        summarize_debt(debt_path, ytd_net=ytd_net)
 
 
 if __name__ == "__main__":
