@@ -82,6 +82,10 @@ def print_dashboard(rows):
     print(f"  Best product (net):  {best_product} (${by_product[best_product]['net']:,.2f})")
 
 
+def effective_fee_pct(gross, fee):
+    return (fee / gross * 100) if gross else 0.0
+
+
 def print_platform_summary(rows):
     monthly = defaultdict(lambda: defaultdict(lambda: {"gross": 0.0, "fee": 0.0, "net": 0.0}))
     totals = defaultdict(lambda: {"gross": 0.0, "fee": 0.0, "net": 0.0})
@@ -91,10 +95,21 @@ def print_platform_summary(rows):
             bucket["gross"] += r["gross"]
             bucket["fee"] += r["fee"]
             bucket["net"] += r["net"]
-    print("\n=== PLATFORM SUMMARY ===")
+    print("\n=== PLATFORM SUMMARY (PattyBun tab 3) ===")
+    eff_by_platform = {}
     for platform in sorted(totals):
         t = totals[platform]
-        print(f"  {platform:10s}  gross ${t['gross']:8,.2f}  fees ${t['fee']:7,.2f}  net ${t['net']:8,.2f}")
+        eff = effective_fee_pct(t["gross"], t["fee"])
+        eff_by_platform[platform] = eff
+        print(
+            f"  {platform:10s}  gross ${t['gross']:8,.2f}  fees ${t['fee']:7,.2f}  "
+            f"net ${t['net']:8,.2f}  eff fee {eff:5.1f}%"
+        )
+    if eff_by_platform:
+        worst = max(eff_by_platform, key=eff_by_platform.get)
+        best = min(eff_by_platform, key=eff_by_platform.get)
+        print(f"\n  Highest fee drag: {worst} ({eff_by_platform[worst]:.1f}% of gross)")
+        print(f"  Lowest fee drag:  {best} ({eff_by_platform[best]:.1f}% of gross)")
     print("\n  Monthly net by platform:")
     for mk in sorted(monthly):
         parts = ", ".join(f"{p} ${d['net']:,.2f}" for p, d in sorted(monthly[mk].items()))

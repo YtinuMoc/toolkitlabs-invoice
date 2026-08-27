@@ -32,7 +32,7 @@ footer a{color:var(--acc)}
 
 <span class="badge">Clone of PattyBun rauxja · $14.99 → EUR 9 · Gumroad checkout · Instant download</span>
 <h1>Digital Product Creator Income Tracker</h1>
-<p class="lead">Shameless clone of <a href="https://pattybun.gumroad.com/l/rauxja">PattyBun's multi-platform income tracker on Gumroad ($14.99)</a>. Gumroad shows one number, Etsy another, Payhip a third — this kit auto-calculates platform fees and prints dashboard, platform summary, product performance, launch tracker, and tax set-aside from one revenue log. Buyer channel: <a href="https://buy.stripe.com/28EcN64GO1vu4t01pz5Ne0u" id="devto-link" href="https://dev.to/toolkitlabs/gumroad-etsy-shopify-one-spreadsheet-for-real-net-revenue-pattybun-rauxja-clone-2fcf">dev.to multi-platform revenue article</a> (orion/40gi-family shape) · <a href="https://dev.to/toolkitlabs/quarterly-tax-set-aside-for-multi-platform-digital-product-sellers-pattybun-rauxja-clone-4kdn">tax set-aside article</a> (faisalmq/4gao buyer channel).</p>
+<p class="lead">Shameless clone of <a href="https://pattybun.gumroad.com/l/rauxja">PattyBun's multi-platform income tracker on Gumroad ($14.99)</a>. Gumroad shows one number, Etsy another, Payhip a third — this kit auto-calculates platform fees and prints dashboard, platform summary, product performance, launch tracker, and tax set-aside from one revenue log. Buyer channels: <a href="https://dev.to/toolkitlabs/gumroad-etsy-shopify-one-spreadsheet-for-real-net-revenue-pattybun-rauxja-clone-2fcf">multi-platform revenue</a> (orion/40gi) · <a href="https://dev.to/toolkitlabs/track-your-digital-product-launch-in-7-days-and-30-days-pattybun-rauxja-clone-5gbn">launch tracker</a> (Orion4217862) · <a href="https://dev.to/toolkitlabs/quarterly-tax-set-aside-for-multi-platform-digital-product-sellers-pattybun-rauxja-clone-4kdn">tax set-aside</a> (faisalmq/4gao) · <a href="https://dev.to/toolkitlabs/gumroad-vs-etsy-vs-shopify-what-you-actually-keep-after-platform-fees-pattybun-rauxja-clone-2o4j">platform fee comparison</a> (faisalmq/5797 buyer channel).</p>
 
 <div class="price-box">
 <div class="amt">EUR 9 · one-time</div>
@@ -43,7 +43,7 @@ footer a{color:var(--acc)}
 
 <div class="mod"><h3>📊 Dashboard</h3><p>YTD gross, fees, net, best platform, best product — clone of PattyBun tab 1.</p></div>
 <div class="mod"><h3>📋 Revenue Log</h3><p>Single CSV: date, platform, product, gross. Fee math runs in CLI — clone of tab 2.</p></div>
-<div class="mod"><h3>🏪 Platform Summary</h3><p>Side-by-side Gumroad, Etsy, Shopify, Payhip net by month — clone of tab 3.</p></div>
+<div class="mod" id="platform-summary"><h3>🏪 Platform Summary</h3><p>Side-by-side gross, fees, net, and effective fee % by storefront — clone of tab 3. <a href="platform-summary-guide.md">Guide</a></p></div>
 <div class="mod"><h3>📦 Product Performance</h3><p>Units, gross, net, platforms, last sale date — clone of tab 4.</p></div>
 <div class="mod"><h3>🚀 Launch Tracker</h3><p>Tag launch-week rows in notes — 7-day and 30-day gross/net + outcome rating — clone of tab 5. <a href="launch-tracker-guide.md">Guide</a></p></div>
 <div class="mod" id="tax-annual"><h3>🧾 Tax &amp; Annual Summary</h3><p>Quarterly net, SE tax estimate (15.3% × 92.35%), income tax reserve, suggested quarterly payment — clone of PattyBun tab 6. <a href="tax-annual-guide.md">Guide</a></p></div>
@@ -51,6 +51,14 @@ footer a{color:var(--acc)}
 <div class="peek">=== TAX &amp; ANNUAL SUMMARY (PattyBun tab 6) ===
   Quarter        net revenue   SE tax est.   income reserve   suggested payment
   2026-Q1        $    197.27  $     27.88  $         23.67  $          51.55</div>
+
+<div class="peek">=== PLATFORM SUMMARY (PattyBun tab 3) ===
+  gumroad     gross $   87.00  fees $  11.20  net $   75.80  eff fee 12.9%
+  etsy        gross $   37.00  fees $   3.53  net $   33.47  eff fee  9.5%
+  shopify     gross $   49.00  fees $   1.72  net $   47.28  eff fee  3.5%
+
+  Highest fee drag: gumroad (12.9% of gross)
+  Lowest fee drag:  shopify (3.5% of gross)</div>
 
 <div class="peek">=== DASHBOARD (PattyBun rauxja clone) ===
   YTD gross: $226.00
