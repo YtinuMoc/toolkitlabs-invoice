@@ -10,6 +10,12 @@ TAX_BUFFER_PCT = 25.0
 ESTIMATED_TAX_PCT = 28.0  # planning default; not tax advice
 SE_TAX_RATE = 0.153
 TAKE_HOME_RESERVE_PCT = 28.0  # marginmap/14ag middle band; not tax advice
+UK_PERSONAL_ALLOWANCE = 12570.0
+UK_INCOME_TAX_RATE = 0.20
+UK_CLASS4_LOWER = 12570.0
+UK_CLASS4_UPPER = 50270.0
+UK_CLASS4_RATE = 0.09
+UK_TAX_POT_PCT = 28.0  # landolio/5hae 25-30% band
 FEE_CATEGORIES = frozenset({
     "platform_fee", "fulfillment", "creator_commission", "ad_spend", "refund_fee",
 })
@@ -410,6 +416,67 @@ def summarize_dashboard_setup(invoice_path, expense_path, reserve_pct=TAX_BUFFER
     print("  Guide: dashboard-setup-guide.md · invoice-log-template.csv · expense-log-template.csv")
 
 
+def load_self_assessment_rows(path):
+    rows = []
+    with open(path, newline="", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            try:
+                amt = float(row["amount"])
+            except (KeyError, ValueError):
+                continue
+            month = (row.get("date") or "")[:7] or "unknown"
+            row_type = (row.get("type") or "").strip().lower()
+            rows.append({
+                "month": month,
+                "type": row_type,
+                "category": (row.get("category") or "other").strip().lower() or "other",
+                "amount": amt,
+            })
+    return rows
+
+
+def summarize_self_assessment(path):
+    """landolio/5hae: monthly P&L + UK self-assessment tax pot planning."""
+    rows = load_self_assessment_rows(path)
+    if not rows:
+        print("No rows in transaction log.")
+        return
+    by_month = defaultdict(lambda: {"income": 0.0, "expense": 0.0})
+    for r in rows:
+        if r["amount"] > 0:
+            by_month[r["month"]]["income"] += r["amount"]
+        else:
+            by_month[r["month"]]["expense"] += abs(r["amount"])
+    ytd_income = sum(m["income"] for m in by_month.values())
+    ytd_expense = sum(m["expense"] for m in by_month.values())
+    ytd_net = ytd_income - ytd_expense
+    print("\n=== MONTHLY P&L (landolio/5hae shape) ===")
+    for month in sorted(by_month):
+        inc = by_month[month]["income"]
+        exp = by_month[month]["expense"]
+        net = inc - exp
+        print(f"  {month}  income ${inc:,.2f}  expense ${exp:,.2f}  net ${net:,.2f}")
+    print(f"  YTD  income ${ytd_income:,.2f}  expense ${ytd_expense:,.2f}  net ${ytd_net:,.2f}")
+    if ytd_net <= 0:
+        return
+    taxable = max(0.0, ytd_net - UK_PERSONAL_ALLOWANCE)
+    income_tax_est = taxable * UK_INCOME_TAX_RATE
+    class4_base = max(0.0, min(ytd_net, UK_CLASS4_UPPER) - UK_CLASS4_LOWER)
+    class4_ni = class4_base * UK_CLASS4_RATE
+    tax_pot = ytd_net * (UK_TAX_POT_PCT / 100)
+    months_logged = max(1, len(by_month))
+    monthly_pot = tax_pot / months_logged
+    print(f"\n=== SELF-ASSESSMENT TAX POT (landolio/5hae shape, UK planning) ===")
+    print(f"  Profit (income − allowable expenses): ${ytd_net:,.2f}")
+    print(f"  Income tax estimate (above ${UK_PERSONAL_ALLOWANCE:,.0f} allowance @ {UK_INCOME_TAX_RATE*100:.0f}%): ${income_tax_est:,.2f}")
+    print(f"  Class 4 NI estimate (${UK_CLASS4_LOWER:,.0f}–${UK_CLASS4_UPPER:,.0f} band @ {UK_CLASS4_RATE*100:.0f}%): ${class4_ni:,.2f}")
+    print(f"  Combined tax liability estimate: ${income_tax_est + class4_ni:,.2f}")
+    print(f"  Tax pot to set aside ({UK_TAX_POT_PCT:.0f}% rule): ${tax_pot:,.2f}")
+    print(f"  Avg monthly set-aside ({months_logged} months logged): ${monthly_pot:,.2f}/mo")
+    print("  Planning only — confirm rates with a qualified tax professional.")
+    print("  Guide: self-assessment-guide.md · self-assessment-sample.csv")
+
+
 def summarize_pricing(
     net_target=90000.0,
     tax_divisor=0.65,
@@ -541,6 +608,9 @@ def main():
     if len(sys.argv) >= 3 and sys.argv[1] == "--savings-goals":
         summarize_savings(sys.argv[2])
         return
+    if len(sys.argv) >= 3 and sys.argv[1] == "--self-assessment":
+        summarize_self_assessment(sys.argv[2])
+        return
     if len(sys.argv) >= 4 and sys.argv[1] == "--spreadsheet-system":
         summarize_spreadsheet_system(sys.argv[2], sys.argv[3])
         return
@@ -572,6 +642,7 @@ def main():
         print("       python3 freelance_finance_os.py --1099k 1099k-freelance-sample.csv")
         print("       python3 freelance_finance_os.py --bills-debt bills-sample.csv debt-sample.csv")
         print("       python3 freelance_finance_os.py --savings-goals savings-sample.csv")
+        print("       python3 freelance_finance_os.py --self-assessment self-assessment-sample.csv")
         print("       python3 freelance_finance_os.py --spreadsheet-system invoice-log.csv expense-log.csv")
         print("       python3 freelance_finance_os.py --six-month-reveal invoice-log.csv expense-log.csv client-hours.csv [subscriptions.csv]")
         print("       python3 freelance_finance_os.py --take-home invoice-log.csv expense-log.csv [reserve_pct]")
