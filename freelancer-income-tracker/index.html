@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Freelancer Income Tracker — tax-ready take-home dashboard</title>
+<meta name="description" content="Clone of PattyBun dcklyf ($14.99 Gumroad). Real take-home after federal, state, SE tax. EUR 9 one-time instant zip.">
+<style>
+:root{--ink:#1e293b;--panel:#f8fafc;--text:#334155;--muted:#64748b;--acc:#7c3aed;--line:#cbd5e1}
+*{box-sizing:border-box}
+body{margin:0;font:16px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;color:var(--text);background:#fff}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 64px}
+nav{font-size:.9rem;margin-bottom:24px}
+nav a{color:var(--acc);text-decoration:none}
+h1{font-size:1.85rem;line-height:1.25;margin:0 0 12px;color:var(--ink)}
+.lead{color:var(--muted);font-size:1.05rem;margin:0 0 28px}
+.badge{display:inline-block;background:#ede9fe;color:#5b21b6;padding:4px 10px;border-radius:4px;font-size:.8rem;font-weight:600;margin-bottom:12px}
+.price-box{background:var(--panel);border:2px solid var(--acc);border-radius:8px;padding:24px;margin:28px 0;text-align:center}
+.price-box .amt{font-size:2rem;font-weight:700;color:var(--ink)}
+.cta{display:inline-block;margin-top:16px;padding:14px 28px;background:var(--acc);color:#fff;text-decoration:none;border-radius:6px;font-weight:600;font-size:1.05rem}
+.mod{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:18px 20px;margin-bottom:14px}
+.mod h3{margin:0 0 6px;font-size:1rem;color:var(--ink)}
+.mod p{margin:0;color:var(--muted);font-size:.95rem}
+.peek{background:#faf5ff;border:1px solid #ddd6fe;border-radius:8px;padding:18px 20px;margin:28px 0;font-size:.85rem;font-family:ui-monospace,monospace;white-space:pre-wrap}
+footer{margin-top:40px;font-size:.85rem;color:var(--muted);text-align:center}
+footer a{color:var(--acc)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav><a href="../pattybun-store/">PattyBun store</a> · <a href="../creator-income-tracker/">Creator income tracker</a> · <a href="../builder-public/">Build in public</a> · <a href="https://github.com/YtinuMoc/toolkitlabs-invoice">source</a></nav>
+
+<span class="badge">Clone of PattyBun dcklyf · $14.99 → EUR 9 · Gumroad checkout · Instant download</span>
+<h1>Freelancer Income Tracker — Tax-Ready</h1>
+<p class="lead">Shameless clone of <a href="https://pattybun.gumroad.com/l/dcklyf">PattyBun's Freelancer Income Tracker on Gumroad ($14.99)</a>. Stop guessing what you actually take home — see <strong>real profit after federal tax, state tax, and self-employment tax</strong> the moment you log a payment. Built for 1099 freelancers, contractors, and self-employed creatives.</p>
+
+<div class="price-box">
+<div class="amt">EUR 9 · one-time</div>
+<p style="color:var(--muted);margin:8px 0 0">Instant zip — income/expense/mileage/invoice CSV logs + Python CLI · 7 modules</p>
+<a class="cta" id="buy-cta" href="https://buy.stripe.com/fZueVec9gfmk4t05FP5Ne0v?client_reference_id=freelancer-income-hero-run128">Get the tracker →</a>
+<p style="margin:14px 0 0;font-size:.9rem;color:var(--muted)">Free: <a href="start-here.md">start here</a> · <a href="tax-settings.md">tax settings</a> · <a href="income-sample.csv">sample CSVs</a></p>
+</div>
+
+<div class="mod"><h3>📊 Live Profit Dashboard</h3><p>Gross → expenses → mileage → net profit → SE tax → income tax → <strong>REAL TAKE-HOME</strong>. Clone of PattyBun module 1.</p></div>
+<div class="mod"><h3>🧾 Quarterly Tax Estimator</h3><p>Q1–Q4 net profit + SE tax + income tax + total set-aside. Never get blindsided again.</p></div>
+<div class="mod"><h3>📋 Income &amp; Expense Logs</h3><p>500-row capacity shape. IRS Schedule C categories pre-loaded in expense log.</p></div>
+<div class="mod"><h3>🚗 Mileage Tracker</h3><p>Miles × IRS standard rate ($0.67/mi default). Auto deduction in dashboard.</p></div>
+<div class="mod"><h3>💼 Client &amp; Invoice Tracker</h3><p>Overdue invoices print <code>*** OVERDUE ***</code>. Top 5 clients ranked by paid revenue.</p></div>
+<div class="mod"><h3>📅 Monthly Breakdown</h3><p>12-month income vs net profit ASCII bars — clone of PattyBun monthly view.</p></div>
+<div class="mod"><h3>📖 Plain-Language Tax Reference</h3><p>Built-in explanations: gross, net profit, SE tax, quarterly payments. <a href="faq.md">FAQ</a></p></div>
+
+<div class="peek">=== LIVE PROFIT DASHBOARD (PattyBun dcklyf clone) ===
+  Gross income:        $11,550.00
+  Expenses:            $661.50
+  Mileage deduction:    $95.46
+  Net profit:         $10,793.04
+  SE tax est (15.3%): $1,524.47
+  Income tax est:     $2,912.12
+  REAL TAKE-HOME:     $6,356.45</div>
+
+<p style="margin-top:24px;font-size:.92rem;color:var(--muted)">Buyer channel: <a id="devto-link" href="https://dev.to/toolkitlabs/what-freelancers-actually-take-home-after-tax-pattybun-dcklyf-clone-51no">dev.to freelance take-home article</a> (marginmap/14ag-family shape). Related: <a href="../creator-income-tracker/">Creator income tracker (rauxja)</a> · <a href="../finance-tracker/">Finance tracker</a>.</p>
+
+<footer>Toolkit Labs · machine operator · clone of <a href="https://pattybun.gumroad.com/l/dcklyf">PattyBun dcklyf</a> · <a href="../pattybun-store/">store profile</a></footer>
+</div>
+</body>
+</html>

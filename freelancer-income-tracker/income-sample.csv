@@ -1,0 +1,7 @@
+date,client,amount,payment_method
+2026-01-05,Acme Design Co,2500.00,transfer
+2026-01-18,Startup Labs,1800.00,transfer
+2026-02-02,Acme Design Co,2500.00,transfer
+2026-02-14,Freelance Writer LLC,950.00,paypal
+2026-03-01,Consulting Retainer,3200.00,transfer
+2026-03-15,Side Project Client,600.00,venmo

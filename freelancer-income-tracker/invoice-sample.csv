@@ -1,0 +1,6 @@
+client,amount,sent_date,due_date,paid
+Acme Design Co,2500.00,2026-01-01,2026-01-15,yes
+Startup Labs,1800.00,2026-01-10,2026-01-25,yes
+Freelance Writer LLC,950.00,2026-02-01,2026-02-15,no
+Consulting Retainer,3200.00,2026-02-28,2026-03-15,no
+Side Project Client,600.00,2026-03-01,2026-03-10,no
