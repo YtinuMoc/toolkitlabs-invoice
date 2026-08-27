@@ -186,6 +186,29 @@ def main():
     print("  2. Expense + buffer    [this run]")
     print("  3. Rate calculator     [open rate-calculator.html]")
     print("  4. Quarterly estimator [this run]")
+    print_command_center(len(invoices), collected, overdue_cnt, overdue_amt, expense_total, net_profit)
+
+
+def print_command_center(inv_count, collected, overdue_cnt, overdue_amt, expense_total, net_profit):
+    """timmothybuilder/4e81: five-template stack ending in unified command center."""
+    active = inv_count > 0 or expense_total > 0
+    status = "active" if active else "add rows"
+    print()
+    print("=== FREELANCER FINANCIAL COMMAND CENTER (timmothybuilder/4e81 shape) ===")
+    print("  Five templates every freelancer needs — #5 unifies the rest:")
+    print(f"  1. Personal finance tracker → expense log + tax buffer [{status}]")
+    print(f"  2. Client / proposal tracker → invoice log + overdue flags [{status}]")
+    print("  3. Content calendar → outside kit [use your own calendar]")
+    print(f"  4. Weekly money check-in → rate calculator.html [{status}]")
+    print(f"  5. Financial command center → full 4-tool By the Loop bundle [{status}]")
+    if overdue_cnt > 0:
+        print(
+            f"  Uncollected overdue invoices: ${overdue_amt:,.2f} ({overdue_cnt}) — "
+            "template #5 pays for itself when you find these"
+        )
+    print(f"  Collected (paid):    ${collected:,.2f}")
+    print(f"  Net profit (paid):   ${net_profit:,.2f}")
+    print("  Guide: command-center-guide.md · timmothybuilder/4e81 buyer channel clone")
 
 
 if __name__ == "__main__":
