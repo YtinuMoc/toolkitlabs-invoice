@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Small Business Finance Tracker — clone of Quillenhart qaduu dashboard tab."""
 import csv
+import os
 import sys
 from collections import defaultdict
 from datetime import datetime
@@ -375,6 +376,45 @@ def summarize_invoices(path):
         print("  Overdue: 0 — no flagged late invoices")
 
 
+def summarize_monthly_dashboard(rows, month=None):
+    """Quillenhart Dashboard tab — pick one month, see P&L + categories + set-aside."""
+    by_month = defaultdict(lambda: {"income": 0.0, "expense": 0.0})
+    by_cat_month = defaultdict(float)
+    for r in rows:
+        key = r["date"].strftime("%Y-%m")
+        if r["type"] == "income" or r["amount"] > 0:
+            by_month[key]["income"] += abs(r["amount"])
+        else:
+            by_month[key]["expense"] += abs(r["amount"])
+        if month is None or key == month:
+            by_cat_month[r["category"]] += r["amount"]
+    if not by_month:
+        return
+    if month is None:
+        month = sorted(by_month)[-1]
+    if month not in by_month:
+        print(f"\n=== FREELANCE MONTHLY DASHBOARD (Quillenhart Dashboard tab shape) ===")
+        print(f"  Selected month: {month} — no transactions logged")
+        return
+    inc = by_month[month]["income"]
+    exp = by_month[month]["expense"]
+    net = inc - exp
+    aside = net * (TAX_SET_ASIDE_PCT / 100)
+    txn_count = sum(1 for r in rows if r["date"].strftime("%Y-%m") == month)
+    print(f"\n=== FREELANCE MONTHLY DASHBOARD (Quillenhart Dashboard tab shape) ===")
+    print(f"  Selected month: {month}  ({txn_count} transactions)")
+    print(f"  Income: ${inc:,.2f}")
+    print(f"  Expenses: ${exp:,.2f}")
+    print(f"  Net profit: ${net:,.2f}")
+    print(f"  Tax set-aside ({TAX_SET_ASIDE_PCT:.0f}% of net): ${aside:,.2f}")
+    if by_cat_month:
+        print("  Top categories this month:")
+        for cat in sorted(by_cat_month, key=lambda c: -abs(by_cat_month[c]))[:6]:
+            print(f"    {cat}: ${by_cat_month[cat]:,.2f}")
+    months_available = ", ".join(sorted(by_month))
+    print(f"  Other months in log: {months_available}")
+
+
 def summarize(rows):
     by_month = defaultdict(lambda: {"income": 0.0, "expense": 0.0})
     by_cat = defaultdict(float)
@@ -468,10 +508,15 @@ def main():
     savings_path = sys.argv[5] if len(sys.argv) > 5 else None
     calc_path = sys.argv[6] if len(sys.argv) > 6 else None
     calculators_path = sys.argv[7] if len(sys.argv) > 7 else None
+    month_arg = sys.argv[8] if len(sys.argv) > 8 else None
+    month_arg = month_arg or os.environ.get("FINANCE_MONTH")
+    if month_arg == "":
+        month_arg = None
     rows = load_rows(path)
     if not rows:
         print("No transactions found.", file=sys.stderr)
         sys.exit(1)
+    summarize_monthly_dashboard(rows, month=month_arg)
     summarize(rows)
     ytd_net = None
     by_month = defaultdict(lambda: {"income": 0.0, "expense": 0.0})
