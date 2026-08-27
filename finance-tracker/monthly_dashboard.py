@@ -816,6 +816,22 @@ COLORWAYS_BUNDLE_PRICE = 34
 COLORWAYS_SINGLE_PRICE = 15
 
 
+def summarize_beginner_friendly(rows):
+    """Quillenhart shaded-cells promise + faisalmq/2fj6 clarity-without-accounting-degree shape."""
+    tx_count = len(rows)
+    capacity = 150
+    print("\n=== BEGINNER-FRIENDLY (Quillenhart — no formulas required) ===")
+    print("  You only type into shaded cells. In this kit that's your CSV rows.")
+    print("  Type here:       date, type, category, description, amount (CSV rows)")
+    print("  Auto-calculated: monthly P&L, margins, YTD, tax set-aside, category %")
+    print(
+        f"  Transaction log: {tx_count}/{capacity} rows used "
+        "(expandable — duplicate transaction-log-template.csv)"
+    )
+    print("  No spreadsheet formula experience needed — run this script after logging")
+    print("  Guide: beginner-guide.md · faisalmq/2fj6 buyer channel clone")
+
+
 def summarize_colorways():
     """Quillenhart qaduu Gumroad colorway variants + All-6 bundle upsell."""
     singles_total = len(COLORWAYS) * COLORWAYS_SINGLE_PRICE
@@ -960,6 +976,7 @@ def main():
         print("No transactions found.", file=sys.stderr)
         sys.exit(1)
     summarize_setup_readme()
+    summarize_beginner_friendly(rows)
     summarize_colorways()
     summarize_transactions_log(rows)
     summarize_ytd_totals(rows)
