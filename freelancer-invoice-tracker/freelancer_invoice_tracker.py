@@ -304,6 +304,40 @@ def summarize_cash_runway(
     print("  Guide: cash-runway-guide.md · agentchip/33mm buyer channel clone")
 
 
+def print_bundle_stack(manifest_path=None):
+    """agentchip/2dgn: separate tools priced individually → one connected workbook stack."""
+    modules = [
+        ("Invoice + overdue flags", "agentchip/2b11", 15),
+        ("Subscription auto-renewal audit", "agentchip/52g8", 12),
+        ("Cash runway forecast", "agentchip/33mm", 12),
+        ("Client dashboard rollup", "built-in", 0),
+    ]
+    if manifest_path:
+        try:
+            with open(manifest_path, newline="") as f:
+                rows = list(csv.DictReader(f))
+            if rows:
+                modules = [
+                    (r["name"], r["buyer_channel"], float(r["separate_price_usd"]))
+                    for r in rows
+                    if r.get("included", "yes").lower() in ("yes", "true", "1")
+                ]
+        except OSError:
+            pass
+    separate_total = sum(p for _, _, p in modules)
+    kit_price_eur = 9
+    savings = max(separate_total - kit_price_eur, 0)
+    pct = int(round(100 * savings / separate_total)) if separate_total else 0
+    print("\n=== FREELANCER FINANCE STACK (agentchip/2dgn shape) ===")
+    for name, channel, price in modules:
+        tag = f"separate ~${price:.0f}" if price else "built-in"
+        print(f"  Module: {name} ({channel}) — {tag} · included ✓")
+    print(f"  Separate stack total: ~${separate_total:.0f} · this kit: EUR {kit_price_eur} one-time")
+    if separate_total:
+        print(f"  Savings vs buying separately: ~{pct}%")
+    print("  Guide: bundle-stack-guide.md · agentchip/2dgn buyer channel clone")
+
+
 def print_report(clients, invoices, payments):
     s = summarize(clients, invoices, payments)
     print("=== FREELANCER INVOICE & CLIENT TRACKER (AgentChip clone) ===")
@@ -355,6 +389,12 @@ def main():
         bills_path=bills_path,
         debt_path=debt_path,
     )
+    manifest = None
+    for arg in sys.argv[4:]:
+        if arg.endswith("modules-manifest.csv"):
+            manifest = arg
+            break
+    print_bundle_stack(manifest)
 
 
 if __name__ == "__main__":

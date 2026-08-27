@@ -1,0 +1,5 @@
+module_id,name,buyer_channel,separate_price_usd,included
+invoicing,Invoice + overdue flags,agentchip/2b11,15,yes
+subscription_audit,Subscription auto-renewal audit,agentchip/52g8,12,yes
+cash_runway,Cash runway forecast,agentchip/33mm,12,yes
+dashboard,Client dashboard rollup,built-in,0,yes
