@@ -75,6 +75,15 @@ def main():
     safe_to_spend = max(net_profit - tax_buffer, 0)
     quarterly = max(net_profit, 0) * ESTIMATED_TAX_PCT / 100 / 4
 
+    inv_rows = len(invoices)
+    exp_rows = sum(1 for _ in open(sys.argv[2], encoding="utf-8")) - 1  # header
+
+    print("=== BEGINNER-FRIENDLY (faisalmq/2fj6 — no formulas required) ===")
+    print("  You only type into shaded cells. In this kit that's your CSV rows.")
+    print("  Type here:     invoice + expense CSV columns (see templates)")
+    print("  Auto-calculated: collected, net profit, tax buffer, safe-to-spend, quarterly")
+    print(f"  Invoice log: {inv_rows} rows · Expense log: {exp_rows} rows (expandable — duplicate templates)")
+    print()
     print("=== FREELANCE FINANCE OS (By the Loop clone) ===")
     print(f"  Invoices logged:     {len(invoices)}")
     print(f"  Total invoiced:      ${invoiced:,.2f}")
