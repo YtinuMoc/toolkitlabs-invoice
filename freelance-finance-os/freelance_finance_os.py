@@ -56,13 +56,60 @@ def load_expenses(path):
     return total, dict(by_cat)
 
 
+def load_expense_rows(path):
+    rows = []
+    with open(path, newline="", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            try:
+                amt = abs(float(row["amount"]))
+            except (KeyError, ValueError):
+                continue
+            date_str = row.get("date", "").strip()
+            try:
+                dt = datetime.strptime(date_str, "%Y-%m-%d").date()
+            except ValueError:
+                continue
+            cat = row.get("category", "other").strip().lower() or "other"
+            rows.append({"date": dt, "category": cat, "amount": amt})
+    return rows
+
+
+def print_category_breakdown(rows):
+    """raxxostudios/5a8i + By the Loop expense tab: category-by-category every month."""
+    print("\n=== CATEGORY BREAKDOWN BY MONTH (raxxostudios/5a8i + By the Loop) ===")
+    print("  12 categories is the sweet spot — fewer and the P&L is useless")
+    by_month_cat = defaultdict(lambda: defaultdict(float))
+    cat_totals = defaultdict(float)
+    for r in rows:
+        key = r["date"].strftime("%Y-%m")
+        by_month_cat[key][r["category"]] += r["amount"]
+        cat_totals[r["category"]] += r["amount"]
+    if not by_month_cat:
+        print("  No expense rows yet — log amounts with date + category columns")
+        return
+    for month in sorted(by_month_cat):
+        cats = by_month_cat[month]
+        total = sum(cats.values())
+        print(f"\n  {month} — expenses ${total:,.2f}")
+        for cat in sorted(cats, key=lambda c: -cats[c]):
+            pct = (cats[cat] / total * 100) if total else 0
+            print(f"    {cat}: ${cats[cat]:,.2f} ({pct:.0f}%)")
+    annual = sum(cat_totals.values())
+    print(f"\n  YTD expense categories (${annual:,.2f} total):")
+    for cat in sorted(cat_totals, key=lambda c: -cat_totals[c]):
+        pct = (cat_totals[cat] / annual * 100) if annual else 0
+        print(f"    {cat}: ${cat_totals[cat]:,.2f} ({pct:.0f}%)")
+
+
 def main():
     if len(sys.argv) < 3:
         print("Usage: python3 freelance_finance_os.py invoice-log.csv expense-log.csv")
         sys.exit(1)
 
     invoices = load_invoices(sys.argv[1])
-    expense_total, by_cat = load_expenses(sys.argv[2])
+    expense_path = sys.argv[2]
+    expense_total, by_cat = load_expenses(expense_path)
+    expense_rows = load_expense_rows(expense_path)
 
     invoiced = sum(r["amount"] for r in invoices)
     collected = sum(r["amount"] for r in invoices if r["status"] == "paid")
@@ -98,6 +145,7 @@ def main():
     print(f"  Net profit (paid):   ${net_profit:,.2f}")
     print(f"  Tax buffer ({TAX_BUFFER_PCT:.0f}%):   ${tax_buffer:,.2f}")
     print(f"  Safe to spend:       ${safe_to_spend:,.2f}")
+    print_category_breakdown(expense_rows)
     print()
     margin_pct = (net_profit / collected * 100) if collected > 0 else 0.0
     print("=== PROFIT MARGINS AT A GLANCE (faisalmq/3cpo shape) ===")
