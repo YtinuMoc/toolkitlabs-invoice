@@ -167,6 +167,131 @@ def months_to_goal(target, initial, monthly, annual_rate_pct):
     return months, contributed, interest, balance
 
 
+def compound_growth(principal, monthly, annual_rate_pct, years):
+    rate = annual_rate_pct / 100 / 12
+    months = int(years * 12)
+    balance = principal
+    contributed = 0.0
+    for _ in range(months):
+        balance += monthly
+        contributed += monthly
+        if rate > 0:
+            balance *= 1 + rate
+    interest = balance - principal - contributed
+    return balance, contributed, interest
+
+
+def months_to_fire(net_worth, monthly_savings, annual_return_pct, target):
+    rate = annual_return_pct / 100 / 12
+    balance = net_worth
+    months = 0
+    contributed = 0.0
+    while balance < target and months < 1200:
+        balance += monthly_savings
+        contributed += monthly_savings
+        if rate > 0:
+            balance *= 1 + rate
+        months += 1
+    if balance < target:
+        return None, contributed, balance
+    return months, contributed, balance
+
+
+def freelance_hourly_rate(target_income, hours_per_week, admin_pct, benefits_pct, weeks_off=2):
+    billable_weeks = 52 - weeks_off
+    billable_hours = billable_weeks * hours_per_week * (1 - admin_pct / 100)
+    if billable_hours <= 0:
+        return None
+    gross_needed = target_income * (1 + benefits_pct / 100) / 0.70
+    return gross_needed / billable_hours, billable_hours, gross_needed
+
+
+def dca_future_value(monthly, annual_rate_pct, years):
+    rate = annual_rate_pct / 100 / 12
+    months = int(years * 12)
+    balance = 0.0
+    for _ in range(months):
+        balance = (balance + monthly) * (1 + rate) if rate > 0 else balance + monthly
+    invested = monthly * months
+    gain = balance - invested
+    return balance, invested, gain
+
+
+def summarize_finance_calculators(path):
+    rows = []
+    with open(path, newline="", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            rows.append(row)
+    if not rows:
+        return
+    print("\n=== FINANCE CALCULATORS HUB (profiterole/1pnb shape) ===")
+    for row in rows:
+        calc = row.get("calculator", "").strip().lower()
+        label = row.get("label", calc).strip() or calc
+        if calc == "compound":
+            principal = float(row.get("principal") or 0)
+            monthly = float(row.get("monthly_contribution") or 0)
+            rate = float(row.get("annual_rate") or 0)
+            years = float(row.get("years") or 0)
+            final, contributed, interest = compound_growth(principal, monthly, rate, years)
+            print(f"  {label} (compound interest): ${principal:,.2f} start · ${monthly:,.2f}/mo · {rate:.1f}% · {years:.0f}y")
+            print(f"    Final balance: ${final:,.2f}")
+            print(f"    Total contributed: ${contributed:,.2f}")
+            print(f"    Interest earned: ${interest:,.2f}")
+        elif calc == "fire":
+            net_worth = float(row.get("principal") or 0)
+            monthly = float(row.get("monthly_contribution") or 0)
+            rate = float(row.get("annual_rate") or 7)
+            spending = float(row.get("annual_spending") or 0)
+            wr = float(row.get("withdrawal_rate") or 4)
+            target = spending / (wr / 100) if wr else 0
+            months, contributed, final = months_to_fire(net_worth, monthly, rate, target)
+            print(f"  {label} (FIRE / {wr:.0f}% rule): ${spending:,.0f}/yr spending → ${target:,.0f} target")
+            print(f"    Current net worth: ${net_worth:,.2f} · saving ${monthly:,.2f}/mo · {rate:.1f}% return")
+            if months is None:
+                print("    Projected: target not reached in 100 years at this pace")
+            else:
+                yrs, rem = divmod(months, 12)
+                when = f"{months} months" if yrs == 0 else f"{yrs}y {rem}m ({months} months)"
+                print(f"    Projected FIRE date: {when}")
+                print(f"    Balance at FIRE: ${final:,.2f}")
+        elif calc == "freelance":
+            target_income = float(row.get("target_income") or 0)
+            hours = float(row.get("hours_per_week") or 30)
+            admin = float(row.get("admin_pct") or 20)
+            benefits = float(row.get("benefits_pct") or 15)
+            hourly, billable, gross = freelance_hourly_rate(target_income, hours, admin, benefits)
+            if hourly is None:
+                continue
+            print(f"  {label} (freelance rate): ${target_income:,.0f} take-home target")
+            print(f"    {hours:.0f}h/wk · {admin:.0f}% admin · {benefits:.0f}% benefits load")
+            print(f"    Billable hours/year: {billable:,.0f}")
+            print(f"    Gross revenue needed: ${gross:,.0f}")
+            print(f"    Hourly rate to charge: ${hourly:,.2f}/hr")
+        elif calc == "dca":
+            monthly = float(row.get("monthly_contribution") or 0)
+            rate = float(row.get("annual_rate") or 0)
+            years = float(row.get("years") or 0)
+            final, invested, gain = dca_future_value(monthly, rate, years)
+            print(f"  {label} (DCA): ${monthly:,.2f}/mo · {rate:.1f}% · {years:.0f}y")
+            print(f"    Total invested: ${invested:,.2f}")
+            print(f"    Portfolio value: ${final:,.2f}")
+            print(f"    Market gains: ${gain:,.2f}")
+        elif calc == "savings":
+            target = float(row.get("target") or row.get("principal") or 0)
+            initial = float(row.get("initial") or row.get("initial_balance") or 0)
+            monthly = float(row.get("monthly_contribution") or 0)
+            rate = float(row.get("annual_rate") or 0)
+            months, contributed, interest, final = months_to_goal(target, initial, monthly, rate)
+            if months is None:
+                print(f"  {label} (savings goal): unreachable at ${monthly:,.2f}/mo")
+                continue
+            yrs, rem = divmod(months, 12)
+            when = f"{months} months" if yrs == 0 else f"{yrs}y {rem}m ({months} months)"
+            print(f"  {label} (savings goal): ${target:,.2f} · ${initial:,.2f} start · ${monthly:,.2f}/mo · {rate:.1f}% APR")
+            print(f"    Time to goal: {when} · final ${final:,.2f}")
+
+
 def summarize_savings_calculator(path):
     rows = []
     with open(path, newline="", encoding="utf-8") as f:
@@ -319,6 +444,7 @@ def main():
     debt_path = sys.argv[4] if len(sys.argv) > 4 else None
     savings_path = sys.argv[5] if len(sys.argv) > 5 else None
     calc_path = sys.argv[6] if len(sys.argv) > 6 else None
+    calculators_path = sys.argv[7] if len(sys.argv) > 7 else None
     rows = load_rows(path)
     if not rows:
         print("No transactions found.", file=sys.stderr)
@@ -349,7 +475,14 @@ def main():
         else:
             summarize_savings(savings_path)
     if calc_path:
-        summarize_savings_calculator(calc_path)
+        with open(calc_path, newline="", encoding="utf-8") as f:
+            hdr = csv.DictReader(f).fieldnames or []
+        if "calculator" in hdr:
+            summarize_finance_calculators(calc_path)
+        else:
+            summarize_savings_calculator(calc_path)
+    if calculators_path:
+        summarize_finance_calculators(calculators_path)
 
 
 if __name__ == "__main__":

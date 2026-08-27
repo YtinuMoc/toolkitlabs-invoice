@@ -1,0 +1,6 @@
+calculator,label,principal,monthly_contribution,annual_rate,years,annual_spending,withdrawal_rate,target_income,hours_per_week,admin_pct,benefits_pct,target,initial
+compound,Retirement index fund,10000,500,7,30,,,,,,,
+fire,Lean FIRE path,150000,2000,7,,40000,4,,,,,
+freelance,Developer freelance rate,,,,,,120000,30,20,15,,
+dca,Monthly index fund DCA,0,500,8,20,,,,,,,
+savings,Emergency fund,,400,4.5,,,,,,,10000,3200
