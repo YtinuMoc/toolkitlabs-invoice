@@ -443,6 +443,74 @@ def summarize_payment_follow_up(invoices_path, payments_path=None):
     print("  Guide: payment-follow-up-guide.md · agentchip/11n6 buyer channel clone")
 
 
+STALE_OPEN_DAYS = 90
+
+
+def summarize_payout_settlement(clients_path, invoices_path, payments_path, stale_days=STALE_OPEN_DAYS):
+    """agentchip/52c0: per-client settlement rollup + stale open invoice flags."""
+    clients = load_clients(clients_path)
+    invoices = load_invoices(invoices_path)
+    payments = load_payments(payments_path)
+    today = date.today()
+    by_client = defaultdict(lambda: {"invoiced": 0.0, "received": 0.0, "open": [], "stale": []})
+
+    for inv in invoices:
+        client = inv["client"]
+        paid_amt = payments.get(inv["invoice_id"], 0.0)
+        balance = max(inv["total"] - paid_amt, 0.0)
+        by_client[client]["invoiced"] += inv["total"]
+        by_client[client]["received"] += paid_amt
+        if balance <= 0:
+            continue
+        inv_date = inv.get("invoice_date", "").strip()
+        days_open = None
+        if inv_date:
+            try:
+                days_open = (today - datetime.strptime(inv_date, "%Y-%m-%d").date()).days
+            except ValueError:
+                pass
+        row = {
+            "invoice_id": inv["invoice_id"],
+            "balance": balance,
+            "status": inv["status"],
+            "days_open": days_open,
+        }
+        by_client[client]["open"].append(row)
+        if days_open is not None and days_open >= stale_days:
+            by_client[client]["stale"].append(row)
+
+    print("\n=== CLIENT PAYOUT SETTLEMENT (agentchip/52c0 shape) ===")
+    print(f"  Per-client rollup — commission math without the afternoon reconciliation.")
+    print(f"  Stale open threshold: {stale_days} days (flag before write-off, like consignment 90-day rule).")
+    if not by_client:
+        print("  No invoice rows — settlement idle.")
+        return
+
+    total_owed = 0.0
+    stale_count = 0
+    for client in sorted(by_client):
+        nums = by_client[client]
+        owed = nums["invoiced"] - nums["received"]
+        total_owed += max(owed, 0.0)
+        stale_count += len(nums["stale"])
+        terms = clients.get(client, {}).get("payment_terms_days", 30)
+        print(f"\n  {client} · terms {terms}d")
+        print(f"    Invoiced: ${nums['invoiced']:,.2f} · Received: ${nums['received']:,.2f} · Balance: ${owed:,.2f}")
+        if nums["open"]:
+            print("    Open invoices:")
+            for row in nums["open"]:
+                age = f"{row['days_open']}d open" if row["days_open"] is not None else "age unknown"
+                flag = " · STALE" if row in nums["stale"] else ""
+                print(f"      {row['invoice_id']} · ${row['balance']:,.2f} · {row['status']} · {age}{flag}")
+        else:
+            print("    Open invoices: none — settled")
+        if nums["stale"]:
+            print(f"    → {len(nums['stale'])} stale open invoice(s) past {stale_days}d — escalate or write off")
+
+    print(f"\n  Portfolio balance due: ${total_owed:,.2f} · stale open lines: {stale_count}")
+    print("  Guide: payout-settlement-guide.md · agentchip/52c0 buyer channel clone")
+
+
 def summarize_invoice_reconciliation(path):
     """agentchip/47ag: CSV in, reconciliation out — nightly copy-paste ritual killer."""
     clean, errors, raw_count = clean_dirty_invoices(path)
@@ -545,12 +613,16 @@ def main():
         payments_path = sys.argv[3] if len(sys.argv) >= 4 else None
         summarize_payment_follow_up(sys.argv[2], payments_path)
         return
+    if len(sys.argv) >= 5 and sys.argv[1] == "--settlement":
+        summarize_payout_settlement(sys.argv[2], sys.argv[3], sys.argv[4])
+        return
     if len(sys.argv) < 4:
         print(
             "Usage: freelancer_invoice_tracker.py clients.csv invoices.csv payments.csv "
             "[subscriptions.csv] [bills.csv] [debt.csv]\n"
             "       freelancer_invoice_tracker.py --reconcile dirty-invoices.csv\n"
-            "       freelancer_invoice_tracker.py --follow-up invoices.csv [payments.csv]",
+            "       freelancer_invoice_tracker.py --follow-up invoices.csv [payments.csv]\n"
+            "       freelancer_invoice_tracker.py --settlement clients.csv invoices.csv payments.csv",
             file=sys.stderr,
         )
         sys.exit(1)
