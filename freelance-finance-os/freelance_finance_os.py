@@ -246,6 +246,44 @@ def summarize_debt(path, ytd_net=None):
     print("  Guide: bills-debt-guide.md · debt-sample.csv")
 
 
+def summarize_savings(path):
+    rows = []
+    with open(path, newline="", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            try:
+                target = float(row["target"])
+                saved = float(row.get("saved", 0) or 0)
+                weekly = float(row.get("weekly_target", 0) or 0)
+            except (KeyError, ValueError):
+                continue
+            rows.append({
+                "goal": row.get("goal", "").strip(),
+                "target": target,
+                "saved": saved,
+                "weekly_target": weekly,
+                "status": row.get("status", "active").strip().lower() or "active",
+            })
+    if not rows:
+        return
+    print("\n=== SAVINGS GOALS (stephane/5629 shape) ===")
+    total_target = total_saved = 0.0
+    for r in rows:
+        pct = (r["saved"] / r["target"] * 100) if r["target"] > 0 else 0.0
+        remaining = max(0.0, r["target"] - r["saved"])
+        weeks_left = (remaining / r["weekly_target"]) if r["weekly_target"] > 0 else 0.0
+        print(
+            f"  {r['goal']}: ${r['saved']:,.2f} / ${r['target']:,.2f} "
+            f"({pct:.0f}% complete, ${remaining:,.2f} left"
+            + (f", ~{weeks_left:.0f} weeks at ${r['weekly_target']:,.0f}/wk" if weeks_left else "")
+            + ")"
+        )
+        total_target += r["target"]
+        total_saved += r["saved"]
+    overall = (total_saved / total_target * 100) if total_target > 0 else 0.0
+    print(f"  Portfolio: ${total_saved:,.2f} / ${total_target:,.2f} ({overall:.0f}% across {len(rows)} goals)")
+    print("  Guide: savings-goals-guide.md · savings-sample.csv")
+
+
 def main():
     if len(sys.argv) >= 3 and sys.argv[1] == "--1099k":
         summarize_1099k_reconciliation(load_transaction_log(sys.argv[2]))
@@ -254,10 +292,14 @@ def main():
         summarize_bills(sys.argv[2])
         summarize_debt(sys.argv[3])
         return
+    if len(sys.argv) >= 3 and sys.argv[1] == "--savings-goals":
+        summarize_savings(sys.argv[2])
+        return
     if len(sys.argv) < 3:
-        print("Usage: python3 freelance_finance_os.py invoice-log.csv expense-log.csv [subscriptions.csv] [bills.csv] [debt.csv]")
+        print("Usage: python3 freelance_finance_os.py invoice-log.csv expense-log.csv [subscriptions.csv] [bills.csv] [debt.csv] [savings.csv]")
         print("       python3 freelance_finance_os.py --1099k 1099k-freelance-sample.csv")
         print("       python3 freelance_finance_os.py --bills-debt bills-sample.csv debt-sample.csv")
+        print("       python3 freelance_finance_os.py --savings-goals savings-sample.csv")
         sys.exit(1)
 
     invoices = load_invoices(sys.argv[1])
@@ -347,12 +389,15 @@ def main():
     subs_path = extra[0] if len(extra) >= 1 and extra[0] else None
     bills_path = extra[1] if len(extra) >= 2 and extra[1] else None
     debt_path = extra[2] if len(extra) >= 3 and extra[2] else None
+    savings_path = extra[3] if len(extra) >= 4 and extra[3] else None
     if subs_path:
         summarize_subscription_audit(subs_path)
     if bills_path:
         summarize_bills(bills_path)
     if debt_path:
         summarize_debt(debt_path, ytd_net=net_profit)
+    if savings_path:
+        summarize_savings(savings_path)
     summarize_cash_runway(invoices, expense_rows, bills_path, debt_path)
 
 
