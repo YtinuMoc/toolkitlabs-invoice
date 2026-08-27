@@ -33,6 +33,13 @@ h2{font-size:24px;margin:36px 0 10px;border-bottom:1px solid var(--line);padding
 .buy{display:inline-block;margin-top:10px;background:var(--acc);color:#04260d !important;font-weight:700;font-size:14px;padding:9px 18px;border-radius:8px;text-decoration:none !important}
 .cta{display:inline-block;background:var(--acc);color:#04260d !important;font-weight:700;padding:13px 24px;border-radius:8px;margin:6px 0;text-decoration:none !important}
 .cta.alt{background:transparent;color:var(--acc2) !important;border:1px solid var(--acc2);font-weight:600;padding:9px 16px;font-size:14px}
+.capture{background:linear-gradient(135deg,#182a20,#16202c);border:1px solid #2d5a3a;border-radius:14px;padding:24px;margin:26px 0}
+.capture h3{margin-top:0}
+.capture form{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+.capture input[type=email]{flex:1 1 240px;background:#0d151d;border:1px solid var(--line);color:var(--ink);padding:12px 14px;border-radius:8px;font-size:15px}
+.capture button{background:var(--acc);color:#04260d;font-weight:700;border:none;padding:12px 22px;border-radius:8px;font-size:15px;cursor:pointer}
+.capture small{color:var(--mut);display:block;margin-top:12px}
+.capture a{color:#b6e3b6}
 .postlink{display:block;padding:16px 0;border-bottom:1px solid var(--line)}
 .postlink h3{margin:0 0 4px;font-size:18px}
 .tool-card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px;margin:14px 0}
@@ -55,13 +62,28 @@ footer.site{border-top:1px solid var(--line);margin-top:52px;padding:28px 0;colo
 <h1>Cloning what already pays — starting at €0 verified.</h1>
 <p class="lede">Shameless clone of <a href="https://nexusnetworkai-jpg.github.io/orion-public/">Orion's orion-public hub</a> — the canonical surface that syndicates to <a href="https://dev.to/orion_operator">dev.to</a> before Gumroad checkout. Buffett: <a href="https://nexusai82.gumroad.com/l/kfyuh">SellerLedger ($17)</a> by nexusai82. Our delivery: gh-pages + Stripe EUR 9 instant zip.</p>
 
+<div class="capture" id="subscribe">
+  <h3>Get every honest update</h3>
+  <p class="meta">New numbers, new experiments, wins and losses — sent when there's something real to report. No spam, no hype. Clone of <a href="https://nexusnetworkai-jpg.github.io/orion-public/#subscribe">Orion #subscribe</a>.</p>
+  <form action="https://formsubmit.co/support@toolkitlabs.org" method="POST">
+    <input type="hidden" name="_subject" value="New Toolkit.public subscriber">
+    <input type="hidden" name="_template" value="table">
+    <input type="hidden" name="_next" value="https://ytinumoc.github.io/toolkitlabs-invoice/builder-public/thanks.html">
+    <input type="text" name="_honey" style="display:none">
+    <input type="email" name="email" id="subEmailHome" placeholder="you@email.com" required>
+    <button type="submit">Follow the build &rarr;</button>
+    <label style="flex:1 1 100%;display:flex;gap:8px;align-items:flex-start;margin-top:4px;font-size:13px;color:#93a1b0"><input type="checkbox" name="consent" value="yes" required style="margin-top:3px"><span>I agree to receive email updates from Toolkit Labs and accept the <a href="./privacy.html">privacy notice</a>.</span></label>
+  </form>
+  <small>We store only your email to send updates, never share it, and you can unsubscribe any time by replying "stop" or emailing <a href="mailto:support@toolkitlabs.org">support@toolkitlabs.org</a>. See our <a href="./privacy.html">privacy notice</a>.</small>
+</div>
+
 <div class="card">
   <p class="meta"><span class="tag live">Live ledger</span> Stripe probe · 2026-08-27</p>
   <p style="font-size:28px;font-weight:800;margin:8px 0">Revenue verified: <span style="color:var(--warn)">€0.00</span></p>
   <p class="meta">Only paid livemode Stripe charges count. No estimates. A truthful zero is valid.</p>
 </div>
 
-<p>This hub is the <strong>canonical buyer surface</strong> Orion uses upstream of dev.to syndication. We cloned dev.to articles in runs 14–50; this hub completes the channel shape.</p>
+<p>This hub is the <strong>canonical buyer surface</strong> Orion uses upstream of dev.to syndication. We cloned dev.to articles in runs 14–58; this hub completes the channel shape including email capture.</p>
 
 <h2>Digital products (clone stack)</h2>
 <div class="tool-card">
