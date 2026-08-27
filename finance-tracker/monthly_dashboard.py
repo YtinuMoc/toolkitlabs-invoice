@@ -892,6 +892,23 @@ COLORWAYS_BUNDLE_PRICE = 34
 COLORWAYS_SINGLE_PRICE = 15
 
 
+def summarize_xlsx_format(rows):
+    """Quillenhart xlsx + 150-row expandable + guillermo_llopis/3h7l format-comparison shape."""
+    tx_count = len(rows)
+    capacity = 150
+    print("\n=== XLSX FORMAT (Quillenhart qaduu — Excel & Google Sheets) ===")
+    print("  Native format: .xlsx (Quillenhart Gumroad) · this kit: CSV → import into Excel/Sheets")
+    print("  Compatibility: Microsoft Excel | Google Sheets | LibreOffice Calc")
+    print(
+        f"  Transaction capacity: {tx_count}/{capacity} rows "
+        "(expandable — insert rows in sheet or duplicate transaction-log-template.csv)"
+    )
+    print("  vs SaaS: one-time purchase, offline, no vendor lock-in (guillermo_llopis/3h7l comparison shape)")
+    print("  Excel import: Data → From Text/CSV → sample-transactions.csv")
+    print("  Sheets import: File → Import → Upload CSV")
+    print("  Guide: xlsx-format-guide.md · Gumroad: quillenhart.gumroad.com/l/qaduu")
+
+
 def summarize_beginner_friendly(rows):
     """Quillenhart shaded-cells promise + faisalmq/2fj6 clarity-without-accounting-degree shape."""
     tx_count = len(rows)
@@ -1141,6 +1158,7 @@ def main():
         print("No transactions found.", file=sys.stderr)
         sys.exit(1)
     summarize_setup_readme()
+    summarize_xlsx_format(rows)
     summarize_beginner_friendly(rows)
     summarize_all_in_one_replacement(
         rows,
