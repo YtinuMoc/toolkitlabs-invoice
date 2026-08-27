@@ -16,6 +16,8 @@ Ads, software, refunds, supplies in `expense-log-template.csv`.
 python3 seller_profit_fee_tracker.py sales-log-template.csv expense-log-template.csv
 ```
 
-You get: seller dashboard, platform performance comparison, monthly summary, lowest-net order flag.
+You get: seller dashboard, platform performance comparison, expense drag by category, monthly summary, lowest-net order flag.
 
 See `sales-sample.csv` for a worked example across Gumroad, Etsy, Shopify, eBay, and Amazon.
+
+Guides: [platform comparison](platform-comparison-guide.md) · [expense drag](expense-drag-guide.md) · [fee settings](platform-fees-guide.md)

@@ -93,12 +93,35 @@ def print_platform_comparison(sales):
         p["net"] += r["net"]
     print("\n=== PLATFORM PERFORMANCE COMPARISON ===")
     ranked = sorted(by_platform.items(), key=lambda x: x[1]["net"], reverse=True)
+    drag = []
     for platform, stats in ranked:
         eff = (stats["fees"] / stats["gross"] * 100) if stats["gross"] else 0
+        drag.append((platform, eff, stats))
         print(
             f"  {platform:10} {stats['orders']:3} orders · gross ${stats['gross']:,.2f} · "
             f"fees ${stats['fees']:,.2f} ({eff:.1f}%) · net ${stats['net']:,.2f}"
         )
+    if drag:
+        highest = max(drag, key=lambda x: x[1])
+        lowest = min(drag, key=lambda x: x[1])
+        print(f"\n  Highest fee drag: {highest[0]} ({highest[1]:.1f}% of gross)")
+        print(f"  Lowest fee drag:  {lowest[0]} ({lowest[1]:.1f}% of gross)")
+
+
+def print_expense_drag(sales, expenses):
+    gross = sum(r["gross"] for r in sales)
+    if not expenses:
+        return
+    by_cat = defaultdict(float)
+    for r in expenses:
+        by_cat[r["category"]] += r["amount"]
+    total = sum(by_cat.values())
+    print("\n=== EXPENSE DRAG (after platform fees) ===")
+    for cat, amt in sorted(by_cat.items(), key=lambda x: x[1], reverse=True):
+        pct_gross = (amt / gross * 100) if gross else 0
+        pct_exp = (amt / total * 100) if total else 0
+        print(f"  {cat:12} ${amt:,.2f} · {pct_gross:.1f}% of gross · {pct_exp:.0f}% of expenses")
+    print(f"  {'TOTAL':12} ${total:,.2f} · {(total / gross * 100) if gross else 0:.1f}% of gross sales")
 
 
 def print_monthly_summary(sales, expenses):
@@ -133,6 +156,7 @@ def main():
     print(f"Sales rows: {len(sales)} · Expense rows: {len(expenses)}")
     print_dashboard(sales, expenses)
     print_platform_comparison(sales)
+    print_expense_drag(sales, expenses)
     print_monthly_summary(sales, expenses)
     print_worst_order(sales)
     print("\nClone target: smadsby.gumroad.com/l/ejxcg ($14.99 SimpleBizDash)")
