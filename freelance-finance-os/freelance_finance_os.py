@@ -99,6 +99,25 @@ def main():
     print(f"  Tax buffer ({TAX_BUFFER_PCT:.0f}%):   ${tax_buffer:,.2f}")
     print(f"  Safe to spend:       ${safe_to_spend:,.2f}")
     print()
+    margin_pct = (net_profit / collected * 100) if collected > 0 else 0.0
+    print("=== PROFIT MARGINS AT A GLANCE (faisalmq/3cpo shape) ===")
+    print(f"  Collected (paid):    ${collected:,.2f}")
+    print(f"  Expenses YTD:        ${expense_total:,.2f}")
+    print(f"  Net profit:          ${net_profit:,.2f}")
+    print(f"  Profit margin:       {margin_pct:.1f}%")
+    print("  Categorized breakdown (tax preparedness):")
+    for cat, amt in sorted(by_cat.items(), key=lambda x: -x[1]):
+        pct_rev = (amt / collected * 100) if collected > 0 else 0.0
+        print(f"    {cat:12} ${amt:,.2f}  ({pct_rev:.1f}% of revenue)")
+    by_client = defaultdict(float)
+    for r in invoices:
+        if r["status"] == "paid":
+            by_client[r["client"]] += r["amount"]
+    if by_client:
+        print("  Per-client collected (pricing decisions):")
+        for client, amt in sorted(by_client.items(), key=lambda x: -x[1]):
+            print(f"    {client:20} ${amt:,.2f}")
+    print()
     print("=== QUARTERLY TAX ESTIMATOR (1040-ES shape) ===")
     print(f"  Estimated annual tax ({ESTIMATED_TAX_PCT:.0f}% planning rate): ${max(net_profit,0)*ESTIMATED_TAX_PCT/100:,.2f}")
     print(f"  Suggested per deadline: ${quarterly:,.2f}")
