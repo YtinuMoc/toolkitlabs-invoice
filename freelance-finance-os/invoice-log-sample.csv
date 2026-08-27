@@ -1,0 +1,7 @@
+date,client,description,amount,status,due_date
+2026-01-05,Acme Corp,Website redesign phase 1,2500.00,paid,2026-01-20
+2026-01-18,Beta LLC,Monthly retainer,1200.00,sent,2026-02-01
+2026-01-22,Gamma Studio,Logo package,800.00,sent,2026-01-30
+2026-02-01,Delta Inc,Audit sprint,1500.00,draft,2026-02-20
+2025-12-10,Echo Co,Year-end cleanup,600.00,paid,2025-12-20
+2025-11-15,Foxtrot,Consulting day,450.00,sent,2025-11-01

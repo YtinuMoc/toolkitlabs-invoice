@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Freelance Rate Calculator — By the Loop clone</title>
+<style>
+body{font:16px/1.5 system-ui,sans-serif;max-width:640px;margin:32px auto;padding:0 16px;color:#1e293b}
+label{display:block;margin:12px 0 4px;font-weight:600}
+input{width:100%;padding:8px;border:1px solid #cbd5e1;border-radius:6px}
+button{margin-top:16px;padding:12px 20px;background:#0d9488;color:#fff;border:0;border-radius:6px;font-weight:600;cursor:pointer}
+.out{margin-top:24px;padding:16px;background:#f0fdfa;border:1px solid #99f6e4;border-radius:8px}
+.out h2{margin:0 0 8px;font-size:1.1rem}
+.out p{margin:4px 0}
+</style>
+</head>
+<body>
+<h1>Freelance rate calculator</h1>
+<p>Clone of tool #3 in <a href="https://bytheloop.gumroad.com/l/freelance-finance-os">By the Loop's Freelance Finance OS ($5)</a>. Works offline.</p>
+<label>Annual net income target ($)</label>
+<input id="net" type="number" value="90000">
+<label>Tax gross-up divisor (default 0.65)</label>
+<input id="taxdiv" type="number" step="0.01" value="0.65">
+<label>Annual business expenses ($)</label>
+<input id="exp" type="number" value="8000">
+<label>Margin buffer (%)</label>
+<input id="margin" type="number" value="18">
+<label>Billable hours / year</label>
+<input id="hours" type="number" value="1044">
+<label>Billable share of work week (%)</label>
+<input id="share" type="number" value="70">
+<button onclick="calc()">Calculate floor rates</button>
+<div class="out" id="out"></div>
+<script>
+function calc(){
+  const net=+document.getElementById('net').value;
+  const taxdiv=+document.getElementById('taxdiv').value||0.65;
+  const exp=+document.getElementById('exp').value;
+  const margin=+document.getElementById('margin').value/100;
+  const hours=+document.getElementById('hours').value;
+  const share=+document.getElementById('share').value/100;
+  const gross=net/taxdiv;
+  const target=gross+exp;
+  const buffered=target*(1+margin);
+  const hourly=buffered/hours;
+  const adjHourly=hourly/(share||1);
+  const daily=hourly*8;
+  const project10=hourly*10*1.25;
+  document.getElementById('out').innerHTML=
+    '<h2>Your floor rate</h2>'+
+    '<p><strong>Target gross revenue:</strong> $'+buffered.toFixed(0)+'</p>'+
+    '<p><strong>Minimum hourly:</strong> $'+hourly.toFixed(0)+'/hr</p>'+
+    '<p><strong>At '+Math.round(share*100)+'% billable share:</strong> $'+adjHourly.toFixed(0)+'/hr required</p>'+
+    '<p><strong>Daily (8h):</strong> $'+daily.toFixed(0)+'</p>'+
+    '<p><strong>10h project + 25% scope buffer:</strong> $'+project10.toFixed(0)+'</p>';
+}
+calc();
+</script>
+</body>
+</html>
