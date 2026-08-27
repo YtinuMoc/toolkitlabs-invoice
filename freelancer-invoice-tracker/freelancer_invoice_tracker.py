@@ -446,6 +446,81 @@ def summarize_payment_follow_up(invoices_path, payments_path=None):
 STALE_OPEN_DAYS = 90
 
 
+def load_inventory(path):
+    rows = []
+    with open(path, newline="", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            sku = row.get("sku", "").strip()
+            if not sku:
+                continue
+            try:
+                unit_cost = float(row.get("unit_cost", "0") or 0)
+                unit_price = float(row.get("unit_price", "0") or 0)
+                reorder = int(float(row.get("reorder_point", "0") or 0))
+            except ValueError:
+                continue
+            rows.append({
+                "sku": sku,
+                "name": row.get("name", "").strip(),
+                "category": row.get("category", "").strip(),
+                "unit_cost": unit_cost,
+                "unit_price": unit_price,
+                "reorder_point": reorder,
+            })
+    return rows
+
+
+def load_stock_log(path):
+    by_sku = defaultdict(float)
+    with open(path, newline="", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            sku = row.get("sku", "").strip()
+            if not sku:
+                continue
+            try:
+                qty = float(row.get("qty", "0") or 0)
+            except ValueError:
+                continue
+            by_sku[sku] += qty
+    return by_sku
+
+
+def summarize_inventory(inventory_path, stock_log_path):
+    """agentchip/5fca: derived stock levels, LOW alerts, movement-log audit trail."""
+    inventory = load_inventory(inventory_path)
+    stock = load_stock_log(stock_log_path)
+    print("\n=== DELIVERABLE INVENTORY TRACKER (agentchip/5fca shape) ===")
+    print("  Stock derived from movement log — never typed by hand (SUMIF shape).")
+    print("  LOW = current stock ≤ reorder point (conditional-format red-row clone).")
+    if not inventory:
+        print("  No SKU rows — inventory idle.")
+        return
+
+    total_units = 0.0
+    value_cost = 0.0
+    value_price = 0.0
+    low_count = 0
+    for item in inventory:
+        sku = item["sku"]
+        current = stock.get(sku, 0.0)
+        reorder = item["reorder_point"]
+        status = "LOW" if current <= reorder else "OK"
+        if status == "LOW":
+            low_count += 1
+        total_units += max(current, 0.0)
+        value_cost += max(current, 0.0) * item["unit_cost"]
+        value_price += max(current, 0.0) * item["unit_price"]
+        print(
+            f"  {sku} · {item['name']} · stock {current:g} · reorder {reorder} · "
+            f"{status} · cost ${item['unit_cost']:,.2f} · price ${item['unit_price']:,.2f}"
+        )
+
+    print(f"\n  Dashboard: {len(inventory)} SKUs · {total_units:g} units on hand")
+    print(f"  Stock value at cost: ${value_cost:,.2f} · potential revenue: ${value_price:,.2f}")
+    print(f"  LOW stock lines: {low_count} (reorder today)")
+    print("  Guide: inventory-tracker-guide.md · inventory-sample.csv · stock-log-sample.csv")
+
+
 def summarize_payout_settlement(clients_path, invoices_path, payments_path, stale_days=STALE_OPEN_DAYS):
     """agentchip/52c0: per-client settlement rollup + stale open invoice flags."""
     clients = load_clients(clients_path)
@@ -616,13 +691,17 @@ def main():
     if len(sys.argv) >= 5 and sys.argv[1] == "--settlement":
         summarize_payout_settlement(sys.argv[2], sys.argv[3], sys.argv[4])
         return
+    if len(sys.argv) >= 4 and sys.argv[1] == "--inventory":
+        summarize_inventory(sys.argv[2], sys.argv[3])
+        return
     if len(sys.argv) < 4:
         print(
             "Usage: freelancer_invoice_tracker.py clients.csv invoices.csv payments.csv "
             "[subscriptions.csv] [bills.csv] [debt.csv]\n"
             "       freelancer_invoice_tracker.py --reconcile dirty-invoices.csv\n"
             "       freelancer_invoice_tracker.py --follow-up invoices.csv [payments.csv]\n"
-            "       freelancer_invoice_tracker.py --settlement clients.csv invoices.csv payments.csv",
+            "       freelancer_invoice_tracker.py --settlement clients.csv invoices.csv payments.csv\n"
+            "       freelancer_invoice_tracker.py --inventory inventory.csv stock-log.csv",
             file=sys.stderr,
         )
         sys.exit(1)

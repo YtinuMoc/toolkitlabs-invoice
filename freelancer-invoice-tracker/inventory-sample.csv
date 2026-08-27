@@ -1,0 +1,4 @@
+sku,name,category,unit_cost,unit_price,reorder_point
+PKG-RETAINER,Monthly retainer hour pack,service,0,150,5
+TPL-DESIGN,Design template deliverable,product,8,45,3
+CONSULT-HR,Consulting hour block,service,0,120,8

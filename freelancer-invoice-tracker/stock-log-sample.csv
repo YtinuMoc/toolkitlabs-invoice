@@ -1,0 +1,8 @@
+date,sku,type,qty,note
+2026-01-05,PKG-RETAINER,Purchase,10,Initial retainer blocks
+2026-01-20,PKG-RETAINER,Sale,-3,Client Alpha Q1
+2026-02-01,TPL-DESIGN,Purchase,12,Template batch print
+2026-02-15,TPL-DESIGN,Sale,-9,Client Beta deliverables
+2026-03-01,PKG-RETAINER,Sale,-5,Client Gamma retainer
+2026-03-10,CONSULT-HR,Purchase,20,Hour bank refill
+2026-03-15,CONSULT-HR,Sale,-14,Client Delta sprint
