@@ -1,0 +1,14 @@
+sku,item,platform_listed,acquired_date,cost,list_price,days_listed,status
+VJ-001,Vintage jacket,ebay,2025-12-01,12.00,55.00,45,sold
+DB-002,Designer bag,poshmark,2025-11-15,25.00,95.00,64,sold
+SN-003,Sneakers,mercari,2026-01-01,18.00,65.00,11,sold
+PC-004,Phone case,amazon,2025-12-20,5.00,25.00,26,sold
+WB-005,Watch band,ebay,2026-01-02,8.00,35.00,18,sold
+DR-006,Dress,poshmark,2025-12-10,15.00,60.00,46,sold
+JK-007,Jacket,mercari,2026-01-15,20.00,85.00,17,sold
+SH-008,Shoes,ebay,2026-01-20,10.00,48.00,19,sold
+HB-009,Handbag,poshmark,2025-11-01,35.00,140.00,106,sold
+CB-010,Cable,amazon,2026-01-25,3.50,18.00,26,sold
+LT-011,Leather tote,ebay,2025-10-01,30.00,90.00,149,listed
+SC-012,Scarf,poshmark,2026-02-01,8.00,28.00,26,listed
+BT-013,Belt,mercari,2026-02-10,6.00,22.00,17,listed

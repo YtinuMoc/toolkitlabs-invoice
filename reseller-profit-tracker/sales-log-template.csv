@@ -1,0 +1,4 @@
+date,platform,item,sku,sale_price,platform_fee,shipping_cost,cogs,net_profit,status
+2026-01-15,ebay,Vintage jacket,VJ-001,45.00,6.75,8.50,12.00,,sold
+2026-01-18,poshmark,Designer bag,DB-002,85.00,17.00,0.00,25.00,,sold
+2026-01-22,mercari,Sneakers,SN-003,60.00,6.00,5.00,18.00,,sold
