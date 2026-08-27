@@ -643,6 +643,49 @@ def summarize_category_breakdown(rows):
         print(f"    {cat}: ${cat_totals[cat]:,.2f} ({pct:.0f}%)")
 
 
+def summarize_profit_margins(rows, month=None):
+    """Clone faisalmq/3cpo automated summaries + Quillenhart categorized income/expense."""
+    by_month = defaultdict(
+        lambda: {"income": 0.0, "expense": 0.0, "categories": defaultdict(lambda: {"income": 0.0, "expense": 0.0})}
+    )
+    for r in rows:
+        key = r["date"].strftime("%Y-%m")
+        cat = r["category"]
+        if r["type"] == "income" or r["amount"] > 0:
+            by_month[key]["income"] += abs(r["amount"])
+            by_month[key]["categories"][cat]["income"] += abs(r["amount"])
+        else:
+            by_month[key]["expense"] += abs(r["amount"])
+            by_month[key]["categories"][cat]["expense"] += abs(r["amount"])
+
+    months = sorted(by_month.keys())
+    active = month or months[-1]
+    print("\n=== PROFIT MARGINS AT A GLANCE (faisalmq/3cpo + Quillenhart categorized tracking) ===")
+    print(f"  Active month: {active}")
+    for m in months:
+        inc = by_month[m]["income"]
+        exp = by_month[m]["expense"]
+        net = inc - exp
+        margin = (net / inc * 100) if inc else 0.0
+        flag = " ← selected" if m == active else ""
+        print(f"    {m}  income ${inc:,.2f}  expense ${exp:,.2f}  net ${net:,.2f}  margin {margin:.1f}%{flag}")
+
+    print(f"\n  Categorized breakdown ({active}) — tax preparedness:")
+    cats = by_month[active]["categories"]
+    for cat in sorted(cats.keys()):
+        c = cats[cat]
+        if c["income"] or c["expense"]:
+            net = c["income"] - c["expense"]
+            print(f"    {cat}: income ${c['income']:,.2f}  expense ${c['expense']:,.2f}  net ${net:,.2f}")
+
+    ytd_income = sum(m["income"] for m in by_month.values())
+    ytd_expense = sum(m["expense"] for m in by_month.values())
+    ytd_net = ytd_income - ytd_expense
+    ytd_margin = (ytd_net / ytd_income * 100) if ytd_income else 0.0
+    print(f"\n  YTD profit margin: {ytd_margin:.1f}%  (${ytd_net:,.2f} net on ${ytd_income:,.2f} income)")
+    print("  → categorized expenses above feed quarterly set-aside (see QUARTERLY TAX block)")
+
+
 def summarize(rows):
     by_month = defaultdict(lambda: {"income": 0.0, "expense": 0.0})
     by_cat = defaultdict(float)
@@ -922,6 +965,7 @@ def main():
     summarize_ytd_totals(rows)
     summarize_monthly_dashboard(rows, month=month_arg)
     summarize_month_switching(rows, month=month_arg)
+    summarize_profit_margins(rows, month=month_arg)
     summarize(rows)
     summarize_category_breakdown(rows)
     summarize_tax_withholding(rows)
