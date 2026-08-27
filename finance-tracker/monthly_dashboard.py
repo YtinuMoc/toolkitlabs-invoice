@@ -424,6 +424,36 @@ def summarize_monthly_dashboard(rows, month=None):
     print(f"  Other months in log: {months_available}")
 
 
+def print_annual_income_expense_chart(by_month, width=20):
+    """Quillenhart qaduu Annual Summary tab: 12-month income vs expenses chart."""
+    if not by_month:
+        return
+    peak = max(
+        max(m["income"], m["expense"]) for m in by_month.values()
+    ) or 1.0
+
+    def bar(value):
+        blocks = int(round((value / peak) * width))
+        return "█" * blocks + "░" * (width - blocks)
+
+    print("\n=== ANNUAL INCOME VS EXPENSES CHART (Quillenhart qaduu shape) ===")
+    for month in sorted(by_month):
+        inc = by_month[month]["income"]
+        exp = by_month[month]["expense"]
+        net = inc - exp
+        print(
+            f"  {month}  in {bar(inc)} ${inc:>9,.0f}  "
+            f"out {bar(exp)} ${exp:>9,.0f}  net ${net:>9,.0f}"
+        )
+    ytd_in = sum(m["income"] for m in by_month.values())
+    ytd_out = sum(m["expense"] for m in by_month.values())
+    ytd_net = ytd_in - ytd_out
+    print(
+        f"  YTD    in {bar(ytd_in)} ${ytd_in:>9,.0f}  "
+        f"out {bar(ytd_out)} ${ytd_out:>9,.0f}  net ${ytd_net:>9,.0f}"
+    )
+
+
 def summarize(rows):
     by_month = defaultdict(lambda: {"income": 0.0, "expense": 0.0})
     by_cat = defaultdict(float)
@@ -465,6 +495,7 @@ def summarize(rows):
         aside = net * (TAX_SET_ASIDE_PCT / 100)
         print(f"  {month}  ${inc:,.2f}  ${exp:,.2f}  ${net:,.2f}  ${aside:,.2f}")
     print(f"  YTD  ${ytd_income:,.2f}  ${ytd_expense:,.2f}  ${ytd_net:,.2f}  ${ytd_net * (TAX_SET_ASIDE_PCT / 100):,.2f}")
+    print_annual_income_expense_chart(by_month)
 
     fee_expense = sum(abs(r["amount"]) for r in rows if r["type"] != "income" and r["amount"] < 0 and r["category"] in FEE_CATEGORIES)
     other_expense = ytd_expense - fee_expense

@@ -29,6 +29,8 @@ python3 monthly_dashboard.py sample-transactions.csv
 | `invoices-guide.md` | agentchip/2b11-style overdue invoicing guide |
 | `invoices-sample.csv` | Sample receivables CSV for CLI dashboard |
 | `setup-guide.md` | Business name, tax year, set-aside % |
+| `annual-summary.md` | Year-at-a-glance table |
+| `annual-chart-guide.md` | timmothybuilder/3fb2 12-month income vs expenses chart |
 | `sample-transactions.csv` | Example data |
 
 ## Refund
