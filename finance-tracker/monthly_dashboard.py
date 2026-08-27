@@ -8,6 +8,9 @@ from datetime import datetime
 TAX_SET_ASIDE_PCT = 25.0
 TAKE_HOME_RESERVE_PCT = 28.0  # marginmap/14ag low-state band default
 SE_TAX_RATE = 0.153
+FEE_CATEGORIES = frozenset({
+    "platform_fee", "fulfillment", "creator_commission", "ad_spend", "refund_fee",
+})
 
 
 def load_rows(path):
@@ -73,6 +76,18 @@ def summarize(rows):
         aside = net * (TAX_SET_ASIDE_PCT / 100)
         print(f"  {month}  ${inc:,.2f}  ${exp:,.2f}  ${net:,.2f}  ${aside:,.2f}")
     print(f"  YTD  ${ytd_income:,.2f}  ${ytd_expense:,.2f}  ${ytd_net:,.2f}  ${ytd_net * (TAX_SET_ASIDE_PCT / 100):,.2f}")
+
+    fee_expense = sum(abs(r["amount"]) for r in rows if r["type"] != "income" and r["amount"] < 0 and r["category"] in FEE_CATEGORIES)
+    other_expense = ytd_expense - fee_expense
+    if ytd_income > 0:
+        print(f"\n=== 1099-K RECONCILIATION (l_d/5284 shape) ===")
+        print(f"  Gross payments (1099-K box 1 equivalent): ${ytd_income:,.2f}")
+        print(f"  Deductible platform/fulfillment/commission/ad fees: ${fee_expense:,.2f}")
+        print(f"  Other business expenses: ${other_expense:,.2f}")
+        print(f"  Taxable net profit (gross − all expenses): ${ytd_net:,.2f}")
+        if ytd_income > 0:
+            overpay_risk = (ytd_income - ytd_net) * (TAX_SET_ASIDE_PCT / 100)
+            print(f"  Extra tax if you set aside on gross instead of net: ~${overpay_risk:,.2f}/quarter habit")
 
     if ytd_net > 0:
         se_tax = ytd_net * SE_TAX_RATE

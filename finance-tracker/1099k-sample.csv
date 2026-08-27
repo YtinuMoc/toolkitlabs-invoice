@@ -1,0 +1,16 @@
+date,type,category,description,amount
+2026-01-05,income,marketplace_sales,TikTok Shop gross sales week 1,12000.00
+2026-01-06,expense,platform_fee,TikTok referral fee 6%,-720.00
+2026-01-06,expense,fulfillment,FBT fulfillment week 1,-1050.00
+2026-01-06,expense,creator_commission,Affiliate commissions week 1,-1680.00
+2026-01-06,expense,ad_spend,TikTok Ads week 1,-900.00
+2026-02-05,income,marketplace_sales,TikTok Shop gross sales week 5,16000.00
+2026-02-06,expense,platform_fee,TikTok referral fee 6%,-960.00
+2026-02-06,expense,fulfillment,FBT fulfillment week 5,-1400.00
+2026-02-06,expense,creator_commission,Affiliate commissions week 5,-2240.00
+2026-02-06,expense,ad_spend,TikTok Ads week 5,-1200.00
+2026-03-05,income,marketplace_sales,TikTok Shop gross sales week 9,20000.00
+2026-03-06,expense,platform_fee,TikTok referral fee 6%,-1200.00
+2026-03-06,expense,fulfillment,FBT fulfillment week 9,-1750.00
+2026-03-06,expense,creator_commission,Affiliate commissions week 9,-2800.00
+2026-03-06,expense,ad_spend,TikTok Ads week 9,-1500.00
