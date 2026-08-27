@@ -284,6 +284,75 @@ def summarize_savings(path):
     print("  Guide: savings-goals-guide.md · savings-sample.csv")
 
 
+def load_client_hours(path):
+    rows = []
+    with open(path, newline="", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            try:
+                hours = float(row["hours_worked"])
+            except (KeyError, ValueError):
+                continue
+            rows.append({
+                "client": row.get("client", "unknown").strip() or "unknown",
+                "hours": hours,
+            })
+    return rows
+
+
+def summarize_six_month_reveal(invoice_path, expense_path, hours_path, subs_path=None):
+    """timmothybuilder/3fb2: six months of tracking → four surprises → client scoreboard."""
+    invoices = load_invoices(invoice_path)
+    expense_total, by_cat = load_expenses(expense_path)
+    hours_rows = load_client_hours(hours_path)
+    collected = sum(r["amount"] for r in invoices if r["status"] == "paid")
+    total_hours = sum(r["hours"] for r in hours_rows)
+    effective_rate = (collected / total_hours) if total_hours > 0 else 0.0
+
+    by_client_paid = defaultdict(float)
+    for r in invoices:
+        if r["status"] == "paid":
+            by_client_paid[r["client"]] += r["amount"]
+    by_client_hours = {r["client"]: r["hours"] for r in hours_rows}
+
+    subs_monthly = 0.0
+    if subs_path:
+        with open(subs_path, newline="", encoding="utf-8") as f:
+            for row in csv.DictReader(f):
+                try:
+                    subs_monthly += float(row.get("monthly_usd", row.get("amount", 0)))
+                except (KeyError, ValueError):
+                    continue
+    subs_annual = subs_monthly * 12
+    subs_pct = (subs_annual / collected * 100) if collected > 0 else 0.0
+    tax_reserve = collected * 0.30
+
+    print("=== SIX-MONTH REVEAL (timmothybuilder/3fb2 shape) ===")
+    print("  Surprise #1 — effective hourly rate (paid ÷ all hours, not billable-only):")
+    print(f"    Collected (paid):    ${collected:,.2f}")
+    print(f"    Total hours logged:  {total_hours:.0f}")
+    print(f"    Effective rate:      ${effective_rate:,.2f}/hr")
+    print("  Surprise #2 — subscription load as % of revenue:")
+    print(f"    SaaS monthly:        ${subs_monthly:,.2f} (${subs_annual:,.2f}/yr)")
+    print(f"    As % of paid revenue:{subs_pct:.1f}%")
+    print("  Surprise #3 — quarterly tax discipline:")
+    print(f"    30% reserve on paid: ${tax_reserve:,.2f} (untouchable until estimates due)")
+    print("  Surprise #4 — revenue ≠ profit per client:")
+    print("  client               paid        hours   effective $/hr")
+    clients = sorted(set(by_client_paid) | set(by_client_hours))
+    for client in clients:
+        paid = by_client_paid.get(client, 0.0)
+        hrs = by_client_hours.get(client, 0.0)
+        rate = (paid / hrs) if hrs > 0 else 0.0
+        print(f"    {client:20} ${paid:>8,.2f}  {hrs:>5.0f}h   ${rate:>6,.0f}/hr")
+    if by_client_paid:
+        top_client = max(by_client_paid, key=by_client_paid.get)
+        concentration = by_client_paid[top_client] / collected * 100 if collected > 0 else 0.0
+        print(f"  Client concentration: {concentration:.0f}% from {top_client}")
+        if concentration > 50:
+            print("  WARNING: top client >50% — one email from financial crisis")
+    print("  Guide: six-month-reveal-guide.md · rate-calculator.html · client-hours-sample.csv")
+
+
 def summarize_spreadsheet_system(invoice_path, expense_path):
     """crazychief/52ge: book principles → invoice+expense vessel → hardened behavior."""
     invoices = load_invoices(invoice_path)
@@ -324,12 +393,17 @@ def main():
     if len(sys.argv) >= 4 and sys.argv[1] == "--spreadsheet-system":
         summarize_spreadsheet_system(sys.argv[2], sys.argv[3])
         return
+    if len(sys.argv) >= 5 and sys.argv[1] == "--six-month-reveal":
+        subs = sys.argv[5] if len(sys.argv) >= 6 else None
+        summarize_six_month_reveal(sys.argv[2], sys.argv[3], sys.argv[4], subs)
+        return
     if len(sys.argv) < 3:
         print("Usage: python3 freelance_finance_os.py invoice-log.csv expense-log.csv [subscriptions.csv] [bills.csv] [debt.csv] [savings.csv]")
         print("       python3 freelance_finance_os.py --1099k 1099k-freelance-sample.csv")
         print("       python3 freelance_finance_os.py --bills-debt bills-sample.csv debt-sample.csv")
         print("       python3 freelance_finance_os.py --savings-goals savings-sample.csv")
         print("       python3 freelance_finance_os.py --spreadsheet-system invoice-log.csv expense-log.csv")
+        print("       python3 freelance_finance_os.py --six-month-reveal invoice-log.csv expense-log.csv client-hours.csv [subscriptions.csv]")
         sys.exit(1)
 
     invoices = load_invoices(sys.argv[1])
