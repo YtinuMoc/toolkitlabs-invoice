@@ -410,6 +410,37 @@ def summarize_dashboard_setup(invoice_path, expense_path, reserve_pct=TAX_BUFFER
     print("  Guide: dashboard-setup-guide.md · invoice-log-template.csv · expense-log-template.csv")
 
 
+def summarize_pricing(
+    net_target=90000.0,
+    tax_divisor=0.65,
+    annual_expenses=8000.0,
+    margin_pct=18.0,
+    billable_hours=1044.0,
+    billable_share=0.70,
+):
+    """datanestdigital/3ma7: floor rate from income + costs you need to cover."""
+    gross = net_target / tax_divisor
+    target = gross + annual_expenses
+    buffered = target * (1 + margin_pct / 100)
+    hourly = buffered / billable_hours if billable_hours else 0.0
+    adj_hourly = hourly / billable_share if billable_share else hourly
+    daily = hourly * 8
+    project10 = hourly * 10 * 1.25
+    print("=== FREELANCE PRICING FLOOR (datanestdigital/3ma7 shape) ===")
+    print("  Start from the income and costs you need to cover — not what feels polite.")
+    print(f"  Net income target:     ${net_target:,.0f}")
+    print(f"  Tax gross-up divisor:  {tax_divisor:.2f} → gross ${gross:,.0f}")
+    print(f"  Annual business costs: ${annual_expenses:,.0f}")
+    print(f"  Margin buffer:         {margin_pct:.0f}%")
+    print(f"  Target gross revenue:  ${buffered:,.0f}")
+    print(f"  Billable hours/year:   {billable_hours:,.0f}")
+    print(f"  Minimum hourly floor:  ${hourly:,.0f}/hr")
+    print(f"  At {billable_share * 100:.0f}% billable share: ${adj_hourly:,.0f}/hr required")
+    print(f"  Daily (8h):            ${daily:,.0f}")
+    print(f"  10h project + 25% buffer:${project10:,.0f}")
+    print("  Guide: pricing-guide.md · rate-calculator.html · datanestdigital/3ma7 buyer channel")
+
+
 def summarize_portable(invoice_path, expense_path, reserve_pct=TAX_BUFFER_PCT):
     """faisalmq/3gcp: portable freelance finance tracker — single source of truth, any device."""
     invoices = load_invoices(invoice_path)
@@ -529,6 +560,13 @@ def main():
         pct = float(sys.argv[4]) if len(sys.argv) >= 5 else TAX_BUFFER_PCT
         summarize_portable(sys.argv[2], sys.argv[3], reserve_pct=pct)
         return
+    if len(sys.argv) >= 2 and sys.argv[1] == "--pricing":
+        args = [float(x) for x in sys.argv[2:8]]
+        while len(args) < 6:
+            defaults = [90000.0, 0.65, 8000.0, 18.0, 1044.0, 0.70]
+            args.append(defaults[len(args)])
+        summarize_pricing(*args)
+        return
     if len(sys.argv) < 3:
         print("Usage: python3 freelance_finance_os.py invoice-log.csv expense-log.csv [subscriptions.csv] [bills.csv] [debt.csv] [savings.csv]")
         print("       python3 freelance_finance_os.py --1099k 1099k-freelance-sample.csv")
@@ -539,6 +577,7 @@ def main():
         print("       python3 freelance_finance_os.py --take-home invoice-log.csv expense-log.csv [reserve_pct]")
         print("       python3 freelance_finance_os.py --dashboard invoice-log.csv expense-log.csv [reserve_pct]")
         print("       python3 freelance_finance_os.py --portable invoice-log.csv expense-log.csv [reserve_pct]")
+        print("       python3 freelance_finance_os.py --pricing [net_target tax_divisor annual_expenses margin_pct billable_hours billable_share]")
         sys.exit(1)
 
     invoices = load_invoices(sys.argv[1])
