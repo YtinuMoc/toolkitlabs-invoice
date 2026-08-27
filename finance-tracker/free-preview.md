@@ -45,3 +45,4 @@ Full kit adds bills/debt/invoices trackers + 150-row template. Clone of [Quillen
 - [Calculators sample CSV](calculators-sample.csv)
 - [Self-assessment tax tracker guide](self-assessment-guide.md)
 - [Freelance monthly dashboard guide](dashboard-guide.md)
+- [Spreadsheet system guide](spreadsheet-system-guide.md)

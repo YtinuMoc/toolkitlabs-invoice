@@ -500,6 +500,26 @@ def summarize(rows):
         print(f"  Effective reserve rate on gross: {(reserve_total / ytd_income * 100):.1f}%")
 
 
+def summarize_spreadsheet_system(rows):
+    """crazychief/52ge: book principles → transaction log vessel → hardened behavior."""
+    months = sorted({r["date"].strftime("%Y-%m") for r in rows})
+    tx_count = len(rows)
+    income = sum(abs(r["amount"]) for r in rows if r["type"] == "income" or r["amount"] > 0)
+    expense = sum(abs(r["amount"]) for r in rows if r["type"] != "income" and r["amount"] < 0)
+    net = income - expense
+    reserve = net * (TAX_SET_ASIDE_PCT / 100) if net > 0 else 0.0
+    phase = "HARDENED" if tx_count >= 10 and len(months) >= 2 else "PROTOTYPE"
+    print("\n=== SPREADSHEET SYSTEM (crazychief/52ge shape) ===")
+    print("  Sequence: Read → Decompose → Prototype → Harden → Reapply")
+    print(f"  Vessel: transaction log ({tx_count} rows, {len(months)} month(s))")
+    print(f"  Fixed rule: tax set-aside {TAX_SET_ASIDE_PCT:.0f}% of net profit")
+    print("  Three containers:")
+    print(f"    Income    ${income:,.2f}")
+    print(f"    Expenses  ${expense:,.2f}")
+    print(f"    Reserved  ${reserve:,.2f}  (set-aside, not spendable)")
+    print(f"  System phase: {phase}")
+
+
 def main():
     path = sys.argv[1] if len(sys.argv) > 1 else "sample-transactions.csv"
     invoice_path = sys.argv[2] if len(sys.argv) > 2 else None
@@ -518,6 +538,7 @@ def main():
         sys.exit(1)
     summarize_monthly_dashboard(rows, month=month_arg)
     summarize(rows)
+    summarize_spreadsheet_system(rows)
     ytd_net = None
     by_month = defaultdict(lambda: {"income": 0.0, "expense": 0.0})
     for r in rows:
