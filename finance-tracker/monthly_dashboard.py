@@ -572,6 +572,24 @@ def summarize_tax_stack(rows, ytd_net):
         print(f"  Stack check: YTD net ${ytd_net:,.2f} · SE tax component ${se:,.2f}")
 
 
+def summarize_setup_readme():
+    """Quillenhart Read Me + Setup tabs; datanestdigital/4l0h dashboard-setup-guide shape."""
+    print("\n=== READ ME (Quillenhart qaduu tab 1 — plain-English setup) ===")
+    print("  9-tab system: Read Me · Setup · Transactions · Bills · Savings · Debt · Invoices · Dashboard · Annual Summary")
+    print("  Rule: only shaded cells get typed — in this kit: CSV rows + setup-guide.md fields")
+    print("  Guides: readme-guide.md · start-here.md · dashboard-setup steps in setup-guide.md")
+    print("\n=== SETUP TAB (Quillenhart qaduu tab 2 — configure once) ===")
+    print("  Field              | Your value (edit setup-guide.md)")
+    print("  -------------------|----------------------------------")
+    print("  Business name      | ________________________________")
+    print("  Tax year           | 2026")
+    print(f"  Tax set-aside %    | {TAX_SET_ASIDE_PCT:.0f}")
+    print("  Financial year     | January start")
+    print("  Quick start (datanestdigital/4l0h):")
+    print("    1. Extract zip → 2. Fill setup-guide.md → 3. Copy transaction log")
+    print("    4. Log first month → 5. Run this script → 6. Mark bills in bills-tracker.md")
+
+
 def summarize_spreadsheet_system(rows):
     """crazychief/52ge: book principles → transaction log vessel → hardened behavior."""
     months = sorted({r["date"].strftime("%Y-%m") for r in rows})
@@ -608,6 +626,7 @@ def main():
     if not rows:
         print("No transactions found.", file=sys.stderr)
         sys.exit(1)
+    summarize_setup_readme()
     summarize_monthly_dashboard(rows, month=month_arg)
     summarize(rows)
     summarize_spreadsheet_system(rows)

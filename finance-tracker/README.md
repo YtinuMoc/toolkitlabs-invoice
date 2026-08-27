@@ -14,6 +14,7 @@ python3 monthly_dashboard.py sample-transactions.csv
 
 | File | Purpose |
 |------|---------|
+| `readme-guide.md` | Read Me tab — plain-English guide |
 | `start-here.md` | Setup in 5 minutes |
 | `spreadsheet-system-guide.md` | crazychief/52ge principles → vessel guide |
 | `tax-stack-guide.md` | tatelyman/3427384 five-layer tax stack guide |
