@@ -939,6 +939,71 @@ def summarize_command_center(rows, invoice_path=None):
     print("  Guide: command-center-guide.md · timmothybuilder/4e81 buyer channel clone")
 
 
+def summarize_cash_runway(rows, bills_path=None, debt_path=None, months_ahead=12):
+    """agentchip/33mm: forward cash forecast — which month balance goes negative."""
+    starting_cash = float(os.environ.get("FINANCE_STARTING_CASH", "3000"))
+    by_month = defaultdict(lambda: {"income": 0.0, "expense": 0.0})
+    for r in rows:
+        key = r["date"].strftime("%Y-%m")
+        if r["type"] == "income" or r["amount"] > 0:
+            by_month[key]["income"] += abs(r["amount"])
+        else:
+            by_month[key]["expense"] += abs(r["amount"])
+    hist_months = sorted(by_month.keys())
+    if not hist_months:
+        return
+    avg_income = sum(m["income"] for m in by_month.values()) / len(hist_months)
+    avg_expense = sum(m["expense"] for m in by_month.values()) / len(hist_months)
+    bills_monthly = 0.0
+    if bills_path:
+        bills_monthly, _ = bills_monthly_load(bills_path)
+    debt_min = 0.0
+    if debt_path:
+        debt_min, _ = debt_monthly_minimum(debt_path)
+    fixed_obligations = bills_monthly + debt_min
+    tax_reserve_pct = TAX_SET_ASIDE_PCT / 100.0
+
+    def project(income_mult, expense_mult):
+        balance = starting_cash
+        forecast = []
+        lowest = (balance, "start")
+        for i in range(months_ahead):
+            inc = avg_income * income_mult
+            exp = (avg_expense * expense_mult) + fixed_obligations
+            tax_set_aside = max(0.0, (inc - exp) * tax_reserve_pct) if inc > exp else 0.0
+            net = inc - exp - tax_set_aside
+            opening = balance
+            balance += net
+            label = f"M+{i + 1}"
+            forecast.append((label, opening, inc, exp, tax_set_aside, net, balance))
+            if balance < lowest[0]:
+                lowest = (balance, label)
+        return forecast, lowest
+
+    base_fc, base_low = project(1.0, 1.0)
+    opt_fc, opt_low = project(1.2, 0.9)
+    pes_fc, pes_low = project(0.8, 1.1)
+
+    print("\n=== CASH RUNWAY FORECAST (agentchip/33mm shape) ===")
+    print(f"  Starting cash: ${starting_cash:,.2f} (set FINANCE_STARTING_CASH to override)")
+    print(f"  Historical avg/mo: income ${avg_income:,.2f} · expenses ${avg_expense:,.2f}")
+    if fixed_obligations > 0:
+        print(f"  Fixed obligations/mo: ${fixed_obligations:,.2f} (bills + debt minimums)")
+    print("  12-month base forecast:")
+    for label, opening, inc, exp, tax, net, closing in base_fc[:6]:
+        print(
+            f"    {label}: open ${opening:,.0f}  in ${inc:,.0f}  out ${exp:,.0f}  "
+            f"tax ${tax:,.0f}  close ${closing:,.0f}"
+        )
+    if len(base_fc) > 6:
+        print(f"    … ({len(base_fc) - 6} more months in full output)")
+    print(f"  Lowest balance (base): ${base_low[0]:,.2f} at {base_low[1]}")
+    if base_low[0] < 0:
+        print("  🚨 CASH GAP — base scenario goes negative before month ends")
+    print(f"  Scenario range: optimistic low ${opt_low[0]:,.2f} · pessimistic low ${pes_low[0]:,.2f}")
+    print("  Guide: cash-runway-guide.md · agentchip/33mm buyer channel clone")
+
+
 def summarize_all_in_one_replacement(rows, invoice_path=None, bills_path=None, savings_path=None):
     """Quillenhart replaces 4 apps + faisalmq/54h7 five-minute weekly check-in."""
     tx_count = len(rows)
@@ -1064,6 +1129,7 @@ def main():
         bills_monthly=bills_monthly,
         debt_min=debt_min,
     )
+    summarize_cash_runway(rows, bills_path=bills_path, debt_path=debt_path)
 
 
 if __name__ == "__main__":
