@@ -1,0 +1,5 @@
+bill,amount,frequency,due_day,status
+Hosting,20.00,monthly,1,paid
+Adobe CC,54.99,monthly,15,paid
+Business insurance,120.00,quarterly,1,pending
+Domain renewals,45.00,yearly,3,pending

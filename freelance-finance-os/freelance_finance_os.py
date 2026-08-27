@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Freelance Finance OS — clone of By the Loop freelance-finance-os ($5 Gumroad)."""
 import csv
+import os
 import sys
 from collections import defaultdict
 from datetime import date, datetime
@@ -32,11 +33,13 @@ def load_invoices(path):
                     overdue = datetime.strptime(due, "%Y-%m-%d").date() < date.today()
                 except ValueError:
                     pass
+            inv_date = _parse_iso_date(row.get("date", ""))
             rows.append({
                 "client": row.get("client", "unknown").strip() or "unknown",
                 "amount": amt,
                 "status": status,
                 "overdue": overdue,
+                "date": inv_date,
             })
     return rows
 
@@ -103,7 +106,7 @@ def print_category_breakdown(rows):
 
 def main():
     if len(sys.argv) < 3:
-        print("Usage: python3 freelance_finance_os.py invoice-log.csv expense-log.csv [subscriptions.csv]")
+        print("Usage: python3 freelance_finance_os.py invoice-log.csv expense-log.csv [subscriptions.csv] [bills.csv] [debt.csv]")
         sys.exit(1)
 
     invoices = load_invoices(sys.argv[1])
@@ -188,8 +191,13 @@ def main():
     print("  4. Quarterly estimator [this run]")
     print_command_center(len(invoices), collected, overdue_cnt, overdue_amt, expense_total, net_profit)
     print_bundle_strategy()
-    if len(sys.argv) >= 4 and sys.argv[3]:
-        summarize_subscription_audit(sys.argv[3])
+    extra = sys.argv[3:]
+    subs_path = extra[0] if len(extra) >= 1 and extra[0] else None
+    bills_path = extra[1] if len(extra) >= 2 and extra[1] else None
+    debt_path = extra[2] if len(extra) >= 3 and extra[2] else None
+    if subs_path:
+        summarize_subscription_audit(subs_path)
+    summarize_cash_runway(invoices, expense_rows, bills_path, debt_path)
 
 
 def _parse_iso_date(s):
@@ -303,6 +311,100 @@ def print_command_center(inv_count, collected, overdue_cnt, overdue_amt, expense
     print(f"  Collected (paid):    ${collected:,.2f}")
     print(f"  Net profit (paid):   ${net_profit:,.2f}")
     print("  Guide: command-center-guide.md · timmothybuilder/4e81 buyer channel clone")
+
+
+def bills_monthly_load(path):
+    monthly_equiv = 0.0
+    with open(path, newline="", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            try:
+                amt = float(row["amount"])
+            except (KeyError, ValueError):
+                continue
+            freq = row.get("frequency", "monthly").strip().lower()
+            if freq == "monthly":
+                monthly_equiv += amt
+            elif freq == "quarterly":
+                monthly_equiv += amt / 3
+            elif freq == "yearly":
+                monthly_equiv += amt / 12
+            else:
+                monthly_equiv += amt
+    return monthly_equiv
+
+
+def debt_monthly_minimum(path):
+    total = 0.0
+    with open(path, newline="", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            try:
+                total += float(row.get("min_payment", 0) or 0)
+            except (KeyError, ValueError):
+                continue
+    return total
+
+
+def summarize_cash_runway(invoices, expense_rows, bills_path=None, debt_path=None, months_ahead=12):
+    """agentchip/33mm: forward cash forecast — which month balance goes negative."""
+    starting_cash = float(os.environ.get("FINANCE_STARTING_CASH", "3000"))
+    by_month = defaultdict(lambda: {"income": 0.0, "expense": 0.0})
+    for inv in invoices:
+        if inv["status"] != "paid" or not inv.get("date"):
+            continue
+        key = inv["date"].strftime("%Y-%m")
+        by_month[key]["income"] += inv["amount"]
+    for r in expense_rows:
+        key = r["date"].strftime("%Y-%m")
+        by_month[key]["expense"] += r["amount"]
+    hist_months = sorted(by_month.keys())
+    if not hist_months:
+        return
+    avg_income = sum(m["income"] for m in by_month.values()) / len(hist_months)
+    avg_expense = sum(m["expense"] for m in by_month.values()) / len(hist_months)
+    bills_monthly = bills_monthly_load(bills_path) if bills_path else 0.0
+    debt_min = debt_monthly_minimum(debt_path) if debt_path else 0.0
+    fixed_obligations = bills_monthly + debt_min
+    tax_reserve_pct = TAX_BUFFER_PCT / 100.0
+
+    def project(income_mult, expense_mult):
+        balance = starting_cash
+        forecast = []
+        lowest = (balance, "start")
+        for i in range(months_ahead):
+            inc = avg_income * income_mult
+            exp = (avg_expense * expense_mult) + fixed_obligations
+            tax_set_aside = max(0.0, (inc - exp) * tax_reserve_pct) if inc > exp else 0.0
+            net = inc - exp - tax_set_aside
+            opening = balance
+            balance += net
+            label = f"M+{i + 1}"
+            forecast.append((label, opening, inc, exp, tax_set_aside, net, balance))
+            if balance < lowest[0]:
+                lowest = (balance, label)
+        return forecast, lowest
+
+    base_fc, base_low = project(1.0, 1.0)
+    opt_fc, opt_low = project(1.2, 0.9)
+    pes_fc, pes_low = project(0.8, 1.1)
+
+    print("\n=== CASH RUNWAY FORECAST (agentchip/33mm shape) ===")
+    print(f"  Starting cash: ${starting_cash:,.2f} (set FINANCE_STARTING_CASH to override)")
+    print(f"  Historical avg/mo: income ${avg_income:,.2f} · expenses ${avg_expense:,.2f}")
+    if fixed_obligations > 0:
+        print(f"  Fixed obligations/mo: ${fixed_obligations:,.2f} (bills + debt minimums)")
+    print("  12-month base forecast:")
+    for label, opening, inc, exp, tax, net, closing in base_fc[:6]:
+        print(
+            f"    {label}: open ${opening:,.0f}  in ${inc:,.0f}  out ${exp:,.0f}  "
+            f"tax ${tax:,.0f}  close ${closing:,.0f}"
+        )
+    if len(base_fc) > 6:
+        print(f"    … ({len(base_fc) - 6} more months in full output)")
+    print(f"  Lowest balance (base): ${base_low[0]:,.2f} at {base_low[1]}")
+    if base_low[0] < 0:
+        print("  CASH GAP — base scenario goes negative before month ends")
+    print(f"  Scenario range: optimistic low ${opt_low[0]:,.2f} · pessimistic low ${pes_low[0]:,.2f}")
+    print("  Guide: cash-runway-guide.md · agentchip/33mm buyer channel clone")
 
 
 if __name__ == "__main__":
