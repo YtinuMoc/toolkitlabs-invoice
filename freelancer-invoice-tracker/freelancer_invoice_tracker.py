@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 """Freelancer Invoice & Client Tracker — clone of AgentChip qiliang.gumroad.com/l/ahefab ($15)."""
 import csv
+import os
 import sys
 from collections import defaultdict
 from datetime import date, datetime
+
+TAX_BUFFER_PCT = 25.0
 
 
 def load_clients(path):
@@ -77,6 +80,63 @@ def load_payments(path):
                 continue
             paid[inv_id] += amt
     return dict(paid)
+
+
+def payments_by_month(path):
+    by_month = defaultdict(float)
+    with open(path, newline="", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            pay_date = row.get("payment_date", "").strip()
+            if not pay_date:
+                continue
+            try:
+                amt = float(row.get("amount", "0") or 0)
+            except ValueError:
+                continue
+            by_month[pay_date[:7]] += amt
+    return dict(by_month)
+
+
+def bills_monthly_load(path):
+    monthly_equiv = 0.0
+    with open(path, newline="", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            try:
+                amt = float(row["amount"])
+            except (KeyError, ValueError):
+                continue
+            freq = row.get("frequency", "monthly").strip().lower()
+            if freq == "monthly":
+                monthly_equiv += amt
+            elif freq == "quarterly":
+                monthly_equiv += amt / 3
+            elif freq == "yearly":
+                monthly_equiv += amt / 12
+            else:
+                monthly_equiv += amt
+    return monthly_equiv
+
+
+def debt_monthly_minimum(path):
+    total = 0.0
+    with open(path, newline="", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            try:
+                total += float(row.get("min_payment", 0) or 0)
+            except (KeyError, ValueError):
+                continue
+    return total
+
+
+def subscription_monthly_load(path):
+    total = 0.0
+    with open(path, newline="", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            try:
+                total += float(row.get("monthly_usd", row.get("amount", 0)) or 0)
+            except (KeyError, ValueError):
+                continue
+    return total
 
 
 def summarize(clients, invoices, payments):
@@ -183,6 +243,67 @@ def summarize_subscription_audit(path):
     print("  Guide: subscription-audit-guide.md · subscriptions-sample.csv")
 
 
+def summarize_cash_runway(
+    payments_path,
+    subscriptions_path=None,
+    bills_path=None,
+    debt_path=None,
+    months_ahead=12,
+):
+    """agentchip/33mm: forward cash forecast — which month balance goes negative."""
+    by_month = payments_by_month(payments_path)
+    if not by_month:
+        return
+    starting_cash = float(os.environ.get("FINANCE_STARTING_CASH", "3000"))
+    hist_months = sorted(by_month.keys())
+    avg_income = sum(by_month.values()) / len(hist_months)
+    sub_monthly = subscription_monthly_load(subscriptions_path) if subscriptions_path else 0.0
+    bills_monthly = bills_monthly_load(bills_path) if bills_path else 0.0
+    debt_min = debt_monthly_minimum(debt_path) if debt_path else 0.0
+    fixed_obligations = sub_monthly + bills_monthly + debt_min
+    tax_reserve_pct = TAX_BUFFER_PCT / 100.0
+
+    def project(income_mult, expense_mult):
+        balance = starting_cash
+        forecast = []
+        lowest = (balance, "start")
+        for i in range(months_ahead):
+            inc = avg_income * income_mult
+            exp = (fixed_obligations * expense_mult)
+            tax_set_aside = max(0.0, (inc - exp) * tax_reserve_pct) if inc > exp else 0.0
+            net = inc - exp - tax_set_aside
+            opening = balance
+            balance += net
+            label = f"M+{i + 1}"
+            forecast.append((label, opening, inc, exp, tax_set_aside, net, balance))
+            if balance < lowest[0]:
+                lowest = (balance, label)
+        return forecast, lowest
+
+    base_fc, base_low = project(1.0, 1.0)
+    opt_fc, opt_low = project(1.2, 0.9)
+    pes_fc, pes_low = project(0.8, 1.1)
+
+    print("\n=== CASH RUNWAY FORECAST (agentchip/33mm shape) ===")
+    print(f"  Starting cash: ${starting_cash:,.2f} (set FINANCE_STARTING_CASH to override)")
+    print(f"  Historical avg/mo income: ${avg_income:,.2f} ({len(hist_months)} month(s) of payments)")
+    if fixed_obligations > 0:
+        print(f"  Fixed obligations/mo: ${fixed_obligations:,.2f} (SaaS + bills + debt minimums)")
+    print("  12-month base forecast:")
+    for label, opening, inc, exp, tax, net, closing in base_fc[:6]:
+        print(
+            f"    {label}: open ${opening:,.0f}  in ${inc:,.0f}  out ${exp:,.0f}  "
+            f"tax ${tax:,.0f}  close ${closing:,.0f}"
+        )
+    if len(base_fc) > 6:
+        print(f"    … ({len(base_fc) - 6} more months in full output)")
+    print(f"  Lowest balance (base): ${base_low[0]:,.2f} at {base_low[1]}")
+    if base_low[0] < 0:
+        print("  CASH GAP — base scenario goes negative before month ends")
+    print(f"  Scenario range: optimistic low ${opt_low[0]:,.2f} · pessimistic low ${pes_low[0]:,.2f}")
+    print("  Guide: cash-runway-guide.md · agentchip/33mm buyer channel clone")
+
+
 def print_report(clients, invoices, payments):
     s = summarize(clients, invoices, payments)
     print("=== FREELANCER INVOICE & CLIENT TRACKER (AgentChip clone) ===")
@@ -214,7 +335,8 @@ def print_report(clients, invoices, payments):
 def main():
     if len(sys.argv) < 4:
         print(
-            "Usage: freelancer_invoice_tracker.py clients.csv invoices.csv payments.csv [subscriptions.csv]",
+            "Usage: freelancer_invoice_tracker.py clients.csv invoices.csv payments.csv "
+            "[subscriptions.csv] [bills.csv] [debt.csv]",
             file=sys.stderr,
         )
         sys.exit(1)
@@ -222,8 +344,17 @@ def main():
     invoices = load_invoices(sys.argv[2])
     payments = load_payments(sys.argv[3])
     print_report(clients, invoices, payments)
-    if len(sys.argv) >= 5:
-        summarize_subscription_audit(sys.argv[4])
+    subs_path = sys.argv[4] if len(sys.argv) >= 5 else None
+    bills_path = sys.argv[5] if len(sys.argv) >= 6 else None
+    debt_path = sys.argv[6] if len(sys.argv) >= 7 else None
+    if subs_path:
+        summarize_subscription_audit(subs_path)
+    summarize_cash_runway(
+        sys.argv[3],
+        subscriptions_path=subs_path,
+        bills_path=bills_path,
+        debt_path=debt_path,
+    )
 
 
 if __name__ == "__main__":

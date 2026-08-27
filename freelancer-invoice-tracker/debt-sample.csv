@@ -1,0 +1,3 @@
+creditor,original_balance,current_balance,min_payment,due_day,apr
+Business credit card,2400.00,1850.00,75.00,15,22.9
+Equipment loan,5000.00,3200.00,210.00,1,8.5
