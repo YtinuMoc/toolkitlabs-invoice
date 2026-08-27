@@ -28,3 +28,4 @@ Full kit adds bills/debt/invoices trackers + 150-row template. Clone of [Quillen
 
 - [Savings goals tracker](savings-tracker.md)
 - [Annual summary template](annual-summary.md)
+- [Take-home estimator guide](take-home-guide.md)

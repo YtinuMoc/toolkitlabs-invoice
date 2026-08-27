@@ -6,6 +6,8 @@ from collections import defaultdict
 from datetime import datetime
 
 TAX_SET_ASIDE_PCT = 25.0
+TAKE_HOME_RESERVE_PCT = 28.0  # marginmap/14ag low-state band default
+SE_TAX_RATE = 0.153
 
 
 def load_rows(path):
@@ -71,6 +73,19 @@ def summarize(rows):
         aside = net * (TAX_SET_ASIDE_PCT / 100)
         print(f"  {month}  ${inc:,.2f}  ${exp:,.2f}  ${net:,.2f}  ${aside:,.2f}")
     print(f"  YTD  ${ytd_income:,.2f}  ${ytd_expense:,.2f}  ${ytd_net:,.2f}  ${ytd_net * (TAX_SET_ASIDE_PCT / 100):,.2f}")
+
+    if ytd_net > 0:
+        se_tax = ytd_net * SE_TAX_RATE
+        reserve_total = ytd_net * (TAKE_HOME_RESERVE_PCT / 100)
+        take_home = ytd_net - reserve_total
+        print(f"\n=== TAKE-HOME ESTIMATE (marginmap/14ag shape, {TAKE_HOME_RESERVE_PCT:.0f}% reserve) ===")
+        print(f"  YTD gross income: ${ytd_income:,.2f}")
+        print(f"  YTD expenses: ${ytd_expense:,.2f}")
+        print(f"  YTD net profit: ${ytd_net:,.2f}")
+        print(f"  Est. SE tax component (15.3% of net): ${se_tax:,.2f}")
+        print(f"  Planned tax reserve ({TAKE_HOME_RESERVE_PCT:.0f}% of net): ${reserve_total:,.2f}")
+        print(f"  Est. take-home after reserve: ${take_home:,.2f}")
+        print(f"  Effective reserve rate on gross: {(reserve_total / ytd_income * 100):.1f}%")
 
 
 def main():
