@@ -572,6 +572,31 @@ def summarize_tax_stack(rows, ytd_net):
         print(f"  Stack check: YTD net ${ytd_net:,.2f} · SE tax component ${se:,.2f}")
 
 
+COLORWAYS = (
+    ("Terracotta", "warm clay + burnt orange accents", 15),
+    ("Rose", "soft blush + muted mauve headers", 15),
+    ("Twilight Garden", "deep green + dusk purple highlights", 15),
+    ("Arctic Shades", "cool gray + ice blue grid lines", 15),
+    ("Sunset Meadows", "golden hour + sage green cells", 15),
+    ("Pink & Green Grid", "retro ledger pink headers + green income rows", 15),
+)
+COLORWAYS_BUNDLE_PRICE = 34
+COLORWAYS_SINGLE_PRICE = 15
+
+
+def summarize_colorways():
+    """Quillenhart qaduu Gumroad colorway variants + All-6 bundle upsell."""
+    singles_total = len(COLORWAYS) * COLORWAYS_SINGLE_PRICE
+    savings = singles_total - COLORWAYS_BUNDLE_PRICE
+    print("\n=== COLORWAYS (Quillenhart qaduu — 6 palettes + All-6 bundle) ===")
+    print("  Same 9-tab tracker in every colorway — only the palette changes.")
+    for name, vibe, price in COLORWAYS:
+        print(f"  {name:20} | ${price:>2} | {vibe}")
+    print(f"  {'All 6 Colorways':20} | ${COLORWAYS_BUNDLE_PRICE:>2} | Best Value — save ${savings} vs 6×${COLORWAYS_SINGLE_PRICE}")
+    print(f"  Bundle math: 6 singles ${singles_total} → bundle ${COLORWAYS_BUNDLE_PRICE} ({100 * savings // singles_total}% off)")
+    print("  Guide: colorways-guide.md · Gumroad: quillenhart.gumroad.com/l/qaduu")
+
+
 def summarize_setup_readme():
     """Quillenhart Read Me + Setup tabs; datanestdigital/4l0h dashboard-setup-guide shape."""
     print("\n=== READ ME (Quillenhart qaduu tab 1 — plain-English setup) ===")
@@ -627,6 +652,7 @@ def main():
         print("No transactions found.", file=sys.stderr)
         sys.exit(1)
     summarize_setup_readme()
+    summarize_colorways()
     summarize_monthly_dashboard(rows, month=month_arg)
     summarize(rows)
     summarize_spreadsheet_system(rows)
