@@ -355,6 +355,61 @@ def summarize_six_month_reveal(invoice_path, expense_path, hours_path, subs_path
     print("  Guide: six-month-reveal-guide.md · rate-calculator.html · client-hours-sample.csv")
 
 
+def summarize_dashboard_setup(invoice_path, expense_path, reserve_pct=TAX_BUFFER_PCT):
+    """datanestdigital/4l0h: five-minute dashboard setup — monthly metrics at a glance."""
+    invoices = load_invoices(invoice_path)
+    expense_total, by_cat = load_expenses(expense_path)
+    expense_rows = load_expense_rows(expense_path)
+    collected = sum(r["amount"] for r in invoices if r["status"] == "paid")
+    awaiting = sum(r["amount"] for r in invoices if r["status"] == "sent")
+    overdue_amt = sum(r["amount"] for r in invoices if r["overdue"])
+    net_profit = collected - expense_total
+    tax_set_aside = max(net_profit, 0) * reserve_pct / 100
+    take_home = max(net_profit - tax_set_aside, 0)
+    margin_pct = (net_profit / collected * 100) if collected > 0 else 0.0
+    by_month = defaultdict(lambda: {"income": 0.0, "expense": 0.0})
+    for inv in invoices:
+        if inv["status"] == "paid" and inv.get("date"):
+            key = inv["date"].strftime("%B %Y")
+            by_month[key]["income"] += inv["amount"]
+    for r in expense_rows:
+        key = r["date"].strftime("%B %Y")
+        by_month[key]["expense"] += r["amount"]
+    print("=== FREELANCE FINANCIAL DASHBOARD (datanestdigital/4l0h shape) ===")
+    print("  Setup: copy invoice + expense templates → log rows → run this CLI.")
+    print("  No bookkeeper required — dashboard metrics from your CSV logs.")
+    print()
+    if by_month:
+        for month_label in sorted(by_month.keys(), key=lambda m: datetime.strptime(m, "%B %Y")):
+            inc = by_month[month_label]["income"]
+            exp = by_month[month_label]["expense"]
+            net = inc - exp
+            reserve = max(net, 0) * reserve_pct / 100
+            home = max(net - reserve, 0)
+            m_margin = (net / inc * 100) if inc > 0 else 0.0
+            print(f"  ═══════════════ {month_label.upper()} ═══════════════")
+            print(f"  Revenue:        ${inc:,.2f}")
+            print(f"  Expenses:       ${exp:,.2f}")
+            print(f"  Net Profit:     ${net:,.2f}    Margin: {m_margin:.1f}%")
+            print(f"  Tax Set-Aside:  ${reserve:,.2f}  ({reserve_pct:.0f}% of net)")
+            print(f"  Take-Home:      ${home:,.2f}")
+            print()
+    print("  ═══════════════ ALL-TIME SUMMARY ═══════════════")
+    print(f"  Revenue (paid):    ${collected:,.2f}")
+    print(f"  Expenses:          ${expense_total:,.2f}")
+    print(f"  Net Profit:        ${net_profit:,.2f}    Margin: {margin_pct:.1f}%")
+    print(f"  Tax Set-Aside:     ${tax_set_aside:,.2f}  ({reserve_pct:.0f}% effective rate on net)")
+    print(f"  Take-Home:         ${take_home:,.2f}")
+    print(f"  Outstanding:       ${awaiting:,.2f}  (sent, not paid)")
+    if overdue_amt > 0:
+        print(f"  Overdue:           ${overdue_amt:,.2f}  (flagged in invoice log)")
+    if by_cat:
+        print("  Expense categories:")
+        for cat, amt in sorted(by_cat.items(), key=lambda x: -x[1]):
+            print(f"    {cat:16} ${amt:,.2f}")
+    print("  Guide: dashboard-setup-guide.md · invoice-log-template.csv · expense-log-template.csv")
+
+
 def summarize_take_home(invoice_path, expense_path, reserve_pct=TAKE_HOME_RESERVE_PCT):
     """marginmap/14ag: gross → net → SE tax component → reserve → take-home."""
     invoices = load_invoices(invoice_path)
@@ -430,6 +485,10 @@ def main():
         pct = float(sys.argv[4]) if len(sys.argv) >= 5 else TAKE_HOME_RESERVE_PCT
         summarize_take_home(sys.argv[2], sys.argv[3], reserve_pct=pct)
         return
+    if len(sys.argv) >= 4 and sys.argv[1] == "--dashboard":
+        pct = float(sys.argv[4]) if len(sys.argv) >= 5 else TAX_BUFFER_PCT
+        summarize_dashboard_setup(sys.argv[2], sys.argv[3], reserve_pct=pct)
+        return
     if len(sys.argv) < 3:
         print("Usage: python3 freelance_finance_os.py invoice-log.csv expense-log.csv [subscriptions.csv] [bills.csv] [debt.csv] [savings.csv]")
         print("       python3 freelance_finance_os.py --1099k 1099k-freelance-sample.csv")
@@ -438,6 +497,7 @@ def main():
         print("       python3 freelance_finance_os.py --spreadsheet-system invoice-log.csv expense-log.csv")
         print("       python3 freelance_finance_os.py --six-month-reveal invoice-log.csv expense-log.csv client-hours.csv [subscriptions.csv]")
         print("       python3 freelance_finance_os.py --take-home invoice-log.csv expense-log.csv [reserve_pct]")
+        print("       python3 freelance_finance_os.py --dashboard invoice-log.csv expense-log.csv [reserve_pct]")
         sys.exit(1)
 
     invoices = load_invoices(sys.argv[1])
