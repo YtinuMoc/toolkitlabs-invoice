@@ -1,0 +1,5 @@
+invoice_id,client,invoice_date,description,amount,tax,due_date,status
+INV-2026-001,Acme Corp,2026-01-05,Website redesign,2500.00,0.00,2026-01-20,paid
+INV-2026-002,Beta LLC,2026-01-18,January retainer,1200.00,0.00,2026-02-01,sent
+INV-2026-003,Gamma Studio,2025-12-10,Brand audit,800.00,0.00,2025-12-24,sent
+INV-2026-004,Acme Corp,2026-02-01,Q1 maintenance,900.00,0.00,2026-02-15,pending

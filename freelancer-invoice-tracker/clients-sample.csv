@@ -1,0 +1,4 @@
+client_name,contact,payment_terms_days,hourly_rate,status
+Acme Corp,finance@acme.example,30,125.00,active
+Beta LLC,ops@beta.example,14,95.00,active
+Gamma Studio,hello@gamma.example,30,150.00,active
