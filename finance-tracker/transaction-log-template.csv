@@ -1,0 +1,4 @@
+date,type,category,description,amount
+2026-01-15,income,client_work,Invoice #101,2500.00
+2026-01-18,expense,software,Adobe subscription,-54.99
+2026-01-22,expense,marketing,Google Ads,-120.00
