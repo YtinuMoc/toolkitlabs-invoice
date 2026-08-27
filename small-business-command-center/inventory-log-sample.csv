@@ -1,0 +1,5 @@
+item_id,name,qty_on_hand,reorder_level,unit_cost,supplier
+SKU-01,All-purpose cleaner,4,6,8.99,Janitorial supply
+SKU-02,Microfiber cloths pack,12,10,14.50,Janitorial supply
+SKU-03,Vacuum bags,2,4,22.00,Equipment co
+SKU-04,Glass cleaner,3,5,6.25,Janitorial supply

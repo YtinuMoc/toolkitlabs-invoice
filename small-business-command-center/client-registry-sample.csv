@@ -1,0 +1,4 @@
+client_id,name,email,phone,service,frequency,rate,status,access_notes
+CLI-001,Maple Cleaning Co,maple@example.com,555-0101,Residential weekly,weekly,120.00,active,Gate code 4421 · dog in yard
+CLI-002,Harbor Airbnb Unit 3,harbor@example.com,555-0102,Turnover clean,per-job,85.00,active,Lockbox rear door
+CLI-003,Westside Office LLC,west@example.com,555-0103,Commercial monthly,monthly,450.00,active,Parking garage level B

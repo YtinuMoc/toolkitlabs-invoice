@@ -1,0 +1,4 @@
+invoice_id,client,sent_date,due_date,amount,paid,notes
+INV-1042,Westside Office LLC,2026-01-02,2026-01-16,450.00,yes,January commercial
+INV-1043,Maple Cleaning Co,2026-01-10,2026-01-24,480.00,no,4 weekly visits
+INV-1044,Harbor Airbnb Unit 3,2026-01-14,2026-01-28,170.00,no,2 turnover cleans

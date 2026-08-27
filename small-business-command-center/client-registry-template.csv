@@ -1,0 +1,3 @@
+client_id,name,email,phone,service,frequency,rate,status,access_notes
+CLI-001,,,,,,,active,
+CLI-002,,,,,,,active,
