@@ -27,3 +27,4 @@ Expected output shape:
 Full kit adds bills/debt/invoices trackers + 150-row template. Clone of [Quillenhart qaduu ($15)](https://quillenhart.gumroad.com/l/qaduu).
 
 - [Savings goals tracker](savings-tracker.md)
+- [Annual summary template](annual-summary.md)

@@ -11,7 +11,7 @@ A complete finance system without monthly bookkeeping software. Log income and e
 - Quarterly tax set-aside estimate
 - Year-to-date totals
 
-Supporting trackers: `bills-tracker.md`, `debt-tracker.md`, `invoices-tracker.md`.
+Supporting trackers: `bills-tracker.md`, `debt-tracker.md`, `invoices-tracker.md`, `savings-tracker.md`, `annual-summary.md`.
 
 ## 5-minute setup
 

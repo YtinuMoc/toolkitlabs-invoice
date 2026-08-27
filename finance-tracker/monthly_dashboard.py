@@ -63,6 +63,15 @@ def summarize(rows):
     print(f"  Estimated per quarter: ${quarterly:,.2f}")
     print(f"  YTD set-aside target: ${ytd_net * (TAX_SET_ASIDE_PCT / 100):,.2f}")
 
+    print("\n=== ANNUAL SUMMARY (month | income | expense | net | set-aside) ===")
+    for month in sorted(by_month):
+        inc = by_month[month]["income"]
+        exp = by_month[month]["expense"]
+        net = inc - exp
+        aside = net * (TAX_SET_ASIDE_PCT / 100)
+        print(f"  {month}  ${inc:,.2f}  ${exp:,.2f}  ${net:,.2f}  ${aside:,.2f}")
+    print(f"  YTD  ${ytd_income:,.2f}  ${ytd_expense:,.2f}  ${ytd_net:,.2f}  ${ytd_net * (TAX_SET_ASIDE_PCT / 100):,.2f}")
+
 
 def main():
     path = sys.argv[1] if len(sys.argv) > 1 else "sample-transactions.csv"
