@@ -767,6 +767,36 @@ def summarize_setup_readme():
     print("    4. Log first month → 5. Run this script → 6. Mark bills in bills-tracker.md")
 
 
+def summarize_ytd_totals(rows):
+    """Quillenhart qaduu YTD promise + orion/40gi always-current P&L dashboard."""
+    by_month = defaultdict(lambda: {"income": 0.0, "expense": 0.0})
+    for r in rows:
+        key = r["date"].strftime("%Y-%m")
+        if r["type"] == "income" or r["amount"] > 0:
+            by_month[key]["income"] += abs(r["amount"])
+        else:
+            by_month[key]["expense"] += abs(r["amount"])
+    ytd_income = sum(m["income"] for m in by_month.values())
+    ytd_expense = sum(m["expense"] for m in by_month.values())
+    ytd_net = ytd_income - ytd_expense
+    aside = ytd_net * (TAX_SET_ASIDE_PCT / 100) if ytd_net > 0 else 0.0
+    months = len(by_month)
+    print("\n=== YEAR-TO-DATE TOTALS (Quillenhart qaduu — always current) ===")
+    print(f"  Months in log: {months}")
+    print(f"  YTD income:    ${ytd_income:,.2f}")
+    print(f"  YTD expenses:  ${ytd_expense:,.2f}")
+    print(f"  YTD net:       ${ytd_net:,.2f}")
+    print(f"  YTD set-aside ({TAX_SET_ASIDE_PCT:.0f}% of net): ${aside:,.2f}")
+    if months >= 2:
+        first, last = sorted(by_month)[0], sorted(by_month)[-1]
+        m1_net = by_month[first]["income"] - by_month[first]["expense"]
+        m2_net = by_month[last]["income"] - by_month[last]["expense"]
+        trend = "up" if m2_net > m1_net else ("down" if m2_net < m1_net else "flat")
+        print(f"  Trend ({first} → {last} net): {trend}")
+    print("  Rule: log once on Transactions tab — YTD recalculates every run (orion/40gi shape)")
+    print("  Guide: ytd-totals-guide.md · gumroad-seller-guide.md")
+
+
 def summarize_transactions_log(rows):
     """Quillenhart Transactions tab + orion_operator/40gi single-source-of-truth."""
     months = sorted({r["date"].strftime("%Y-%m") for r in rows})
@@ -852,6 +882,7 @@ def main():
     summarize_setup_readme()
     summarize_colorways()
     summarize_transactions_log(rows)
+    summarize_ytd_totals(rows)
     summarize_monthly_dashboard(rows, month=month_arg)
     summarize(rows)
     summarize_category_breakdown(rows)
