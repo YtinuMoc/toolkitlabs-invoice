@@ -374,6 +374,48 @@ def clean_dirty_invoices(path):
 FOLLOW_UP_CADENCE_DAYS = (1, 3, 7, 14, 30)
 
 
+def summarize_tax_buffer(payments_path, invoices_path=None, reserve_pct=TAX_BUFFER_PCT):
+    """faisalmq/4gao: client payment lands → per-payment buffer → tax-only savings → tracker upsell."""
+    payments = []
+    with open(payments_path, newline="", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            try:
+                amt = float(row.get("amount", "0") or 0)
+            except ValueError:
+                continue
+            if amt <= 0:
+                continue
+            payments.append({
+                "payment_date": row.get("payment_date", "").strip(),
+                "invoice_id": row.get("invoice_id", "").strip(),
+                "amount": amt,
+                "method": row.get("method", "").strip(),
+            })
+    inv_client = {}
+    if invoices_path:
+        for inv in load_invoices(invoices_path):
+            inv_client[inv["invoice_id"]] = inv["client"]
+
+    total = sum(p["amount"] for p in payments)
+    tax_buffer = max(total, 0) * reserve_pct / 100
+    safe = max(total - tax_buffer, 0)
+
+    print("\n=== PER-PAYMENT TAX BUFFER (faisalmq/4gao shape) ===")
+    print("  Client payment lands → five minutes of joy → tax panic → buffer same day.")
+    print(f"  {'Payment':<20} {'Received':>12} {'Buffer':>10} {'Safe':>12}")
+    for p in payments:
+        buf = p["amount"] * reserve_pct / 100
+        safe_amt = p["amount"] - buf
+        label = inv_client.get(p["invoice_id"], p["invoice_id"] or "Payment")[:20]
+        print(f"  {label:<20} ${p['amount']:>10,.2f} ${buf:>8,.2f} ${safe_amt:>10,.2f}")
+    print("\n=== INVOICE PAYMENTS + TAX BUFFER ===")
+    print(f"  Payments received:   ${total:,.2f}")
+    print(f"  Tax buffer ({reserve_pct:.0f}%):   ${tax_buffer:,.2f}")
+    print(f"  Safe to spend:       ${safe:,.2f}")
+    print("  Transfer buffer to tax-only savings when payment lands — not in April.")
+    print("  Guide: tax-buffer-guide.md · payments-sample.csv · invoices-sample.csv")
+
+
 def summarize_payment_follow_up(invoices_path, payments_path=None):
     """agentchip/11n6: overdue invoice follow-up cadence preview — no email send."""
     invoices = load_invoices(invoices_path)
@@ -749,6 +791,11 @@ def main():
         payments_path = sys.argv[3] if len(sys.argv) >= 4 else None
         summarize_payment_follow_up(sys.argv[2], payments_path)
         return
+    if len(sys.argv) >= 3 and sys.argv[1] == "--tax-buffer":
+        invoices_path = sys.argv[3] if len(sys.argv) >= 4 else None
+        tax_pct = float(sys.argv[4]) if len(sys.argv) >= 5 else TAX_BUFFER_PCT
+        summarize_tax_buffer(sys.argv[2], invoices_path, tax_pct)
+        return
     if len(sys.argv) >= 5 and sys.argv[1] == "--settlement":
         summarize_payout_settlement(sys.argv[2], sys.argv[3], sys.argv[4])
         return
@@ -764,6 +811,7 @@ def main():
             "[subscriptions.csv] [bills.csv] [debt.csv]\n"
             "       productiveclub_invoice_tracker.py --reconcile dirty-invoices.csv\n"
             "       productiveclub_invoice_tracker.py --follow-up invoices.csv [payments.csv]\n"
+            "       productiveclub_invoice_tracker.py --tax-buffer payments.csv [invoices.csv] [tax_pct]\n"
             "       productiveclub_invoice_tracker.py --settlement clients.csv invoices.csv payments.csv\n"
             "       productiveclub_invoice_tracker.py --inventory inventory.csv stock-log.csv\n"
             "       productiveclub_invoice_tracker.py --trial-audit trials.csv",
