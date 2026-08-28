@@ -34,8 +34,8 @@ Spending from gross deposits is how freelancers overspend in Q3 and panic in Apr
 
 ## Pair with
 
-- [tax-buffer-guide.md](tax-buffer-guide.md) — faisalmq/4gao deposit-day transfers (run326)
-- [take-home-guide.md](take-home-guide.md) — marginmap/14ag buyer channel (run325)
+- [tax-buffer-guide.md](tax-buffer-guide.md) — faisalmq/4gao deposit-day transfers (run331)
+- [take-home-guide.md](take-home-guide.md) — marginmap/14ag buyer channel (run330)
 - [start-here.md](start-here.md) — full income + expense setup
 
 Full bundle: [Matthew Finance Tracker landing](https://ytinumoc.github.io/toolkitlabs-invoice/matthew-finance-tracker/) — 7 CSV templates, dashboard CLI, and all buyer-channel guides.
