@@ -1,0 +1,6 @@
+date,client,description,hours,rate,amount,status,due_date
+2026-01-05,Acme Corp,January retainer,,,2500.00,Paid,2026-01-15
+2026-01-18,Beta LLC,API integration,32,125,4000.00,Paid,2026-02-01
+2026-02-01,Gamma Studio,Design sprint,20,95,1900.00,Sent,2026-02-15
+2026-02-10,Delta Inc,Consulting block,8,150,1200.00,Overdue,2026-02-20
+2026-03-01,Acme Corp,Q1 maintenance,,,1800.00,Awaiting,2026-03-15
