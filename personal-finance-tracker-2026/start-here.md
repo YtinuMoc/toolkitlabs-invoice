@@ -2,6 +2,10 @@
 
 Clone of [ohmygoshna 2026 Personal Finance Tracker ($13 · 7 ratings · 5.0★)](https://ohmygoshna.gumroad.com/l/2026).
 
+## Guide index
+
+See [mesh-hub.md](mesh-hub.md) for all 4 dev.to buyer-channel guides.
+
 ## 10-minute setup
 
 1. Copy the five template CSVs to your workspace.
