@@ -227,6 +227,50 @@ def summarize_beginner_friendly(income_path, expense_path, tax_pct=DEFAULT_TAX_P
     print("  Guide: beginner-guide.md · income-sample.csv · expenses-sample.csv")
 
 
+def summarize_complete_workbook(income_path, expense_path, tax_pct=DEFAULT_TAX_PCT):
+    """hemantdev/1iae: one workbook, connected views, offline, no Notion."""
+    income = load_income(income_path)
+    expenses = load_expenses(expense_path)
+    total_income = sum(i["amount"] for i in income)
+    total_expenses = sum(e["amount"] for e in expenses)
+    net_profit = total_income - total_expenses
+    tax_set_aside = max(net_profit, 0) * (tax_pct / 100.0)
+    safe_to_spend = max(net_profit - tax_set_aside, 0)
+    by_client = defaultdict(float)
+    for row in income:
+        by_client[row["source"]] += row["amount"]
+    by_category = defaultdict(float)
+    for row in expenses:
+        by_category[row["category"]] += row["amount"]
+    print("=== COMPLETE WORKBOOK (hemantdev/1iae — no Notion, offline file) ===")
+    print("  Dashboard view:      collected, net profit, safe-to-spend (this stdout)")
+    print("  Income log:          income-template.csv — one row per payment")
+    print("  Expense log:         expenses-template.csv — categorized totals")
+    print("  Subscriptions view:  subscriptions-template.csv — recurring drag")
+    print("  Investments view:    investments-template.csv — cost basis vs value")
+    print("  Debts view:          debts-template.csv — avalanche payoff schedule")
+    print("  Savings goals view:  savings-template.csv — target vs current")
+    print("  Accounts view:       accounts-template.csv — net worth rollup")
+    print("  Zero onboarding:     open CSV, type shaded columns, run CLI — no account")
+    print()
+    print(f"  Collected YTD:       {fmt_money(total_income)}")
+    print(f"  Expenses YTD:        {fmt_money(total_expenses)}")
+    print(f"  Net profit:          {fmt_money(net_profit)}")
+    print(f"  Tax set-aside ({tax_pct:.0f}%): {fmt_money(tax_set_aside)}")
+    print(f"  Safe to spend:       {fmt_money(safe_to_spend)}")
+    print()
+    print("--- Income by source (clients view) ---")
+    for source, amt in sorted(by_client.items(), key=lambda x: -x[1]):
+        print(f"  {source:<22} {fmt_money(amt)}")
+    print()
+    print("--- Expense breakdown ---")
+    for cat, amt in sorted(by_category.items(), key=lambda x: -x[1]):
+        print(f"  {cat:<22} {fmt_money(amt)}")
+    print()
+    print("  Full kit adds subscriptions, investments, debts, goals, net worth.")
+    print("  Guide: complete-workbook-guide.md · income-sample.csv · expenses-sample.csv")
+
+
 def summarize_guesswork(income_path, expense_path, subs_path, tax_pct=DEFAULT_TAX_PCT):
     """faisalmq/54h7: guesswork → clarity — one file replaces mental math."""
     income = load_income(income_path)
@@ -264,6 +308,10 @@ def summarize_guesswork(income_path, expense_path, subs_path, tax_pct=DEFAULT_TA
 
 def main():
     args = sys.argv[1:]
+    if len(args) >= 3 and args[0] == "--complete-workbook":
+        pct = float(args[3]) if len(args) >= 4 else DEFAULT_TAX_PCT
+        summarize_complete_workbook(args[1], args[2], pct)
+        return
     if len(args) >= 3 and args[0] == "--beginner":
         pct = float(args[3]) if len(args) >= 4 else DEFAULT_TAX_PCT
         summarize_beginner_friendly(args[1], args[2], pct)
@@ -280,6 +328,10 @@ def main():
         )
         print(
             "       ultimate_finance_tracker.py --guesswork income.csv expenses.csv subscriptions.csv [tax_pct]",
+            file=sys.stderr,
+        )
+        print(
+            "       ultimate_finance_tracker.py --complete-workbook income.csv expenses.csv [tax_pct]",
             file=sys.stderr,
         )
         print(
