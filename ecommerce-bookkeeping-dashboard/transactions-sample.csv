@@ -1,0 +1,17 @@
+date,type,category,description,amount,platform
+2026-07-02,sale,product,Handmade ceramic mug,25.00,etsy
+2026-07-02,expense,materials,Mug clay and glaze,8.00,etsy
+2026-07-02,expense,shipping,Postage supplies,3.50,etsy
+2026-07-05,sale,product,Vintage denim jacket,32.00,vinted
+2026-07-05,expense,materials,Cleaning supplies,2.00,vinted
+2026-07-08,sale,product,Digital template pack,19.00,gumroad
+2026-07-08,expense,software,Canva subscription,12.99,other
+2026-07-12,sale,product,Custom pet portrait,45.00,etsy
+2026-07-12,expense,materials,Canvas and paint,12.00,etsy
+2026-07-15,expense,ads,Etsy offsite ads,18.50,etsy
+2026-07-18,sale,product,Phone case bundle,18.00,amazon
+2026-07-18,expense,materials,Case blanks,4.00,amazon
+2026-07-22,sale,product,Sticker pack,12.00,etsy
+2026-07-22,expense,materials,Vinyl sheets,7.50,etsy
+2026-08-01,sale,product,Notion template,15.00,gumroad
+2026-08-05,expense,software,Domain renewal,14.00,other

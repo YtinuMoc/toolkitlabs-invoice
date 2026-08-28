@@ -1,0 +1,3 @@
+date,type,category,description,amount,platform
+2026-01-01,sale,product,Example sale,25.00,etsy
+2026-01-01,expense,materials,Example cost,8.00,etsy
