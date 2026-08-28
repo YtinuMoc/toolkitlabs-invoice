@@ -34,7 +34,7 @@ Spending from gross deposits is how freelancers overspend in Q3 and panic in Apr
 
 ## Pair with
 
-- [tax-buffer-guide.md](tax-buffer-guide.md) — faisalmq/4gao deposit-day transfers (run321)
+- [tax-buffer-guide.md](tax-buffer-guide.md) — faisalmq/4gao deposit-day transfers (run326)
 - [take-home-guide.md](take-home-guide.md) — marginmap/14ag buyer channel (run325)
 - [start-here.md](start-here.md) — full income + expense setup
 
