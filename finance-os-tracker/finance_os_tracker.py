@@ -14,10 +14,9 @@ def load_csv(path, fields):
         for row in csv.DictReader(f):
             try:
                 parsed = {k: row.get(k, "").strip() for k in fields}
-                if "amount" in parsed or "balance" in parsed or "target" in parsed:
-                    for num_field in ("amount", "balance", "target", "current", "monthly_limit"):
-                        if num_field in parsed:
-                            parsed[num_field] = float(parsed.get(num_field) or 0)
+                for num_field in ("amount", "balance", "target", "current", "monthly_limit"):
+                    if num_field in parsed:
+                        parsed[num_field] = float(parsed.get(num_field) or 0)
                 if "active" in parsed:
                     parsed["active"] = parsed["active"].lower() in ("yes", "y", "1", "true")
                 rows.append(parsed)
