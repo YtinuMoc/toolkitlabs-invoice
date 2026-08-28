@@ -163,6 +163,7 @@ def print_monthly_products(rows: list[dict]) -> None:
 
 
 DEFAULT_TAX_PCT = 25.0
+SE_IF_TAX = 0.153  # self-employment tax approximation (marginmap/14ag)
 
 
 def print_net_income(rows: list[dict], reserve_pct: float = DEFAULT_TAX_PCT) -> None:
@@ -182,6 +183,38 @@ def print_net_income(rows: list[dict], reserve_pct: float = DEFAULT_TAX_PCT) -> 
     print(f"  Safe to spend:         ${safe:,.2f}")
     print(f"  Take-home rate:        {take_home_rate:.1f}% of gross deposits")
     print("  Guide: net-income-guide.md · gumroad-sample.csv · stripe-sample.csv")
+
+
+def print_take_home(rows: list[dict], reserve_pct: float = 28.0, state_rate: float = 4.4) -> None:
+    """marginmap/14ag shape — gross sales → fees → SE tax → real take-home."""
+    sales = [r for r in rows if r["category"] == "Product Revenue" and _money(r["amount"]) > 0]
+    gross = sum(_money(r["amount"]) for r in sales)
+    fees = sum(_money(r["fee"]) for r in sales)
+    net = gross - fees
+    se_tax = max(net, 0) * SE_IF_TAX
+    se_deduction = se_tax * 0.5
+    agi = max(net - se_deduction, 0)
+    std_deduction = 15000.0
+    taxable = max(agi - std_deduction, 0)
+    federal = taxable * 0.113
+    state = taxable * (state_rate / 100.0)
+    total_tax = se_tax + federal + state
+    take_home = max(net - total_tax, 0)
+    effective = (total_tax / gross * 100) if gross else 0.0
+    print("=== TAKE-HOME ESTIMATE (marginmap/14ag shape) ===")
+    print("  Digital product sales ≠ what you keep after SE + income tax.")
+    print(f"  Gross revenue:         ${gross:,.2f}")
+    print(f"  Platform fees:         ${fees:,.2f}")
+    print(f"  Net self-employment:   ${net:,.2f}")
+    print(f"  SE tax (~15.3%):       ${se_tax:,.2f}")
+    print(f"  Federal income (est.): ${federal:,.2f}")
+    print(f"  State tax ({state_rate}%):     ${state:,.2f}")
+    print(f"  Total taxes:           ${total_tax:,.2f}")
+    print(f"  Take-home:             ${take_home:,.2f}")
+    print(f"  Effective rate:        {effective:.1f}% of gross")
+    print(f"  Reserve shortcut:      {reserve_pct:.0f}% of net → ${max(net, 0) * reserve_pct / 100:,.2f}")
+    print("  Not tax advice. Confirm with a CPA.")
+    print("  Guide: take-home-guide.md · gumroad-sample.csv · stripe-sample.csv")
 
 
 def print_tax_buffer(rows: list[dict], reserve_pct: float = DEFAULT_TAX_PCT) -> None:
@@ -224,6 +257,11 @@ def main() -> int:
     p.add_argument("inputs", nargs="*", help="Gumroad and/or Stripe CSV exports")
     p.add_argument("-o", "--output", default="sales-ledger.csv", help="unified ledger CSV")
     p.add_argument(
+        "--take-home",
+        action="store_true",
+        help="marginmap/14ag: take-home estimate from merged sales CSVs",
+    )
+    p.add_argument(
         "--net-income",
         action="store_true",
         help="faisalmq/5797: safe-to-spend visibility from merged sales CSVs",
@@ -240,6 +278,14 @@ def main() -> int:
         help="tax reserve percentage (default 25)",
     )
     args = p.parse_args()
+
+    if args.take_home:
+        if not args.inputs:
+            print("Usage: automated_sales_os.py --take-home gumroad.csv stripe.csv")
+            return 1
+        rows = load_sales([Path(inp) for inp in args.inputs])
+        print_take_home(rows)
+        return 0
 
     if args.net_income:
         if not args.inputs:
