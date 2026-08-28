@@ -24,9 +24,9 @@ Import `ledger-merged.csv` into your income log — same workflow as heymarcus's
 
 ## Pair with
 
-- [net-income-guide.md](net-income-guide.md) — faisalmq/5797 safe-to-spend visibility (run362)
-- [tax-buffer-guide.md](tax-buffer-guide.md) — faisalmq/4gao deposit-day transfers (run361)
-- [take-home-guide.md](take-home-guide.md) — marginmap/14ag buyer channel (run360)
+- [net-income-guide.md](net-income-guide.md) — faisalmq/5797 safe-to-spend visibility (run367)
+- [tax-buffer-guide.md](tax-buffer-guide.md) — faisalmq/4gao deposit-day transfers (run366)
+- [take-home-guide.md](take-home-guide.md) — marginmap/14ag buyer channel (run365)
 - [start-here.md](start-here.md) — kit setup
 
 Full bundle: [Finance Tracker landing](https://ytinumoc.github.io/toolkitlabs-invoice/heymarcus-freelance-dashboard/).
