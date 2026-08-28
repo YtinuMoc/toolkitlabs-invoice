@@ -1,0 +1,10 @@
+date,type,category,description,amount
+2026-01-05,income,client_work,Retainer Client A,3200.00
+2026-01-08,expense,software,Notion,-10.00
+2026-01-10,expense,contractor,Design freelancer,-450.00
+2026-01-15,income,client_work,Project invoice #42,1800.00
+2026-01-18,expense,hosting,Vercel,-20.00
+2026-01-22,expense,marketing,Newsletter tool,-29.00
+2026-02-01,income,client_work,Retainer Client A,3200.00
+2026-02-03,expense,software,Figma,-15.00
+2026-02-14,expense,office,Coworking day pass,-35.00
