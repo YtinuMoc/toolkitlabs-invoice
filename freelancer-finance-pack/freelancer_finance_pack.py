@@ -10,6 +10,12 @@ US_STANDARD_DEDUCTION = 15000
 US_QBI_DEDUCTION_PCT = 0.20
 INDIA_44ADA_PCT = 0.50
 INDIA_ADVANCE_THRESH = 10000
+UK_PERSONAL_ALLOWANCE = 12570.0
+UK_INCOME_TAX_RATE = 0.20
+UK_CLASS4_LOWER = 12570.0
+UK_CLASS4_UPPER = 50270.0
+UK_CLASS4_RATE = 0.09
+UK_TAX_POT_PCT = 28.0  # landolio/5hae 25-30% band
 
 
 def load_invoices(path):
@@ -228,6 +234,66 @@ def profit_dashboard(invoices, expenses, billable_hours=120, state_rate=0.05):
     }
 
 
+def load_self_assessment_rows(path):
+    rows = []
+    with open(path, newline="", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            try:
+                amt = float(row["amount"])
+            except (KeyError, ValueError):
+                continue
+            month = (row.get("date") or "")[:7] or "unknown"
+            rows.append({
+                "month": month,
+                "type": (row.get("type") or "").strip().lower(),
+                "category": (row.get("category") or "other").strip().lower() or "other",
+                "amount": amt,
+            })
+    return rows
+
+
+def summarize_self_assessment(path):
+    """landolio/5hae: monthly P&L + UK self-assessment tax pot planning."""
+    rows = load_self_assessment_rows(path)
+    if not rows:
+        print("No rows in transaction log.")
+        return
+    by_month = defaultdict(lambda: {"income": 0.0, "expense": 0.0})
+    for r in rows:
+        if r["amount"] > 0:
+            by_month[r["month"]]["income"] += r["amount"]
+        else:
+            by_month[r["month"]]["expense"] += abs(r["amount"])
+    ytd_income = sum(m["income"] for m in by_month.values())
+    ytd_expense = sum(m["expense"] for m in by_month.values())
+    ytd_net = ytd_income - ytd_expense
+    print("\n=== MONTHLY P&L (landolio/5hae shape) ===")
+    for month in sorted(by_month):
+        inc = by_month[month]["income"]
+        exp = by_month[month]["expense"]
+        net = inc - exp
+        print(f"  {month}  income ${inc:,.2f}  expense ${exp:,.2f}  net ${net:,.2f}")
+    print(f"  YTD  income ${ytd_income:,.2f}  expense ${ytd_expense:,.2f}  net ${ytd_net:,.2f}")
+    if ytd_net <= 0:
+        return
+    taxable = max(0.0, ytd_net - UK_PERSONAL_ALLOWANCE)
+    income_tax_est = taxable * UK_INCOME_TAX_RATE
+    class4_base = max(0.0, min(ytd_net, UK_CLASS4_UPPER) - UK_CLASS4_LOWER)
+    class4_ni = class4_base * UK_CLASS4_RATE
+    tax_pot = ytd_net * (UK_TAX_POT_PCT / 100)
+    months_logged = max(1, len(by_month))
+    monthly_pot = tax_pot / months_logged
+    print(f"\n=== SELF-ASSESSMENT TAX POT (landolio/5hae shape, UK planning) ===")
+    print(f"  Profit (income − allowable expenses): ${ytd_net:,.2f}")
+    print(f"  Income tax estimate (above ${UK_PERSONAL_ALLOWANCE:,.0f} allowance @ {UK_INCOME_TAX_RATE*100:.0f}%): ${income_tax_est:,.2f}")
+    print(f"  Class 4 NI estimate (${UK_CLASS4_LOWER:,.0f}–${UK_CLASS4_UPPER:,.0f} band @ {UK_CLASS4_RATE*100:.0f}%): ${class4_ni:,.2f}")
+    print(f"  Combined tax liability estimate: ${income_tax_est + class4_ni:,.2f}")
+    print(f"  Tax pot to set aside ({UK_TAX_POT_PCT:.0f}% rule): ${tax_pot:,.2f}")
+    print(f"  Avg monthly set-aside ({months_logged} months logged): ${monthly_pot:,.2f}/mo")
+    print("  Planning only — confirm rates with a qualified tax professional.")
+    print("  Guide: self-assessment-guide.md · self-assessment-sample.csv")
+
+
 def print_report(invoices, expenses, billable_hours=120):
     d = profit_dashboard(invoices, expenses, billable_hours)
     inv = d["invoice_detail"]
@@ -256,6 +322,9 @@ def print_report(invoices, expenses, billable_hours=120):
 
 def main():
     args = sys.argv[1:]
+    if len(args) >= 3 and args[0] == "--self-assessment":
+        summarize_self_assessment(args[1])
+        return
     if "--merge" in args:
         idx = args.index("--merge")
         inputs = []
