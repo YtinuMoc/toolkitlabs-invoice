@@ -2,6 +2,10 @@
 
 Clone of [heyismail Finance OS Pro ($29+ on Gumroad · 15,254 sales · 177 ratings)](https://heyismail.gumroad.com/l/TheUltimateFinanceTracker).
 
+## Guide index
+
+See [mesh-hub.md](mesh-hub.md) for all 7 dev.to buyer-channel guides.
+
 ## 10-minute setup
 
 1. Copy all `*-template.csv` files to your workspace (or use the samples).
