@@ -92,6 +92,42 @@ def summarize(revenue, expenses, tax_pct=DEFAULT_TAX_PCT):
     }
 
 
+def summarize_portable(revenue_path, expense_path, tax_pct=DEFAULT_TAX_PCT):
+    """faisalmq/3gcp: portable solo business tracker — single source of truth, any device."""
+    revenue = load_revenue(revenue_path)
+    expenses = load_expenses(expense_path)
+    total_revenue = sum(r["amount"] for r in revenue)
+    total_expenses = sum(e["amount"] for e in expenses)
+    by_expense_cat = defaultdict(float)
+    for e in expenses:
+        by_expense_cat[e["category"]] += e["amount"]
+    net_profit = total_revenue - total_expenses
+    tax_set_aside = max(net_profit, 0) * (tax_pct / 100.0)
+    take_home = max(net_profit - tax_set_aside, 0)
+    rev_rows = len(revenue)
+    exp_rows = len(expenses)
+    print("=== PORTABLE SOLO BUSINESS TRACKER (faisalmq/3gcp shape) ===")
+    print("  Vessel: plain CSV logs — sync via Dropbox/iCloud/Git; no Google account.")
+    print("  Update from phone (any CSV editor) or desktop (Excel, Numbers, CLI).")
+    print("  Single source of truth — stop winging it with mental math.")
+    print()
+    print("  Four metrics that matter:")
+    print(f"    Income tracking:     ${total_revenue:,.2f} collected ({rev_rows} revenue rows)")
+    print(f"    Expense categories:  ${total_expenses:,.2f} ({exp_rows} expense rows)")
+    if by_expense_cat:
+        for cat, amt in sorted(by_expense_cat.items(), key=lambda x: -x[1])[:4]:
+            print(f"      · {cat}: ${amt:,.2f}")
+    print(f"    Tax estimation:      ${tax_set_aside:,.2f} set aside ({tax_pct:.0f}% of net)")
+    print(f"    Net profit view:     ${net_profit:,.2f} → take-home ${take_home:,.2f}")
+    print()
+    print("  Portability checklist:")
+    print("    [x] Plain-text CSV — opens everywhere")
+    print("    [x] No subscription — one-time kit")
+    print("    [x] Offline CLI preview — python3 solo_business_revenue_tracker.py --portable …")
+    print("    [x] Expandable — duplicate template rows as you grow")
+    print("  Guide: portable-tracker-guide.md · revenue-sample.csv · expenses-sample.csv")
+
+
 def print_dashboard(d):
     print("=== SOLO BUSINESS REVENUE TRACKER (amyragland tckuq clone) ===")
     print(f"  Total revenue:       {fmt_money(d['total_revenue'])}")
@@ -131,8 +167,13 @@ def print_dashboard(d):
 
 
 def main():
+    if len(sys.argv) >= 4 and sys.argv[1] == "--portable":
+        tax_pct = float(sys.argv[4]) if len(sys.argv) > 4 else DEFAULT_TAX_PCT
+        summarize_portable(sys.argv[2], sys.argv[3], tax_pct)
+        return
     if len(sys.argv) < 3:
         print("Usage: solo_business_revenue_tracker.py revenue.csv expenses.csv [tax_pct]")
+        print("       solo_business_revenue_tracker.py --portable revenue.csv expenses.csv [tax_pct]")
         print("Clone target: amyragland.gumroad.com/l/tckuq ($10 2026 Solo Business Revenue & Expense Tracker)")
         sys.exit(1)
     revenue = load_revenue(sys.argv[1])
