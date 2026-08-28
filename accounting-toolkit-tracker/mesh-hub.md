@@ -1,7 +1,7 @@
-# Matthew Finance Tracker — guide index
+# Accounting Toolkit Tracker — guide index
 
-Mesh hub: [dev.to index article](https://dev.to/toolkitlabs/matthew-finance-tracker-complete-guide-index-4-matthewnotion-clones-3161)
+Mesh hub: [dev.to index article](https://dev.to/toolkitlabs/accounting-toolkit-tracker-complete-guide-index-4-theaccountantguy-clones-2gp4)
 
-Checkout: https://buy.stripe.com/00w6oIc9g1vu3oWfgp5Ne0Y
+Checkout: https://buy.stripe.com/6oUbJ2gpweiggbIb095Ne0Z
 
-Clone of [matthewnotion Finance Tracker (58 sales · $28)](https://matthewnotion.gumroad.com/l/financetracker).
+Clone of [theaccountantguy Ultimate Accounting Toolkit (92 sales · $49+)](https://theaccountantguy.gumroad.com/l/notionaccountingtoolkit).
