@@ -187,6 +187,69 @@ def merge_ledgers(paths, out_path=None):
     return rows
 
 
+def load_invoices(path):
+    rows = []
+    with open(path, newline="", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            try:
+                amount = float(row.get("amount") or 0)
+                due = row.get("due_date", "").strip()
+                status = row.get("status", "unpaid").strip().lower()
+                if status != "paid" and due:
+                    try:
+                        if datetime.strptime(due, "%Y-%m-%d") < datetime.now():
+                            status = "overdue"
+                    except ValueError:
+                        pass
+                rows.append({
+                    "invoice_id": row.get("invoice_id", "").strip(),
+                    "client": row.get("client", "").strip(),
+                    "amount": amount,
+                    "due_date": due,
+                    "status": status,
+                })
+            except (KeyError, ValueError):
+                continue
+    return rows
+
+
+def summarize_invoice_panic(invoices):
+    """faisalmq/43dl: end-of-month panic → invoice status log + overdue flags."""
+    paid = [i for i in invoices if i["status"] == "paid"]
+    sent = [i for i in invoices if i["status"] in ("sent", "unpaid")]
+    overdue = [i for i in invoices if i["status"] == "overdue"]
+    collected = sum(i["amount"] for i in paid)
+    awaiting = sum(i["amount"] for i in sent)
+    overdue_amt = sum(i["amount"] for i in overdue)
+
+    by_client = defaultdict(lambda: {"invoiced": 0.0, "paid": 0.0, "outstanding": 0.0})
+    for i in invoices:
+        by_client[i["client"]]["invoiced"] += i["amount"]
+        if i["status"] == "paid":
+            by_client[i["client"]]["paid"] += i["amount"]
+        elif i["status"] in ("sent", "unpaid", "overdue"):
+            by_client[i["client"]]["outstanding"] += i["amount"]
+
+    print("\n=== INVOICE TRACKER WITHOUT END-OF-MONTH PANIC (faisalmq/43dl shape) ===")
+    print(f"  Invoices logged:     {len(invoices)}")
+    print(f"  Collected (paid):    {fmt_money(collected)}")
+    print(f"  Awaiting payment:    {fmt_money(awaiting)}")
+    print(f"  Overdue (late):      {len(overdue)} invoices · {fmt_money(overdue_amt)}")
+    if overdue:
+        print("\n--- Overdue invoices ---")
+        for i in overdue:
+            print(f"  {i['invoice_id']:16s} {i['client'][:16]:<16} {fmt_money(i['amount']):>12} due {i['due_date']}")
+    if by_client:
+        print("\n--- Per-client totals ---")
+        for client, totals in sorted(by_client.items(), key=lambda x: -x[1]["invoiced"]):
+            print(
+                f"  {client[:20]:<20} invoiced {fmt_money(totals['invoiced']):>12} "
+                f"paid {fmt_money(totals['paid']):>12} outstanding {fmt_money(totals['outstanding']):>12}"
+            )
+    print("\n  Log every invoice when sent. Mark paid when deposit lands. Run weekly — not in panic.")
+    print("  Guide: invoice-panic-guide.md · invoices-sample.csv · start-here.md")
+
+
 def summarize_net_income(income_path, expense_path, tax_pct=DEFAULT_TAX_PCT):
     """faisalmq/5797: net income visibility — safe-to-spend after tax + subscriptions."""
     income = load_income(income_path)
@@ -344,6 +407,9 @@ def print_dashboard(d):
 
 def main():
     args = sys.argv[1:]
+    if len(args) >= 2 and args[0] == "--invoice-panic":
+        summarize_invoice_panic(load_invoices(args[1]))
+        return
     if len(args) >= 3 and args[0] == "--net-income":
         pct = float(args[3]) if len(args) >= 4 else DEFAULT_TAX_PCT
         summarize_net_income(args[1], args[2], pct)
