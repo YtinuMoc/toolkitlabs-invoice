@@ -165,6 +165,25 @@ def print_monthly_products(rows: list[dict]) -> None:
 DEFAULT_TAX_PCT = 25.0
 
 
+def print_net_income(rows: list[dict], reserve_pct: float = DEFAULT_TAX_PCT) -> None:
+    """faisalmq/5797 shape — safe-to-spend after fees + tax reserve."""
+    sales = [r for r in rows if r["category"] == "Product Revenue" and _money(r["net"]) > 0]
+    gross = sum(_money(r["amount"]) for r in sales)
+    fees = sum(_money(r["fee"]) for r in sales)
+    net_profit = sum(_money(r["net"]) for r in sales)
+    tax_set_aside = max(net_profit, 0) * reserve_pct / 100
+    safe = max(net_profit - tax_set_aside, 0)
+    take_home_rate = (safe / gross * 100) if gross else 0.0
+    print("=== NET INCOME VISIBILITY (faisalmq/5797 shape) ===")
+    print(f"  Gross collected:       ${gross:,.2f}")
+    print(f"  Platform fees:         ${fees:,.2f}")
+    print(f"  Net profit:            ${net_profit:,.2f}")
+    print(f"  Tax set-aside ({reserve_pct:.0f}%):   ${tax_set_aside:,.2f}")
+    print(f"  Safe to spend:         ${safe:,.2f}")
+    print(f"  Take-home rate:        {take_home_rate:.1f}% of gross deposits")
+    print("  Guide: net-income-guide.md · gumroad-sample.csv · stripe-sample.csv")
+
+
 def print_tax_buffer(rows: list[dict], reserve_pct: float = DEFAULT_TAX_PCT) -> None:
     """faisalmq/4gao shape for digital product sellers — buffer when sale revenue lands."""
     sales = [r for r in rows if r["category"] == "Product Revenue" and _money(r["net"]) > 0]
@@ -205,6 +224,11 @@ def main() -> int:
     p.add_argument("inputs", nargs="*", help="Gumroad and/or Stripe CSV exports")
     p.add_argument("-o", "--output", default="sales-ledger.csv", help="unified ledger CSV")
     p.add_argument(
+        "--net-income",
+        action="store_true",
+        help="faisalmq/5797: safe-to-spend visibility from merged sales CSVs",
+    )
+    p.add_argument(
         "--tax-buffer",
         action="store_true",
         help="faisalmq/4gao: per-sale tax buffer from merged sales CSVs",
@@ -216,6 +240,14 @@ def main() -> int:
         help="tax reserve percentage (default 25)",
     )
     args = p.parse_args()
+
+    if args.net_income:
+        if not args.inputs:
+            print("Usage: automated_sales_os.py --net-income gumroad.csv stripe.csv")
+            return 1
+        rows = load_sales([Path(inp) for inp in args.inputs])
+        print_net_income(rows, args.tax_pct)
+        return 0
 
     if args.tax_buffer:
         if not args.inputs:
