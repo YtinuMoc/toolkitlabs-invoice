@@ -1,6 +1,6 @@
 # Tax buffer calculator — the day client money lands
 
-Clone of [faisalmq/4gao](https://dev.to/faisalmq/freelance-finance-tracker-google-sheets-4gao) buyer channel + [Easlo Finance Tracker (134 ratings · 4.9★ · $39)](https://easlo.gumroad.com/l/beygm).
+Clone of [faisalmq/4gao](https://dev.to/faisalmq/freelance-finance-tracker-google-sheets-4gao) buyer channel + [mariesells Yearly Budget Tracker (6 ratings · 5★ · $5.99+)](https://mariesells.gumroad.com/l/yearly-budget-tracker).
 
 ## The five-minute panic
 
@@ -10,11 +10,11 @@ You finish a project, watch the deposit land in your account. It feels great for
 - How much goes to quarterly taxes?
 - Did impulse spending eat the margin?
 
-faisalmq/4gao calls this "mental accounting" — treating your checking account like a slush fund. Easlo's Finance Tracker rolls account balances, income, expenses, budgets, goals, and subscriptions into one overview — the tax buffer habit belongs in the same workbook.
+faisalmq/4gao calls this "mental accounting" — treating your checking account like a slush fund. mariesells's Yearly Budget Tracker rolls yearly overview, monthly breakdowns, income/expenses, debt tracker, and savings goals into one workspace — the tax buffer habit belongs in the same workbook.
 
 ## Per-payment withholding (faisalmq/4gao shape)
 
-Default reserve: **25% of net profit** (adjust `DEFAULT_TAX_PCT` in `easlo_finance_tracker.py`).
+Default reserve: **25% of net profit** (adjust `DEFAULT_TAX_PCT` in `yearly_budget_tracker.py`).
 
 | Source | Collected | Est. buffer (25%) | Safe to spend |
 |--------|-----------|-------------------|---------------|
@@ -24,16 +24,16 @@ Default reserve: **25% of net profit** (adjust `DEFAULT_TAX_PCT` in `easlo_finan
 Run:
 
 ```bash
-python3 easlo_finance_tracker.py --tax-buffer income-sample.csv expenses-sample.csv
+python3 yearly_budget_tracker.py --tax-buffer income-sample.csv expenses-sample.csv
 ```
 
 Read **EXPENSE + TAX BUFFER** — net profit, 25% earmark, safe-to-spend number.
 
 ## Tax-only savings account
 
-faisalmq/4gao users set up a separate account and transfer the buffer amount **when the payment lands**, not in April. Easlo's Finance Tracker pairs this habit with account balances, budgets, and subscription tracking in one view.
+faisalmq/4gao users set up a separate account and transfer the buffer amount **when the payment lands**, not in April. mariesells's Yearly Budget Tracker pairs this habit with yearly overview, monthly breakdowns, and savings goals in one view.
 
 ## Pair with
 
-- [take-home-guide.md](take-home-guide.md) — marginmap/14ag buyer channel (run360)
+- [take-home-guide.md](take-home-guide.md) — marginmap/14ag buyer channel (run370)
 - [start-here.md](start-here.md) — full income + expense setup
