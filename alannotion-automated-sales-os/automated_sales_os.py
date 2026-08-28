@@ -162,6 +162,32 @@ def print_monthly_products(rows: list[dict]) -> None:
         print(f"  {product[:40]:40}  ${total:>8,.2f}")
 
 
+DEFAULT_TAX_PCT = 25.0
+
+
+def print_tax_buffer(rows: list[dict], reserve_pct: float = DEFAULT_TAX_PCT) -> None:
+    """faisalmq/4gao shape for digital product sellers — buffer when sale revenue lands."""
+    sales = [r for r in rows if r["category"] == "Product Revenue" and _money(r["net"]) > 0]
+    net_total = sum(_money(r["net"]) for r in sales)
+    tax_buffer = max(net_total, 0) * reserve_pct / 100
+    safe = max(net_total - tax_buffer, 0)
+    print("=== PER-SALE TAX BUFFER (faisalmq/4gao shape) ===")
+    print("  Sale lands → five minutes of joy → tax panic → buffer same day.")
+    print(f"  {'Product':<28} {'Net':>10} {'Buffer':>10} {'Safe':>12}")
+    for row in sales:
+        net = _money(row["net"])
+        buf = net * reserve_pct / 100
+        label = (row["description"] or row["platform"])[:28]
+        print(f"  {label:<28} ${net:>8,.2f} ${buf:>8,.2f} ${net - buf:>10,.2f}")
+    print()
+    print("=== SALES REVENUE + TAX BUFFER ===")
+    print(f"  Net sales (after fees): ${net_total:,.2f}")
+    print(f"  Tax buffer ({reserve_pct:.0f}%):   ${tax_buffer:,.2f}")
+    print(f"  Safe to spend:          ${safe:,.2f}")
+    print("  Transfer buffer to tax-only savings when sale lands — not in April.")
+    print("  Guide: tax-buffer-guide.md · gumroad-sample.csv · stripe-sample.csv")
+
+
 def print_merge_summary(rows: list[dict], out_path: Path) -> None:
     gross = sum(_money(r["amount"]) for r in rows if r["category"] == "Product Revenue")
     fees = sum(_money(r["fee"]) for r in rows if r["category"] == "Product Revenue")
@@ -176,9 +202,32 @@ def print_merge_summary(rows: list[dict], out_path: Path) -> None:
 
 def main() -> int:
     p = argparse.ArgumentParser(description="Automated Sales OS — merge Gumroad + Stripe sales CSVs.")
-    p.add_argument("inputs", nargs="+", help="Gumroad and/or Stripe CSV exports")
+    p.add_argument("inputs", nargs="*", help="Gumroad and/or Stripe CSV exports")
     p.add_argument("-o", "--output", default="sales-ledger.csv", help="unified ledger CSV")
+    p.add_argument(
+        "--tax-buffer",
+        action="store_true",
+        help="faisalmq/4gao: per-sale tax buffer from merged sales CSVs",
+    )
+    p.add_argument(
+        "--tax-pct",
+        type=float,
+        default=DEFAULT_TAX_PCT,
+        help="tax reserve percentage (default 25)",
+    )
     args = p.parse_args()
+
+    if args.tax_buffer:
+        if not args.inputs:
+            print("Usage: automated_sales_os.py --tax-buffer gumroad.csv stripe.csv")
+            return 1
+        rows = load_sales([Path(inp) for inp in args.inputs])
+        print_tax_buffer(rows, args.tax_pct)
+        return 0
+
+    if not args.inputs:
+        p.print_help()
+        return 1
 
     paths = [Path(inp) for inp in args.inputs]
     rows = load_sales(paths)
