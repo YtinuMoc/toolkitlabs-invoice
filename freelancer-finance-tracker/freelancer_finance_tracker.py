@@ -132,6 +132,43 @@ def summarize_net_income(income, expenses, tax_pct=DEFAULT_TAX_PCT):
     print("  Guide: net-income-guide.md · income-sample.csv · expenses-sample.csv")
 
 
+def summarize_invoice_panic(invoices):
+    """faisalmq/43dl: end-of-month panic → invoice status log + overdue flags."""
+    paid = [i for i in invoices if i["status"] == "paid"]
+    sent = [i for i in invoices if i["status"] in ("sent", "unpaid")]
+    overdue = [i for i in invoices if i["status"] == "overdue"]
+    collected = sum(i["amount"] for i in paid)
+    awaiting = sum(i["amount"] for i in sent)
+    overdue_amt = sum(i["amount"] for i in overdue)
+
+    by_client = defaultdict(lambda: {"invoiced": 0.0, "paid": 0.0, "outstanding": 0.0})
+    for i in invoices:
+        by_client[i["client"]]["invoiced"] += i["amount"]
+        if i["status"] == "paid":
+            by_client[i["client"]]["paid"] += i["amount"]
+        elif i["status"] in ("sent", "unpaid", "overdue"):
+            by_client[i["client"]]["outstanding"] += i["amount"]
+
+    print("\n=== INVOICE TRACKER WITHOUT END-OF-MONTH PANIC (faisalmq/43dl shape) ===")
+    print(f"  Invoices logged:     {len(invoices)}")
+    print(f"  Collected (paid):    {fmt_money(collected)}")
+    print(f"  Awaiting payment:    {fmt_money(awaiting)}")
+    print(f"  Overdue (late):      {len(overdue)} invoices · {fmt_money(overdue_amt)}")
+    if overdue:
+        print("\n--- Overdue invoices ---")
+        for i in overdue:
+            print(f"  {i['invoice_id']:16s} {i['client'][:16]:<16} {fmt_money(i['amount']):>12} due {i['due_date']}")
+    if by_client:
+        print("\n--- Per-client totals ---")
+        for client, totals in sorted(by_client.items(), key=lambda x: -x[1]["invoiced"]):
+            print(
+                f"  {client[:20]:<20} invoiced {fmt_money(totals['invoiced']):>12} "
+                f"paid {fmt_money(totals['paid']):>12} outstanding {fmt_money(totals['outstanding']):>12}"
+            )
+    print("\n  Log every invoice when sent. Mark paid when deposit lands. Run weekly — not in panic.")
+    print("  Guide: invoice-panic-guide.md · invoices-sample.csv · start-here.md")
+
+
 def summarize_tax_buffer(income, expenses, tax_pct=DEFAULT_TAX_PCT):
     """faisalmq/4gao: per-payment set-aside + YTD safe-to-spend."""
     paid = [i for i in income if i["status"] == "paid"]
@@ -179,6 +216,10 @@ def print_dashboard(d):
 
 def main():
     args = sys.argv[1:]
+    if len(args) >= 2 and args[0] == "--invoice-panic":
+        invoices = load_invoices(args[1])
+        summarize_invoice_panic(invoices)
+        return
     if len(args) >= 3 and args[0] == "--net-income":
         income = load_income(args[1])
         expenses = load_expenses(args[2])
@@ -193,6 +234,7 @@ def main():
         return
     if len(args) < 3:
         print("Usage: freelancer_finance_tracker.py income.csv expenses.csv invoices.csv [tax_pct]")
+        print("       freelancer_finance_tracker.py --invoice-panic invoices.csv")
         print("       freelancer_finance_tracker.py --net-income income.csv expenses.csv [tax_pct]")
         print("       freelancer_finance_tracker.py --tax-buffer income.csv expenses.csv invoices.csv [tax_pct]")
         print("Clone target: moonlight573.gumroad.com/l/unsjlk ($10 Freelancer Finance Tracker)")
