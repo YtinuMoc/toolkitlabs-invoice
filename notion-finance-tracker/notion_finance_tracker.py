@@ -61,6 +61,86 @@ def fmt_money(n):
     return f"${n:,.2f}"
 
 
+def detect_platform(headers):
+    headers = [h.lower() for h in headers]
+    if "sale id" in headers and "product name" in headers:
+        return "Gumroad"
+    if "transaction id" in headers and "stripe fee" in headers:
+        return "Stripe"
+    if "transaction id" in headers and "gross" in headers:
+        return "PayPal"
+    return None
+
+
+def parse_ledger_row(platform, row):
+    common = {
+        "date": "",
+        "platform": platform,
+        "transaction_id": "",
+        "description": "",
+        "amount": "",
+        "fee": "",
+        "net": "",
+        "buyer": "",
+    }
+    try:
+        if platform == "Gumroad":
+            common.update({
+                "date": row["Sale creation date"],
+                "transaction_id": row["Sale ID"],
+                "description": row["Product name"],
+                "amount": row["Price (including tax)"],
+                "fee": str(float(row["Gumroad fee"]) + float(row.get("Additional fee", "0") or 0)),
+                "net": row["Net"],
+                "buyer": row.get("Customer email", ""),
+            })
+        elif platform == "Stripe":
+            common.update({
+                "date": row["Created (UTC)"],
+                "transaction_id": row["Transaction ID"],
+                "description": row.get("Description", ""),
+                "amount": row["Gross"],
+                "fee": row["Stripe fee"],
+                "net": row["Net"],
+                "buyer": row.get("Customer email", ""),
+            })
+        elif platform == "PayPal":
+            common.update({
+                "date": row["Date"],
+                "transaction_id": row["Transaction ID"],
+                "description": row.get("Subject", ""),
+                "amount": row["Gross"],
+                "fee": row["Fee"],
+                "net": row["Net"],
+                "buyer": row.get("Name", ""),
+            })
+    except KeyError as e:
+        print(f"Missing column: {e}", file=sys.stderr)
+    return common
+
+
+def merge_ledgers(paths, out_path=None):
+    rows = []
+    for path in paths:
+        with open(path, newline="", encoding="utf-8") as f:
+            reader = csv.DictReader(f)
+            platform = detect_platform(reader.fieldnames or [])
+            if not platform:
+                print(f"Unknown format: {path}", file=sys.stderr)
+                continue
+            for row in reader:
+                if row and list(row.values())[0]:
+                    rows.append(parse_ledger_row(platform, row))
+    rows.sort(key=lambda r: r["date"])
+    if out_path:
+        with open(out_path, "w", newline="", encoding="utf-8") as f:
+            w = csv.DictWriter(f, fieldnames=rows[0].keys() if rows else [])
+            if rows:
+                w.writeheader()
+                w.writerows(rows)
+    return rows
+
+
 def quarter_key(date_str):
     try:
         dt = datetime.strptime(date_str[:10], "%Y-%m-%d")
@@ -223,11 +303,35 @@ def summarize_quarterly_tax(income_path, expense_path, tax_pct=DEFAULT_TAX_PCT, 
 
 def main():
     args = sys.argv[1:]
+    if "--merge" in args:
+        idx = args.index("--merge")
+        inputs = []
+        i = idx + 1
+        while i < len(args) and not args[i].startswith("-"):
+            inputs.append(args[i])
+            i += 1
+        out = "ledger-merged.csv"
+        if "-o" in args:
+            out = args[args.index("-o") + 1]
+        rows = merge_ledgers(inputs, out)
+        gross = sum(float(r["amount"] or 0) for r in rows)
+        fees = sum(float(r["fee"] or 0) for r in rows)
+        net = sum(float(r["net"] or 0) for r in rows)
+        print("\n=== UNIFIED PAYMENT LEDGER (goldenalien/206o shape) ===")
+        print(f"  Transactions:        {len(rows)}")
+        print(f"  Gross:               ${gross:,.2f}")
+        print(f"  Fees:                ${fees:,.2f}")
+        print(f"  Net:                 ${net:,.2f}")
+        if out:
+            print(f"  Wrote:               {out}")
+        print("  Guide: merge-ledger-guide.md · import into Notion Finance Tracker income log")
+        return
     if not args:
         print("Usage: notion_finance_tracker.py <income> <expenses> <accounts> <goals> <debts> <subscriptions>")
         print("       notion_finance_tracker.py --quarterly-tax <income> <expenses>")
         print("       notion_finance_tracker.py --tax-buffer <income> <expenses> [tax_pct]")
         print("       notion_finance_tracker.py --net-income <income> <expenses> [tax_pct]")
+        print("       notion_finance_tracker.py --merge gumroad.csv stripe.csv paypal.csv [-o out.csv]")
         sys.exit(1)
     if args[0] == "--tax-buffer":
         tax_pct = float(args[3]) if len(args) > 3 else DEFAULT_TAX_PCT
