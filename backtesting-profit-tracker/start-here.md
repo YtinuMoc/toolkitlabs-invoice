@@ -40,6 +40,10 @@ See [smc-fvg-listicle-guide.md](smc-fvg-listicle-guide.md) — orion_operator/42
 
 See [technical-breakdown-guide.md](technical-breakdown-guide.md) — orion_operator/4219902 buyer channel shape.
 
-## 6. Full zip
+## 6. 3 SMC Lite indicators
+
+See [3lite-listicle-guide.md](3lite-listicle-guide.md) — orion_operator/4218626 buyer channel shape.
+
+## 7. Full zip
 
 EUR 9 one-time checkout on the landing page — same delivery shape as the Gumroad original.
