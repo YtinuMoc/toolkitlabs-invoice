@@ -2,6 +2,10 @@
 
 Clone of [amyragland tckuq ($10)](https://amyragland.gumroad.com/l/tckuq).
 
+## Guide index
+
+See [mesh-hub.md](mesh-hub.md) for all 4 dev.to buyer-channel guides.
+
 ## 10-minute setup
 
 1. Copy `revenue-template.csv` and `expenses-template.csv` to your workspace.
