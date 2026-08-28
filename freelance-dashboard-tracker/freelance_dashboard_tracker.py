@@ -93,6 +93,87 @@ def summarize(revenue, expenses, tax_pct=DEFAULT_TAX_PCT):
     }
 
 
+def day_key(date_str):
+    return date_str[:10] if len(date_str) >= 10 else "unknown"
+
+
+def summarize_daily_check(revenue_path, expense_path, tax_pct=DEFAULT_TAX_PCT):
+    """wilsonhoe/4413368 2kdc: 5-minute daily money check → planning-layer dashboard."""
+    revenue = load_revenue(revenue_path)
+    expenses = load_expenses(expense_path)
+    d = summarize(revenue, expenses, tax_pct)
+
+    by_day_rev = defaultdict(float)
+    by_day_exp = defaultdict(float)
+    for r in revenue:
+        by_day_rev[day_key(r["date"])] += r["amount"]
+    for e in expenses:
+        by_day_exp[day_key(e["date"])] += e["amount"]
+
+    all_days = sorted(set(by_day_rev) | set(by_day_exp) - {"unknown"})
+    recent_days = all_days[-7:] if all_days else []
+
+    print("=== 5-MINUTE DAILY MONEY CHECK (wilsonhoe/2kdc shape) ===")
+    print("  Monthly P&L is a tax record. Daily log = steering wheel.")
+    print("  Solopreneurs who look daily catch problems ~3 weeks earlier.")
+    print()
+    print("--- 90-second daily protocol ---")
+    print("  1. Log today's deposits and expenses (30 sec)")
+    print("  2. Glance at 7-day rolling net — up, flat, or down? (30 sec)")
+    print("  3. Flag one anomaly: late client, unusual charge, sub creep (30 sec)")
+    print()
+
+    if all_days:
+        today = all_days[-1]
+        rev_today = by_day_rev.get(today, 0.0)
+        exp_today = by_day_exp.get(today, 0.0)
+        print(f"--- Today ({today}) ---")
+        print(f"  Revenue in:          {fmt_money(rev_today)}")
+        print(f"  Expenses out:        {fmt_money(exp_today)}")
+        print(f"  Net today:           {fmt_money(rev_today - exp_today)}")
+        print()
+
+    if recent_days:
+        print("--- 7-day rolling trend ---")
+        rolling_net = 0.0
+        for day in recent_days:
+            rev = by_day_rev.get(day, 0.0)
+            exp = by_day_exp.get(day, 0.0)
+            net = rev - exp
+            rolling_net += net
+            print(f"  {day}  in {fmt_money(rev):>10}  out {fmt_money(exp):>10}  net {fmt_money(net):>10}")
+        avg_daily = rolling_net / len(recent_days)
+        trend = "rising" if avg_daily > 50 else ("flat" if avg_daily >= -50 else "drifting down")
+        print(f"  7-day net: {fmt_money(rolling_net)}  avg/day {fmt_money(avg_daily)}  trend: {trend}")
+        print()
+
+    flags = []
+    if d["runway_months"] < 3:
+        flags.append(f"LOW RUNWAY: {d['runway_months']:.1f} months at current burn")
+    if d["by_client"]:
+        top_client, top_amt = max(d["by_client"].items(), key=lambda x: x[1])
+        pct = (top_amt / d["total_revenue"] * 100) if d["total_revenue"] else 0
+        if pct > 50:
+            flags.append(f"CLIENT CONCENTRATION: {top_client} = {pct:.0f}% of revenue")
+    if d["by_expense_cat"]:
+        top_cat, top_exp = max(d["by_expense_cat"].items(), key=lambda x: x[1])
+        if top_exp > d["total_expenses"] * 0.4:
+            flags.append(f"EXPENSE SPIKE WATCH: {top_cat} = {fmt_money(top_exp)}")
+
+    print("--- Flags (catch problems early) ---")
+    if flags:
+        for f in flags:
+            print(f"  ⚠ {f}")
+    else:
+        print("  ✓ No immediate flags — keep logging daily")
+    print()
+    print_dashboard(d)
+    print()
+    print(f"  Safe to spend:       {fmt_money(d['safe_to_spend'])} (after {d['tax_pct']:.0f}% tax set-aside)")
+    print(f"  Cash runway:         {d['runway_months']:.1f} months")
+    print("  Guide: daily-check-guide.md · revenue-sample.csv · expenses-sample.csv")
+
+
 def summarize_spreadsheet_trap(revenue_path, expense_path, tax_pct=DEFAULT_TAX_PCT):
     """wilsonhoe/4383424 4khk: spreadsheet trap → planning-layer dashboard."""
     revenue = load_revenue(revenue_path)
@@ -154,12 +235,17 @@ def print_dashboard(d):
 
 
 def main():
+    if len(sys.argv) >= 4 and sys.argv[1] == "--daily-check":
+        tax_pct = float(sys.argv[4]) if len(sys.argv) > 4 else DEFAULT_TAX_PCT
+        summarize_daily_check(sys.argv[2], sys.argv[3], tax_pct)
+        return
     if len(sys.argv) >= 4 and sys.argv[1] == "--spreadsheet-trap":
         tax_pct = float(sys.argv[4]) if len(sys.argv) > 4 else DEFAULT_TAX_PCT
         summarize_spreadsheet_trap(sys.argv[2], sys.argv[3], tax_pct)
         return
     if len(sys.argv) < 3:
         print("Usage: freelance_dashboard_tracker.py revenue.csv expenses.csv [tax_pct]")
+        print("       freelance_dashboard_tracker.py --daily-check revenue.csv expenses.csv [tax_pct]")
         print("       freelance_dashboard_tracker.py --spreadsheet-trap revenue.csv expenses.csv [tax_pct]")
         print("Clone target: cedabranding.gumroad.com/l/pro-dashboard ($97 · 1251 sales · 69 ratings)")
         sys.exit(1)
