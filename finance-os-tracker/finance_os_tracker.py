@@ -250,6 +250,69 @@ def summarize_invoice_panic(invoices):
     print("  Guide: invoice-panic-guide.md · invoices-sample.csv · start-here.md")
 
 
+def summarize_profit_margins(income, expenses, month=None):
+    """faisalmq/3cpo: monthly margin % + categorized breakdown + per-source rank."""
+    by_month = defaultdict(
+        lambda: {
+            "income": 0.0,
+            "expense": 0.0,
+            "categories": defaultdict(lambda: {"income": 0.0, "expense": 0.0}),
+        }
+    )
+    by_source = defaultdict(float)
+    for i in income:
+        if not i["date"]:
+            continue
+        key = i["date"][:7]
+        by_month[key]["income"] += i["amount"]
+        cat = i.get("category") or "other"
+        by_month[key]["categories"][cat]["income"] += i["amount"]
+        by_source[i.get("source") or "unknown"] += i["amount"]
+    for e in expenses:
+        if not e["date"]:
+            continue
+        key = e["date"][:7]
+        by_month[key]["expense"] += e["amount"]
+        cat = e.get("category") or "other"
+        by_month[key]["categories"][cat]["expense"] += e["amount"]
+
+    months = sorted(by_month.keys())
+    active = month or (months[-1] if months else None)
+    print("\n=== PROFIT MARGINS AT A GLANCE (faisalmq/3cpo shape) ===")
+    if active:
+        print(f"  Active month: {active}")
+    for m in months:
+        inc = by_month[m]["income"]
+        exp = by_month[m]["expense"]
+        net = inc - exp
+        margin = (net / inc * 100) if inc else 0.0
+        flag = " ← selected" if m == active else ""
+        print(f"    {m}  income ${inc:,.2f}  expense ${exp:,.2f}  net ${net:,.2f}  margin {margin:.1f}%{flag}")
+
+    if active and active in by_month:
+        print(f"\n  Categorized breakdown ({active}) — tax preparedness:")
+        cats = by_month[active]["categories"]
+        for cat in sorted(cats.keys()):
+            c = cats[cat]
+            if c["income"] or c["expense"]:
+                net = c["income"] - c["expense"]
+                print(f"    {cat}: income ${c['income']:,.2f}  expense ${c['expense']:,.2f}  net ${net:,.2f}")
+
+    if by_source:
+        total_source = sum(by_source.values())
+        print("\n  Per-source income rank — price the next offer:")
+        for source, amt in sorted(by_source.items(), key=lambda x: -x[1]):
+            share = (amt / total_source * 100) if total_source else 0
+            print(f"    {source}: ${amt:,.2f} ({share:.0f}% of collected)")
+
+    ytd_income = sum(m["income"] for m in by_month.values())
+    ytd_expense = sum(m["expense"] for m in by_month.values())
+    ytd_net = ytd_income - ytd_expense
+    ytd_margin = (ytd_net / ytd_income * 100) if ytd_income else 0.0
+    print(f"\n  YTD profit margin: {ytd_margin:.1f}%  (${ytd_net:,.2f} net on ${ytd_income:,.2f} income)")
+    print("  Guide: profit-margins-guide.md · income-sample.csv · expenses-sample.csv")
+
+
 def summarize_net_income(income_path, expense_path, tax_pct=DEFAULT_TAX_PCT):
     """faisalmq/5797: net income visibility — safe-to-spend after tax + subscriptions."""
     income = load_income(income_path)
@@ -409,6 +472,10 @@ def main():
     args = sys.argv[1:]
     if len(args) >= 2 and args[0] == "--invoice-panic":
         summarize_invoice_panic(load_invoices(args[1]))
+        return
+    if len(args) >= 3 and args[0] == "--profit-margins":
+        month = args[3] if len(args) >= 4 and not args[3].startswith("-") else None
+        summarize_profit_margins(load_income(args[1]), load_expenses(args[2]), month)
         return
     if len(args) >= 3 and args[0] == "--net-income":
         pct = float(args[3]) if len(args) >= 4 else DEFAULT_TAX_PCT
