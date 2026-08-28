@@ -1,0 +1,2 @@
+payment_date,invoice_id,amount,method,notes
+2026-01-22,INV-2026-001,2500.00,ACH,Full payment
