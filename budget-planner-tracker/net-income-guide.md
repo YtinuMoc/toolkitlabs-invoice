@@ -1,6 +1,6 @@
 # Net income visibility — what's actually safe to spend
 
-Clone of [faisalmq/5797](https://dev.to/faisalmq/freelance-finance-tracker-google-sheets-5797) buyer channel + [gracedigitalsco Finance Tracker (3,000 sales · 91 ratings · 5.0★)](https://gracedigitalsco.gumroad.com/l/FinanceTracker).
+Clone of [faisalmq/5797](https://dev.to/faisalmq/freelance-finance-tracker-google-sheets-5797) buyer channel + [jordilabs Notion Budget Tracker (105 ratings · 4.9★)](https://jordilabs.gumroad.com/l/budget-planner).
 
 ## The financial fog
 
@@ -14,12 +14,12 @@ Then the fog:
 
 faisalmq/5797 frames the fix as **net income visibility** — see safe-to-spend after obligations, not gross deposits.
 
-gracedigitalsco's **Finance Tracker** rolls income, expenses, subscriptions, savings goals, and debt tracking into one overview — the safe-spend number belongs in the same workbook.
+jordilabs' **Budget Planner** rolls monthly income, category budgets, and expense tracking into one overview — the safe-spend number belongs in the same workbook.
 
 ## Free CLI preview
 
 ```bash
-python3 grace_finance_tracker.py --net-income income-sample.csv expenses-sample.csv
+python3 budget_planner_tracker.py --net-income income-sample.csv expenses-sample.csv
 ```
 
 Read the **NET INCOME VISIBILITY** block — gross collected, deductible expenses, tax set-aside, and safe-to-spend.
@@ -34,8 +34,8 @@ Spending from gross deposits is how freelancers overspend in Q3 and panic in Apr
 
 ## Pair with
 
-- [tax-buffer-guide.md](tax-buffer-guide.md) — faisalmq/4gao deposit-day transfers (run321)
-- [take-home-guide.md](take-home-guide.md) — marginmap/14ag buyer channel (run320)
+- [tax-buffer-guide.md](tax-buffer-guide.md) — faisalmq/4gao deposit-day transfers (run341)
+- [take-home-guide.md](take-home-guide.md) — marginmap/14ag buyer channel (run340)
 - [start-here.md](start-here.md) — full income + expense setup
 
-Full bundle: [Grace Finance Tracker landing](https://ytinumoc.github.io/toolkitlabs-invoice/grace-finance-tracker/) — 7 CSV templates, dashboard CLI, and all buyer-channel guides.
+Full bundle: [Budget Planner Tracker landing](https://ytinumoc.github.io/toolkitlabs-invoice/budget-planner-tracker/) — CSV templates, dashboard CLI, and all buyer-channel guides.
