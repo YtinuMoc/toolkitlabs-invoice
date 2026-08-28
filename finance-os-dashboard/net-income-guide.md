@@ -1,6 +1,6 @@
 # Net income visibility — what's actually safe to spend
 
-Clone of [faisalmq/5797](https://dev.to/faisalmq/freelance-finance-tracker-google-sheets-5797) buyer channel + [jnkxstudio Finance Tracker 4.0 (2,995 sales · 4.9★)](https://jnkxstudio.gumroad.com/l/Finance_Tracker_3).
+Clone of [faisalmq/5797](https://dev.to/faisalmq/freelance-finance-tracker-google-sheets-5797) buyer channel + [chrisnotion Finance OS Dashboard (30,427 sales · 506 ratings · 4.9★)](https://chrisnotion.gumroad.com/l/fcufra).
 
 ## The financial fog
 
@@ -14,12 +14,12 @@ Then the fog:
 
 faisalmq/5797 frames the fix as **net income visibility** — see safe-to-spend after obligations, not gross deposits.
 
-jnkxstudio's **Finance Tracker 4.0** rolls income, expenses, accounts, goals, and debts into one dashboard — the safe-spend number belongs in the same workbook.
+chrisnotion's **Finance OS Dashboard** rolls income, expenses, subscriptions, bank accounts, and budget tracking into one overview — the safe-spend number belongs in the same workbook.
 
 ## Free CLI preview
 
 ```bash
-python3 finance_tracker_4.py --net-income income-sample.csv expenses-sample.csv
+python3 finance_os_dashboard.py --net-income income-sample.csv expenses-sample.csv
 ```
 
 Read the **NET INCOME VISIBILITY** block — gross collected, deductible expenses, tax set-aside, and safe-to-spend.
@@ -34,8 +34,8 @@ Spending from gross deposits is how freelancers overspend in Q3 and panic in Apr
 
 ## Pair with
 
-- [tax-buffer-guide.md](tax-buffer-guide.md) — faisalmq/4gao deposit-day transfers (run311)
-- [late-payment-guide.md](late-payment-guide.md) — wilsonhoe/2gnj buyer channel (run310)
+- [tax-buffer-guide.md](tax-buffer-guide.md) — faisalmq/4gao deposit-day transfers (run316)
+- [take-home-guide.md](take-home-guide.md) — marginmap/14ag buyer channel (run315)
 - [start-here.md](start-here.md) — full income + expense setup
 
-Full bundle: [Finance Tracker 4.0 landing](https://ytinumoc.github.io/toolkitlabs-invoice/finance-tracker-4/) — 7 CSV templates, dashboard CLI, and all buyer-channel guides.
+Full bundle: [Finance OS Dashboard landing](https://ytinumoc.github.io/toolkitlabs-invoice/finance-os-dashboard/) — 7 CSV templates, dashboard CLI, and all buyer-channel guides.
