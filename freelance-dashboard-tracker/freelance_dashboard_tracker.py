@@ -174,6 +174,39 @@ def summarize_daily_check(revenue_path, expense_path, tax_pct=DEFAULT_TAX_PCT):
     print("  Guide: daily-check-guide.md · revenue-sample.csv · expenses-sample.csv")
 
 
+def summarize_finance_tracker(revenue_path, expense_path, tax_pct=DEFAULT_TAX_PCT):
+    """faisalmq/5598: wing-it accounting → income vs expenses → tax set-aside → profit margins."""
+    revenue = load_revenue(revenue_path)
+    expenses = load_expenses(expense_path)
+    d = summarize(revenue, expenses, tax_pct)
+    margin_pct = (d["net_profit"] / d["total_revenue"] * 100) if d["total_revenue"] else 0.0
+    print("=== FREELANCE FINANCE TRACKER (faisalmq/5598 shape) ===")
+    print("  Wing-it accounting = mental tax. Simple tracker = peace of mind.")
+    print("  Track income vs expenses · automate tax set-aside · monitor profit margins.")
+    print()
+    print(f"  Total income:        {fmt_money(d['total_revenue'])}")
+    print(f"  Total expenses:      {fmt_money(d['total_expenses'])}")
+    print(f"  Net profit:          {fmt_money(d['net_profit'])}")
+    print(f"  Profit margin:       {margin_pct:.1f}%")
+    print(f"  Tax set-aside ({d['tax_pct']:.0f}%): {fmt_money(d['tax_set_aside'])}")
+    print(f"  Safe to spend:       {fmt_money(d['safe_to_spend'])}")
+    print()
+    if d["by_client"]:
+        total = d["total_revenue"]
+        print("--- Revenue by client (% of total) ---")
+        for client, amt in sorted(d["by_client"].items(), key=lambda x: -x[1]):
+            pct = (amt / total * 100) if total else 0
+            print(f"  {client:24s} {fmt_money(amt):>12}  ({pct:5.1f}%)")
+        print()
+    if d["by_expense_cat"]:
+        print("--- Expenses by category ---")
+        for cat, amt in sorted(d["by_expense_cat"].items(), key=lambda x: -x[1]):
+            print(f"  {cat:24s} {fmt_money(amt)}")
+        print()
+    print(f"  Cash runway:         {d['runway_months']:.1f} months at avg burn {fmt_money(d['avg_monthly_expense'])}/mo")
+    print("  Guide: freelance-finance-tracker-guide.md · revenue-sample.csv · expenses-sample.csv")
+
+
 def summarize_spreadsheet_trap(revenue_path, expense_path, tax_pct=DEFAULT_TAX_PCT):
     """wilsonhoe/4383424 4khk: spreadsheet trap → planning-layer dashboard."""
     revenue = load_revenue(revenue_path)
@@ -239,6 +272,10 @@ def main():
         tax_pct = float(sys.argv[4]) if len(sys.argv) > 4 else DEFAULT_TAX_PCT
         summarize_daily_check(sys.argv[2], sys.argv[3], tax_pct)
         return
+    if len(sys.argv) >= 4 and sys.argv[1] == "--finance-tracker":
+        tax_pct = float(sys.argv[4]) if len(sys.argv) > 4 else DEFAULT_TAX_PCT
+        summarize_finance_tracker(sys.argv[2], sys.argv[3], tax_pct)
+        return
     if len(sys.argv) >= 4 and sys.argv[1] == "--spreadsheet-trap":
         tax_pct = float(sys.argv[4]) if len(sys.argv) > 4 else DEFAULT_TAX_PCT
         summarize_spreadsheet_trap(sys.argv[2], sys.argv[3], tax_pct)
@@ -246,6 +283,7 @@ def main():
     if len(sys.argv) < 3:
         print("Usage: freelance_dashboard_tracker.py revenue.csv expenses.csv [tax_pct]")
         print("       freelance_dashboard_tracker.py --daily-check revenue.csv expenses.csv [tax_pct]")
+        print("       freelance_dashboard_tracker.py --finance-tracker revenue.csv expenses.csv [tax_pct]")
         print("       freelance_dashboard_tracker.py --spreadsheet-trap revenue.csv expenses.csv [tax_pct]")
         print("Clone target: cedabranding.gumroad.com/l/pro-dashboard ($97 · 1251 sales · 69 ratings)")
         sys.exit(1)
