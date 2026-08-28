@@ -68,6 +68,25 @@ def payoff_months(balance, apr, payment):
         return 999
 
 
+def avalanche_schedule(debts, extra_pool=0.0):
+    ordered = sorted(debts, key=lambda d: (-d["apr"], -d["balance"]))
+    schedule = []
+    freed = extra_pool
+    for rank, debt in enumerate(ordered, 1):
+        payment = debt["minimum_payment"] + debt["extra_payment"] + freed
+        months = payoff_months(debt["balance"], debt["apr"], payment)
+        schedule.append({
+            "rank": rank,
+            "issuer": debt["issuer"],
+            "balance": debt["balance"],
+            "apr": debt["apr"],
+            "payment": payment,
+            "months": months,
+        })
+        freed = payment
+    return schedule
+
+
 def snowball_schedule(debts, extra_pool=0.0):
     ordered = sorted(debts, key=lambda d: d["balance"])
     schedule = []
@@ -134,6 +153,22 @@ def dashboard(income, expenses, debts, savings, accounts):
     print(f"  Net worth:           {fmt_money(net_worth)}")
 
 
+def summarize_avalanche(debts_path, extra_pool=0.0):
+    """aissam_baidi/46bl: avalanche schedule — highest APR first."""
+    debts = load_debts(debts_path)
+    print("\n=== DEBT AVALANCHE (aissam_baidi/46bl shape) ===")
+    for row in avalanche_schedule(debts, extra_pool):
+        print(
+            f"  #{row['rank']} {row['issuer']:<18} "
+            f"bal {fmt_money(row['balance']):>10}  "
+            f"APR {row['apr']:>5.2f}%  "
+            f"pay {fmt_money(row['payment']):>8}/mo  "
+            f"~{row['months']} mo"
+        )
+    print("\n  Highest APR first — roll payments as each card clears.")
+    print("  Guide: avalanche-guide.md · debts-sample.csv")
+
+
 def summarize_net_income(income_path, expense_path, tax_pct=DEFAULT_TAX_PCT):
     """faisalmq/5797: net income visibility — safe-to-spend after tax + subscriptions."""
     income = load_income(income_path)
@@ -196,6 +231,10 @@ def main():
         pct = float(args[3]) if len(args) >= 4 else DEFAULT_TAX_PCT
         summarize_net_income(args[1], args[2], pct)
         return
+    if len(args) >= 2 and args[0] == "--avalanche":
+        extra = float(args[2]) if len(args) >= 3 else 0.0
+        summarize_avalanche(args[1], extra)
+        return
     if len(args) < 5:
         print(
             "Usage: personal_finance_tracker_2026.py "
@@ -208,6 +247,10 @@ def main():
         )
         print(
             "       personal_finance_tracker_2026.py --net-income income.csv expenses.csv [pct]",
+            file=sys.stderr,
+        )
+        print(
+            "       personal_finance_tracker_2026.py --avalanche debts.csv [extra_pool]",
             file=sys.stderr,
         )
         sys.exit(1)
