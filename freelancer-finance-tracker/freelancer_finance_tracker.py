@@ -106,6 +106,31 @@ def fmt_money(n):
     return f"${n:,.2f}"
 
 
+def summarize_tax_buffer(income, expenses, tax_pct=DEFAULT_TAX_PCT):
+    """faisalmq/4gao: per-payment set-aside + YTD safe-to-spend."""
+    paid = [i for i in income if i["status"] == "paid"]
+    collected = sum(i["amount"] for i in paid)
+    total_expenses = sum(e["amount"] for e in expenses)
+    deductible = sum(e["amount"] for e in expenses if e["deductible"])
+    net_profit = collected - deductible
+    tax_set_aside = max(net_profit, 0) * (tax_pct / 100.0)
+    safe_to_spend = max(net_profit - tax_set_aside, 0)
+    print("\n=== PER-PAYMENT TAX SET-ASIDE (faisalmq/4gao shape) ===")
+    print(f"  {'Client':<16} {'Collected':>12} {'Set-aside':>12} {'Safe':>12}")
+    for i in paid:
+        share = i["amount"] / collected if collected else 0
+        buf = net_profit * share * tax_pct / 100 if net_profit > 0 else 0
+        safe = i["amount"] - buf
+        print(f"  {i['client'][:16]:<16} ${i['amount']:>10,.2f} ${buf:>10,.2f} ${safe:>10,.2f}")
+    print("\n=== EXPENSE + TAX SET-ASIDE ===")
+    print(f"  Expenses YTD:        {fmt_money(total_expenses)} ({fmt_money(deductible)} deductible)")
+    print(f"  Net profit (paid):   {fmt_money(net_profit)}")
+    print(f"  Tax set-aside ({tax_pct:.0f}%): {fmt_money(tax_set_aside)}")
+    print(f"  Safe to spend:       {fmt_money(safe_to_spend)}")
+    print("  Transfer set-aside to tax-only savings when payment lands — not in April.")
+    print("  Guide: tax-set-aside-guide.md · income-sample.csv · expenses-sample.csv")
+
+
 def print_dashboard(d):
     print("=== FREELANCER FINANCE TRACKER (moonlight573 unsjlk clone) ===")
     print(f"  Total income:        {fmt_money(d['total_income'])}")
@@ -127,14 +152,22 @@ def print_dashboard(d):
 
 
 def main():
-    if len(sys.argv) < 4:
+    args = sys.argv[1:]
+    if len(args) >= 4 and args[0] == "--tax-buffer":
+        income = load_income(args[1])
+        expenses = load_expenses(args[2])
+        tax_pct = float(args[4]) if len(args) >= 5 else DEFAULT_TAX_PCT
+        summarize_tax_buffer(income, expenses, tax_pct)
+        return
+    if len(args) < 3:
         print("Usage: freelancer_finance_tracker.py income.csv expenses.csv invoices.csv [tax_pct]")
+        print("       freelancer_finance_tracker.py --tax-buffer income.csv expenses.csv invoices.csv [tax_pct]")
         print("Clone target: moonlight573.gumroad.com/l/unsjlk ($10 Freelancer Finance Tracker)")
         sys.exit(1)
-    income = load_income(sys.argv[1])
-    expenses = load_expenses(sys.argv[2])
-    invoices = load_invoices(sys.argv[3])
-    tax_pct = float(sys.argv[4]) if len(sys.argv) > 4 else DEFAULT_TAX_PCT
+    income = load_income(args[0])
+    expenses = load_expenses(args[1])
+    invoices = load_invoices(args[2])
+    tax_pct = float(args[3]) if len(args) > 3 else DEFAULT_TAX_PCT
     d = dashboard(income, expenses, invoices, tax_pct)
     print_dashboard(d)
 
