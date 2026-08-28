@@ -24,8 +24,8 @@ Import `ledger-merged.csv` into your income log — same workflow as somethingor
 
 ## Pair with
 
-- [net-income-guide.md](net-income-guide.md) — faisalmq/5797 safe-to-spend visibility (run322)
-- [tax-buffer-guide.md](tax-buffer-guide.md) — faisalmq/4gao deposit-day transfers (run321)
+- [net-income-guide.md](net-income-guide.md) — faisalmq/5797 safe-to-spend visibility (run327)
+- [tax-buffer-guide.md](tax-buffer-guide.md) — faisalmq/4gao deposit-day transfers (run326)
 - [take-home-guide.md](take-home-guide.md) — marginmap/14ag buyer channel (run325)
 - [start-here.md](start-here.md) — kit setup
 
