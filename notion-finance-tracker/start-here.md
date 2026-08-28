@@ -2,6 +2,10 @@
 
 Clone of [Rosidssoy Notion Finance Tracker ($5+ · 190 ratings · 13,696 sales)](https://rosidssoy.gumroad.com/l/financetracker).
 
+## Guide index
+
+See [mesh-hub.md](mesh-hub.md) for all 4 dev.to buyer-channel guides.
+
 ## 10-minute setup
 
 1. Copy the six template CSVs to your workspace.
