@@ -6,3 +6,5 @@ date,order_id,item,platform,sale_price,platform_fee,postage,packaging,cogs,time_
 2026-07-15,DP-221,Upcycled tote bag,depop,22.00,,2.50,0.50,5.00,40
 2026-07-18,VB-901,Designer scarf,vinted,28.00,,2.80,0.60,6.00,12
 2026-07-22,ET-1055,Low-margin sticker pack,etsy,12.00,,2.20,0.80,7.50,30
+2026-08-01,AM-441,Phone case,amazon,18.00,5.20,1.20,0.50,4.00,25
+2026-08-05,AM-442,Cable,amazon,12.00,4.05,0.80,0.30,2.50,15
