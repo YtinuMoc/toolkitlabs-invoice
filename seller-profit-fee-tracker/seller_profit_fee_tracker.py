@@ -108,6 +108,31 @@ def print_platform_comparison(sales):
         print(f"  Lowest fee drag:  {lowest[0]} ({lowest[1]:.1f}% of gross)")
 
 
+def print_refund_impact(sales, expenses):
+    gross = sum(r["gross"] for r in sales)
+    fees = sum(r["fee"] for r in sales)
+    net_sales = gross - fees
+    refund_rows = [r for r in expenses if r["category"] in ("refund", "refunds")]
+    if not refund_rows:
+        return
+    refund_total = sum(r["amount"] for r in expenses)
+    refund_only = sum(r["amount"] for r in refund_rows)
+    other_expense = refund_total - refund_only
+    profit_with = net_sales - refund_total
+    profit_without = net_sales - other_expense
+    margin_with = (profit_with / gross * 100) if gross else 0
+    margin_without = (profit_without / gross * 100) if gross else 0
+    print("\n=== REFUND IMPACT (smadsby ejxcg / orion_operator/40gi shape) ===")
+    print(f"  Refund events:       {len(refund_rows)}")
+    print(f"  Refund total:        ${refund_only:,.2f}")
+    print(f"  Refunds % of gross:  {(refund_only / gross * 100) if gross else 0:.1f}%")
+    print(f"  Profit margin w/refunds:    {margin_with:.1f}%")
+    print(f"  Profit margin w/o refunds:  {margin_without:.1f}%")
+    print(f"  Margin lost to refunds:     {margin_without - margin_with:.1f} pts")
+    for r in sorted(refund_rows, key=lambda x: x["date"]):
+        print(f"    {r['date'].date()} · ${r['amount']:,.2f}")
+
+
 def print_expense_drag(sales, expenses):
     gross = sum(r["gross"] for r in sales)
     if not expenses:
@@ -230,6 +255,7 @@ def main():
     print(f"Sales rows: {len(sales)} · Expense rows: {len(expenses)}")
     print_dashboard(sales, expenses)
     print_profit_margins(sales, expenses)
+    print_refund_impact(sales, expenses)
     print_platform_comparison(sales)
     print_expense_drag(sales, expenses)
     print_monthly_summary(sales, expenses)
