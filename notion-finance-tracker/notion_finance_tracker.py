@@ -149,6 +149,33 @@ def summarize_tax_buffer(income_path, expense_path, reserve_pct=DEFAULT_TAX_PCT)
     print("  Guide: tax-buffer-guide.md · income-sample.csv · expenses-sample.csv")
 
 
+def summarize_net_income(income_path, expense_path, tax_pct=DEFAULT_TAX_PCT):
+    """faisalmq/5797: net income visibility — safe-to-spend after tax + subscriptions."""
+    income = load_income(income_path)
+    expenses = load_expenses(expense_path)
+    collected = sum(i["amount"] for i in income)
+    deductible = sum(e["amount"] for e in expenses)
+    subs = sum(
+        e["amount"] for e in expenses
+        if e["category"].lower() in ("software", "subscriptions", "saas", "tools")
+    )
+    net_profit = collected - deductible
+    tax_set_aside = max(net_profit, 0) * (tax_pct / 100.0)
+    safe_to_spend = max(net_profit - tax_set_aside, 0)
+    print("=== NET INCOME VISIBILITY (faisalmq/5797 shape) ===")
+    print(f"  Gross collected:     {fmt_money(collected)}")
+    print(f"  Expenses (deductible): {fmt_money(deductible)}")
+    if subs:
+        print(f"    subscriptions/SaaS:  {fmt_money(subs)}")
+    print(f"  Net profit:            {fmt_money(net_profit)}")
+    print(f"  Tax set-aside ({tax_pct:.0f}%): {fmt_money(tax_set_aside)}")
+    print(f"  Safe to spend:         {fmt_money(safe_to_spend)}")
+    if collected:
+        print(f"  Take-home rate:        {safe_to_spend / collected * 100:.1f}% of gross deposits")
+    print("  Gross deposits lie. Safe-to-spend is what you can actually use.")
+    print("  Guide: net-income-guide.md · income-sample.csv · expenses-sample.csv")
+
+
 def summarize_quarterly_tax(income_path, expense_path, tax_pct=DEFAULT_TAX_PCT, hourly_rate=75.0):
     """wilsonhoe/4lhd: tax season cash crunch → quarterly set-aside system."""
     income = load_income(income_path)
@@ -200,10 +227,14 @@ def main():
         print("Usage: notion_finance_tracker.py <income> <expenses> <accounts> <goals> <debts> <subscriptions>")
         print("       notion_finance_tracker.py --quarterly-tax <income> <expenses>")
         print("       notion_finance_tracker.py --tax-buffer <income> <expenses> [tax_pct]")
+        print("       notion_finance_tracker.py --net-income <income> <expenses> [tax_pct]")
         sys.exit(1)
     if args[0] == "--tax-buffer":
         tax_pct = float(args[3]) if len(args) > 3 else DEFAULT_TAX_PCT
         summarize_tax_buffer(args[1], args[2], tax_pct)
+    elif args[0] == "--net-income":
+        tax_pct = float(args[3]) if len(args) > 3 else DEFAULT_TAX_PCT
+        summarize_net_income(args[1], args[2], tax_pct)
     elif args[0] == "--quarterly-tax":
         summarize_quarterly_tax(args[1], args[2])
     else:
