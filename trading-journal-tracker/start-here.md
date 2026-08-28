@@ -32,6 +32,10 @@ Copy `trades-template.csv` and add one row per trade:
 python3 trading_journal_tracker.py my-trades.csv --capital 25000
 ```
 
-## 4. Full zip
+## 4. Data asymmetry
+
+See [data-asymmetry-guide.md](data-asymmetry-guide.md) — gfil86/4502459 buyer channel shape.
+
+## 5. Full zip
 
 EUR 9 one-time checkout on the landing page — same delivery shape as the Gumroad original.
