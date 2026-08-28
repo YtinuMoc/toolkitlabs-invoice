@@ -2,6 +2,10 @@
 
 Clone of [chrisnotion Finance OS Dashboard (30,427 sales · 506 ratings · 4.9★)](https://chrisnotion.gumroad.com/l/fcufra).
 
+## Guide index
+
+See [mesh-hub.md](mesh-hub.md) for all 4 dev.to buyer-channel guides.
+
 ## 10-minute setup
 
 1. Copy the seven template CSVs to your workspace.
