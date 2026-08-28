@@ -109,6 +109,78 @@ def dashboard(income, expenses, budgets, subscriptions, accounts, goals, tax_pct
     }
 
 
+def detect_platform(headers):
+    headers = [h.lower() for h in headers]
+    if "sale id" in headers and "product name" in headers:
+        return "Gumroad"
+    if "transaction id" in headers and "stripe fee" in headers:
+        return "Stripe"
+    if "transaction id" in headers and "gross" in headers:
+        return "PayPal"
+    return None
+
+
+def parse_ledger_row(platform, row):
+    common = {"date": "", "platform": platform, "transaction_id": "", "description": "",
+              "amount": "", "fee": "", "net": "", "buyer": ""}
+    try:
+        if platform == "Gumroad":
+            common.update({
+                "date": row["Sale creation date"],
+                "transaction_id": row["Sale ID"],
+                "description": row["Product name"],
+                "amount": row["Price (including tax)"],
+                "fee": str(float(row["Gumroad fee"]) + float(row.get("Additional fee", "0") or 0)),
+                "net": row["Net"],
+                "buyer": row.get("Customer email", ""),
+            })
+        elif platform == "Stripe":
+            common.update({
+                "date": row["Created (UTC)"],
+                "transaction_id": row["Transaction ID"],
+                "description": row.get("Description", ""),
+                "amount": row["Gross"],
+                "fee": row["Stripe fee"],
+                "net": row["Net"],
+                "buyer": row.get("Customer email", ""),
+            })
+        elif platform == "PayPal":
+            common.update({
+                "date": row["Date"],
+                "transaction_id": row["Transaction ID"],
+                "description": row.get("Subject", ""),
+                "amount": row["Gross"],
+                "fee": row["Fee"],
+                "net": row["Net"],
+                "buyer": row.get("Name", ""),
+            })
+    except KeyError as e:
+        print(f"Missing column: {e}", file=sys.stderr)
+    return common
+
+
+def merge_ledgers(paths, out_path=None):
+    rows = []
+    for path in paths:
+        with open(path, newline="", encoding="utf-8") as f:
+            reader = csv.DictReader(f)
+            platform = detect_platform(reader.fieldnames or [])
+            if not platform:
+                print(f"Unknown format: {path}", file=sys.stderr)
+                continue
+            for row in reader:
+                if row and list(row.values())[0]:
+                    rows.append(parse_ledger_row(platform, row))
+    rows.sort(key=lambda r: r["date"])
+    if out_path:
+        with open(out_path, "w", newline="", encoding="utf-8") as f:
+            w = csv.DictWriter(f, fieldnames=rows[0].keys() if rows else [])
+            if rows:
+                w.writeheader()
+                w.writerows(rows)
+    return rows
+
+
 def summarize_tax_buffer(income_path, expense_path, reserve_pct=DEFAULT_TAX_PCT):
     """faisalmq/4gao: per-payment buffer + YTD safe-to-spend."""
     income = load_income(income_path)
@@ -182,6 +254,29 @@ def main():
     if len(args) >= 3 and args[0] == "--tax-buffer":
         pct = float(args[3]) if len(args) >= 4 else DEFAULT_TAX_PCT
         summarize_tax_buffer(args[1], args[2], pct)
+        return
+    if "--merge" in args:
+        idx = args.index("--merge")
+        inputs = []
+        i = idx + 1
+        while i < len(args) and not args[i].startswith("-"):
+            inputs.append(args[i])
+            i += 1
+        out = "ledger-merged.csv"
+        if "-o" in args:
+            out = args[args.index("-o") + 1]
+        rows = merge_ledgers(inputs, out)
+        gross = sum(float(r["amount"] or 0) for r in rows)
+        fees = sum(float(r["fee"] or 0) for r in rows)
+        net = sum(float(r["net"] or 0) for r in rows)
+        print("\n=== UNIFIED PAYMENT LEDGER (goldenalien/206o shape) ===")
+        print(f"  Transactions:        {len(rows)}")
+        print(f"  Gross:               ${gross:,.2f}")
+        print(f"  Fees:                ${fees:,.2f}")
+        print(f"  Net:                 ${net:,.2f}")
+        if out:
+            print(f"  Wrote:               {out}")
+        print("  Guide: merge-ledger-guide.md · import into Finance OS income log")
         return
     if len(args) < 5:
         print("Usage: finance_os_tracker.py income.csv expenses.csv budgets.csv subscriptions.csv accounts.csv [goals.csv] [tax_pct]")
