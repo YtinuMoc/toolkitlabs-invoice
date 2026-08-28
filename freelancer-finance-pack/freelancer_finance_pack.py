@@ -295,6 +295,35 @@ def summarize_self_assessment(path):
     print("  Guide: self-assessment-guide.md · self-assessment-sample.csv")
 
 
+def summarize_net_income(invoice_path, expense_path, reserve_pct=TAX_BUFFER_PCT):
+    """faisalmq/5797: net income visibility — safe-to-spend after tax + subscriptions."""
+    invoices = load_invoices(invoice_path)
+    expenses = load_expenses(expense_path)
+    inv = invoice_summary(invoices)
+    exp = expense_summary(expenses)
+    collected = inv["collected"]
+    net_profit = collected - exp["deductible"]
+    tax_buffer = max(net_profit, 0) * reserve_pct / 100
+    safe_to_spend = max(net_profit - tax_buffer, 0)
+    subs = sum(
+        amt for cat, amt in exp["by_category"].items()
+        if cat.lower() in ("software", "subscriptions", "saas", "tools")
+    )
+    print("\n=== NET INCOME VISIBILITY (faisalmq/5797 shape) ===")
+    print(f"  Gross collected:     ${collected:,.2f}")
+    print(f"  Expenses (deductible): ${exp['deductible']:,.2f}")
+    if subs:
+        print(f"    subscriptions/SaaS:  ${subs:,.2f}")
+    print(f"  Net profit:            ${net_profit:,.2f}")
+    print(f"  Tax set-aside ({reserve_pct:.0f}%): ${tax_buffer:,.2f}")
+    print(f"  Safe to spend:         ${safe_to_spend:,.2f}")
+    if collected:
+        pct = safe_to_spend / collected * 100
+        print(f"  Take-home rate:        {pct:.1f}% of gross deposits")
+    print("\n  Gross deposits lie. Safe-to-spend is what you can actually use.")
+    print("  Guide: net-income-guide.md · invoices-sample.csv · expenses-sample.csv")
+
+
 def summarize_tax_buffer(invoice_path, expense_path, reserve_pct=TAX_BUFFER_PCT):
     """faisalmq/4gao: per-payment buffer + YTD safe-to-spend."""
     invoices = load_invoices(invoice_path)
@@ -359,6 +388,10 @@ def main():
     if len(args) >= 3 and args[0] == "--tax-buffer":
         pct = float(args[3]) if len(args) >= 4 else TAX_BUFFER_PCT
         summarize_tax_buffer(args[1], args[2], pct)
+        return
+    if len(args) >= 3 and args[0] == "--net-income":
+        pct = float(args[3]) if len(args) >= 4 else TAX_BUFFER_PCT
+        summarize_net_income(args[1], args[2], pct)
         return
     if "--merge" in args:
         idx = args.index("--merge")
