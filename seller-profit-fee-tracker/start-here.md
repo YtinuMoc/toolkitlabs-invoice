@@ -20,4 +20,4 @@ You get: seller dashboard, platform performance comparison, expense drag by cate
 
 See `sales-sample.csv` for a worked example across Gumroad, Etsy, Shopify, eBay, and Amazon.
 
-Guides: [platform comparison](platform-comparison-guide.md · [monthly summary](monthly-summary-guide.md) · [Etsy vs Gumroad fees](etsy-gumroad-fee-guide.md)) · [expense drag](expense-drag-guide.md) · [fee settings](platform-fees-guide.md)
+Guides: [platform comparison](platform-comparison-guide.md · [monthly summary](monthly-summary-guide.md · [profit margins](profit-margin-guide.md)) · [Etsy vs Gumroad fees](etsy-gumroad-fee-guide.md)) · [expense drag](expense-drag-guide.md) · [fee settings](platform-fees-guide.md)

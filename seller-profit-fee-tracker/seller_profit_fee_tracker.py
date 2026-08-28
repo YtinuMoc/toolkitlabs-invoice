@@ -139,6 +139,44 @@ def print_monthly_summary(sales, expenses):
         print(f"  {m}  gross ${d['gross']:,.2f} · fees ${d['fees']:,.2f} · exp ${d['expense']:,.2f} · profit ${profit:,.2f}")
 
 
+def print_profit_margins(sales, expenses):
+    gross = sum(r["gross"] for r in sales)
+    fees = sum(r["fee"] for r in sales)
+    expense_total = sum(r["amount"] for r in expenses)
+    net_sales = gross - fees
+    profit = net_sales - expense_total
+    margin = (profit / gross * 100) if gross else 0
+    print("\n=== PROFIT MARGINS AT A GLANCE (smadsby ejxcg / faisalmq/3cpo shape) ===")
+    print(f"  Gross sales:         ${gross:,.2f}")
+    print(f"  Platform fees:       ${fees:,.2f}")
+    print(f"  Expenses:            ${expense_total:,.2f}")
+    print(f"  Real profit:         ${profit:,.2f}")
+    print(f"  Profit margin:       {margin:.1f}%")
+    by_product = defaultdict(lambda: {"orders": 0, "gross": 0.0, "fees": 0.0, "net": 0.0})
+    for r in sales:
+        p = by_product[r["product"]]
+        p["orders"] += 1
+        p["gross"] += r["gross"]
+        p["fees"] += r["fee"]
+        p["net"] += r["net"]
+    print("\n  Per-SKU margin after platform fees (pricing decisions):")
+    for product, stats in sorted(by_product.items(), key=lambda x: x[1]["net"], reverse=True):
+        contrib = (stats["net"] / stats["gross"] * 100) if stats["gross"] else 0
+        eff_fee = (stats["fees"] / stats["gross"] * 100) if stats["gross"] else 0
+        print(
+            f"    {product[:28]:28} {stats['orders']:2} orders · gross ${stats['gross']:,.2f} · "
+            f"fees {eff_fee:.1f}% · net ${stats['net']:,.2f} · contrib {contrib:.1f}%"
+        )
+    if expenses:
+        by_cat = defaultdict(float)
+        for r in expenses:
+            by_cat[r["category"]] += r["amount"]
+        print("\n  Expense drag by category (margin killers):")
+        for cat, amt in sorted(by_cat.items(), key=lambda x: x[1], reverse=True):
+            pct = (amt / gross * 100) if gross else 0
+            print(f"    {cat:12} ${amt:,.2f} · {pct:.1f}% of gross sales")
+
+
 def print_worst_order(sales):
     if not sales:
         return
@@ -191,6 +229,7 @@ def main():
     expenses = load_expenses(args[1])
     print(f"Sales rows: {len(sales)} · Expense rows: {len(expenses)}")
     print_dashboard(sales, expenses)
+    print_profit_margins(sales, expenses)
     print_platform_comparison(sales)
     print_expense_drag(sales, expenses)
     print_monthly_summary(sales, expenses)
