@@ -2,6 +2,10 @@
 
 Clone of [moonlight573 unsjlk ($10)](https://moonlight573.gumroad.com/l/unsjlk).
 
+## Guide index
+
+See [mesh-hub.md](mesh-hub.md) for all 5 dev.to buyer-channel guides.
+
 ## 10-minute setup
 
 1. Copy `income-template.csv`, `expenses-template.csv`, and `invoices-template.csv` to your workspace.
