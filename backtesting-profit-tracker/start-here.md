@@ -36,6 +36,10 @@ python3 backtesting_profit_tracker.py my-trades.csv --capital 25000
 
 See [smc-fvg-listicle-guide.md](smc-fvg-listicle-guide.md) — orion_operator/4219970 buyer channel shape.
 
-## 5. Full zip
+## 5. Technical breakdown
+
+See [technical-breakdown-guide.md](technical-breakdown-guide.md) — orion_operator/4219902 buyer channel shape.
+
+## 6. Full zip
 
 EUR 9 one-time checkout on the landing page — same delivery shape as the Gumroad original.
