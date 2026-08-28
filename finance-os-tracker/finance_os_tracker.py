@@ -109,6 +109,31 @@ def dashboard(income, expenses, budgets, subscriptions, accounts, goals, tax_pct
     }
 
 
+def summarize_tax_buffer(income_path, expense_path, reserve_pct=DEFAULT_TAX_PCT):
+    """faisalmq/4gao: per-payment buffer + YTD safe-to-spend."""
+    income = load_income(income_path)
+    expenses = load_expenses(expense_path)
+    collected = sum(i["amount"] for i in income)
+    deductible = sum(e["amount"] for e in expenses)
+    net_profit = collected - deductible
+    tax_buffer = max(net_profit, 0) * reserve_pct / 100
+    safe_to_spend = max(net_profit - tax_buffer, 0)
+    print("\n=== PER-PAYMENT TAX BUFFER (faisalmq/4gao shape) ===")
+    print(f"  {'Source':<20} {'Collected':>12} {'Buffer':>10} {'Safe':>12}")
+    for i in income:
+        share = i["amount"] / collected if collected else 0
+        buf = net_profit * share * reserve_pct / 100 if net_profit > 0 else 0
+        safe = i["amount"] - buf
+        print(f"  {i['source'][:20]:<20} ${i['amount']:>10,.2f} ${buf:>8,.2f} ${safe:>10,.2f}")
+    print("\n=== EXPENSE + TAX BUFFER ===")
+    print(f"  Expenses YTD:        ${deductible:,.2f}")
+    print(f"  Net profit:            ${net_profit:,.2f}")
+    print(f"  Tax buffer ({reserve_pct:.0f}%):   ${tax_buffer:,.2f}")
+    print(f"  Safe to spend:       ${safe_to_spend:,.2f}")
+    print("  Transfer buffer to tax-only savings when payment lands — not in April.")
+    print("  Guide: tax-buffer-guide.md · income-sample.csv · expenses-sample.csv")
+
+
 def print_dashboard(d):
     print("=== FINANCE OS (heyismail TheUltimateFinanceTracker clone) ===")
     print(f"  Total income:        {fmt_money(d['total_income'])}")
@@ -154,6 +179,10 @@ def print_dashboard(d):
 
 def main():
     args = sys.argv[1:]
+    if len(args) >= 3 and args[0] == "--tax-buffer":
+        pct = float(args[3]) if len(args) >= 4 else DEFAULT_TAX_PCT
+        summarize_tax_buffer(args[1], args[2], pct)
+        return
     if len(args) < 5:
         print("Usage: finance_os_tracker.py income.csv expenses.csv budgets.csv subscriptions.csv accounts.csv [goals.csv] [tax_pct]")
         print("Clone target: heyismail.gumroad.com/l/TheUltimateFinanceTracker ($29+ · 15,254 sales)")
