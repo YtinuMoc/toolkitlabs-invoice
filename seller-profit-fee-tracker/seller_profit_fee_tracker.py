@@ -147,17 +147,55 @@ def print_worst_order(sales):
     print(f"  {worst['date'].date()} · {worst['product'][:30]} · {worst['platform']} · net ${worst['net']:,.2f}")
 
 
+def print_etsy_gumroad_compare(sales):
+    targets = {"etsy", "gumroad"}
+    subset = [r for r in sales if r["platform"] in targets]
+    if not subset:
+        print("\n=== ETSY VS GUMROAD (no rows) ===")
+        return
+    by_platform = defaultdict(lambda: {"orders": 0, "gross": 0.0, "fees": 0.0, "net": 0.0})
+    for r in subset:
+        p = by_platform[r["platform"]]
+        p["orders"] += 1
+        p["gross"] += r["gross"]
+        p["fees"] += r["fee"]
+        p["net"] += r["net"]
+    print("\n=== ETSY VS GUMROAD FEE SHAPES ===")
+    rows = []
+    for platform in ("gumroad", "etsy"):
+        if platform not in by_platform:
+            continue
+        stats = by_platform[platform]
+        eff = (stats["fees"] / stats["gross"] * 100) if stats["gross"] else 0
+        avg_net = stats["net"] / stats["orders"] if stats["orders"] else 0
+        rows.append((platform, eff, avg_net, stats))
+        print(
+            f"  {platform:8} {stats['orders']:3} orders · gross ${stats['gross']:,.2f} · "
+            f"fees ${stats['fees']:,.2f} ({eff:.1f}%) · net ${stats['net']:,.2f} · "
+            f"avg net/order ${avg_net:,.2f}"
+        )
+    if len(rows) == 2:
+        winner = max(rows, key=lambda x: x[3]["net"])
+        print(f"\n  Higher net volume: {winner[0]} (${winner[3]['net']:,.2f})")
+        lower_drag = min(rows, key=lambda x: x[1])
+        print(f"  Lower fee drag:    {lower_drag[0]} ({lower_drag[1]:.1f}% of gross)")
+
+
 def main():
-    if len(sys.argv) < 3:
-        print("Usage: seller_profit_fee_tracker.py sales.csv expenses.csv")
+    args = [a for a in sys.argv[1:] if not a.startswith("--")]
+    flags = {a for a in sys.argv[1:] if a.startswith("--")}
+    if len(args) < 2:
+        print("Usage: seller_profit_fee_tracker.py sales.csv expenses.csv [--etsy-gumroad]")
         sys.exit(1)
-    sales = load_sales(sys.argv[1])
-    expenses = load_expenses(sys.argv[2])
+    sales = load_sales(args[0])
+    expenses = load_expenses(args[1])
     print(f"Sales rows: {len(sales)} · Expense rows: {len(expenses)}")
     print_dashboard(sales, expenses)
     print_platform_comparison(sales)
     print_expense_drag(sales, expenses)
     print_monthly_summary(sales, expenses)
+    if "--etsy-gumroad" in flags:
+        print_etsy_gumroad_compare(sales)
     print_worst_order(sales)
     print("\nClone target: smadsby.gumroad.com/l/ejxcg ($14.99 SimpleBizDash)")
 
