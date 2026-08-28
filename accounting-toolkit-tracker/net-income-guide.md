@@ -1,6 +1,6 @@
 # Net income visibility — what's actually safe to spend
 
-Clone of [faisalmq/5797](https://dev.to/faisalmq/freelance-finance-tracker-google-sheets-5797) buyer channel + [matthewnotion Finance Tracker (58 sales)](https://matthewnotion.gumroad.com/l/financetracker).
+Clone of [faisalmq/5797](https://dev.to/faisalmq/freelance-finance-tracker-google-sheets-5797) buyer channel + [theaccountantguy Ultimate Accounting Toolkit (92 sales)](https://theaccountantguy.gumroad.com/l/notionaccountingtoolkit).
 
 ## The financial fog
 
@@ -14,12 +14,12 @@ Then the fog:
 
 faisalmq/5797 frames the fix as **net income visibility** — see safe-to-spend after obligations, not gross deposits.
 
-matthewnotion's **Finance Tracker** rolls income, expenses, subscriptions, savings goals, and debt tracking into one overview — the safe-spend number belongs in the same workbook.
+theaccountantguy's **Accounting Toolkit** rolls income, expenses, debt, savings, budget, and net worth into one overview — the safe-spend number belongs in the same workbook.
 
 ## Free CLI preview
 
 ```bash
-python3 matthew_finance_tracker.py --net-income income-sample.csv expenses-sample.csv
+python3 accounting_toolkit.py --net-income income-sample.csv expenses-sample.csv
 ```
 
 Read the **NET INCOME VISIBILITY** block — gross collected, deductible expenses, tax set-aside, and safe-to-spend.
@@ -34,8 +34,8 @@ Spending from gross deposits is how freelancers overspend in Q3 and panic in Apr
 
 ## Pair with
 
-- [tax-buffer-guide.md](tax-buffer-guide.md) — faisalmq/4gao deposit-day transfers (run331)
-- [take-home-guide.md](take-home-guide.md) — marginmap/14ag buyer channel (run330)
+- [tax-buffer-guide.md](tax-buffer-guide.md) — faisalmq/4gao deposit-day transfers (run336)
+- [take-home-guide.md](take-home-guide.md) — marginmap/14ag buyer channel (run335)
 - [start-here.md](start-here.md) — full income + expense setup
 
-Full bundle: [Matthew Finance Tracker landing](https://ytinumoc.github.io/toolkitlabs-invoice/matthew-finance-tracker/) — 7 CSV templates, dashboard CLI, and all buyer-channel guides.
+Full bundle: [Accounting Toolkit Tracker landing](https://ytinumoc.github.io/toolkitlabs-invoice/accounting-toolkit-tracker/) — 6 CSV templates, dashboard CLI, and all buyer-channel guides.
