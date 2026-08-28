@@ -3,6 +3,7 @@
 import csv
 import sys
 from collections import defaultdict
+from datetime import datetime
 
 DEFAULT_TAX_PCT = 25.0
 
@@ -207,6 +208,69 @@ def summarize_finance_tracker(revenue_path, expense_path, tax_pct=DEFAULT_TAX_PC
     print("  Guide: freelance-finance-tracker-guide.md · revenue-sample.csv · expenses-sample.csv")
 
 
+def load_invoices(path):
+    rows = []
+    with open(path, newline="", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            try:
+                amount = float(row.get("amount") or 0)
+                due = row.get("due_date", "").strip()
+                status = row.get("status", "unpaid").strip().lower()
+                if status != "paid" and due:
+                    try:
+                        if datetime.strptime(due, "%Y-%m-%d") < datetime.now():
+                            status = "overdue"
+                    except ValueError:
+                        pass
+                rows.append({
+                    "invoice_id": row.get("invoice_id", "").strip(),
+                    "client": row.get("client", "").strip(),
+                    "amount": amount,
+                    "due_date": due,
+                    "status": status,
+                })
+            except (KeyError, ValueError):
+                continue
+    return rows
+
+
+def summarize_invoice_panic(invoices):
+    """faisalmq/43dl: end-of-month panic → invoice status log + overdue flags."""
+    paid = [i for i in invoices if i["status"] == "paid"]
+    sent = [i for i in invoices if i["status"] in ("sent", "unpaid")]
+    overdue = [i for i in invoices if i["status"] == "overdue"]
+    collected = sum(i["amount"] for i in paid)
+    awaiting = sum(i["amount"] for i in sent)
+    overdue_amt = sum(i["amount"] for i in overdue)
+
+    by_client = defaultdict(lambda: {"invoiced": 0.0, "paid": 0.0, "outstanding": 0.0})
+    for i in invoices:
+        by_client[i["client"]]["invoiced"] += i["amount"]
+        if i["status"] == "paid":
+            by_client[i["client"]]["paid"] += i["amount"]
+        elif i["status"] in ("sent", "unpaid", "overdue"):
+            by_client[i["client"]]["outstanding"] += i["amount"]
+
+    print("\n=== INVOICE TRACKER WITHOUT END-OF-MONTH PANIC (faisalmq/43dl shape) ===")
+    print(f"  Invoices logged:     {len(invoices)}")
+    print(f"  Collected (paid):    {fmt_money(collected)}")
+    print(f"  Awaiting payment:    {fmt_money(awaiting)}")
+    print(f"  Overdue (late):      {len(overdue)} invoices · {fmt_money(overdue_amt)}")
+    if overdue:
+        print("\n--- Overdue invoices ---")
+        for i in overdue:
+            print(f"  {i['invoice_id']:16s} {i['client'][:16]:<16} {fmt_money(i['amount']):>12} due {i['due_date']}")
+    if by_client:
+        print("\n--- Per-client totals ---")
+        for client, totals in sorted(by_client.items(), key=lambda x: -x[1]["invoiced"]):
+            print(
+                f"  {client[:20]:<20} invoiced {fmt_money(totals['invoiced']):>12} "
+                f"paid {fmt_money(totals['paid']):>12} outstanding {fmt_money(totals['outstanding']):>12}"
+            )
+    print("\n  Log every invoice when sent. Mark paid when deposit lands. Run weekly — not in panic.")
+    print("  Guide: invoice-panic-guide.md · invoices-sample.csv · start-here.md")
+
+
 def summarize_net_income(revenue_path, expense_path, tax_pct=DEFAULT_TAX_PCT):
     """faisalmq/5797: net income visibility — safe-to-spend after tax + subscriptions."""
     revenue = load_revenue(revenue_path)
@@ -342,6 +406,9 @@ def main():
         tax_pct = float(sys.argv[4]) if len(sys.argv) > 4 else DEFAULT_TAX_PCT
         summarize_net_income(sys.argv[2], sys.argv[3], tax_pct)
         return
+    if len(sys.argv) >= 3 and sys.argv[1] == "--invoice-panic":
+        summarize_invoice_panic(load_invoices(sys.argv[2]))
+        return
     if len(sys.argv) < 3:
         print("Usage: freelance_dashboard_tracker.py revenue.csv expenses.csv [tax_pct]")
         print("       freelance_dashboard_tracker.py --daily-check revenue.csv expenses.csv [tax_pct]")
@@ -349,6 +416,7 @@ def main():
         print("       freelance_dashboard_tracker.py --spreadsheet-trap revenue.csv expenses.csv [tax_pct]")
         print("       freelance_dashboard_tracker.py --tax-buffer revenue.csv expenses.csv [tax_pct]")
         print("       freelance_dashboard_tracker.py --net-income revenue.csv expenses.csv [tax_pct]")
+        print("       freelance_dashboard_tracker.py --invoice-panic invoices.csv")
         print("Clone target: cedabranding.gumroad.com/l/pro-dashboard ($97 · 1251 sales · 69 ratings)")
         sys.exit(1)
     revenue = load_revenue(sys.argv[1])

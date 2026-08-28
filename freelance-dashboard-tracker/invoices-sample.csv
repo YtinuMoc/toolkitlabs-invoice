@@ -1,0 +1,5 @@
+invoice_id,client,amount,due_date,status
+INV-2026-001,Gamma Studio,1900.00,2026-02-15,paid
+INV-2026-002,Delta Inc,1200.00,2026-02-20,overdue
+INV-2026-003,Acme Corp,1800.00,2026-03-15,unpaid
+INV-2026-004,Echo LLC,950.00,2026-03-20,unpaid
