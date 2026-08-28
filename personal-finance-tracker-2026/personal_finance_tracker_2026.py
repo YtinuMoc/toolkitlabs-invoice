@@ -5,6 +5,8 @@ import math
 import sys
 from collections import defaultdict
 
+DEFAULT_TAX_PCT = 25.0
+
 
 def load_csv(path, fields, float_fields=None):
     float_fields = float_fields or []
@@ -132,20 +134,54 @@ def dashboard(income, expenses, debts, savings, accounts):
     print(f"  Net worth:           {fmt_money(net_worth)}")
 
 
+def summarize_tax_buffer(income_path, expense_path, reserve_pct=DEFAULT_TAX_PCT):
+    """faisalmq/4gao: per-payment buffer + YTD safe-to-spend."""
+    income = load_income(income_path)
+    expenses = load_expenses(expense_path)
+    collected = sum(i["amount"] for i in income)
+    deductible = sum(e["amount"] for e in expenses)
+    net_profit = collected - deductible
+    tax_buffer = max(net_profit, 0) * reserve_pct / 100
+    safe_to_spend = max(net_profit - tax_buffer, 0)
+    print("\n=== PER-PAYMENT TAX BUFFER (faisalmq/4gao shape) ===")
+    print(f"  {'Source':<20} {'Collected':>12} {'Buffer':>10} {'Safe':>12}")
+    for i in income:
+        share = i["amount"] / collected if collected else 0
+        buf = net_profit * share * reserve_pct / 100 if net_profit > 0 else 0
+        safe = i["amount"] - buf
+        print(f"  {i['source'][:20]:<20} ${i['amount']:>10,.2f} ${buf:>8,.2f} ${safe:>10,.2f}")
+    print("\n=== EXPENSE + TAX BUFFER ===")
+    print(f"  Expenses YTD:        ${deductible:,.2f}")
+    print(f"  Net cash flow:         ${net_profit:,.2f}")
+    print(f"  Tax buffer ({reserve_pct:.0f}%):   ${tax_buffer:,.2f}")
+    print(f"  Safe to spend:       ${safe_to_spend:,.2f}")
+    print("  Transfer buffer to tax-only savings when payment lands — not in April.")
+    print("  Guide: tax-buffer-guide.md · income-sample.csv · expenses-sample.csv")
+
+
 def main():
-    if len(sys.argv) < 6:
+    args = sys.argv[1:]
+    if len(args) >= 3 and args[0] == "--tax-buffer":
+        pct = float(args[3]) if len(args) >= 4 else DEFAULT_TAX_PCT
+        summarize_tax_buffer(args[1], args[2], pct)
+        return
+    if len(args) < 5:
         print(
             "Usage: personal_finance_tracker_2026.py "
             "income.csv expenses.csv debts.csv savings.csv accounts.csv",
             file=sys.stderr,
         )
+        print(
+            "       personal_finance_tracker_2026.py --tax-buffer income.csv expenses.csv [pct]",
+            file=sys.stderr,
+        )
         sys.exit(1)
     dashboard(
-        load_income(sys.argv[1]),
-        load_expenses(sys.argv[2]),
-        load_debts(sys.argv[3]),
-        load_savings(sys.argv[4]),
-        load_accounts(sys.argv[5]),
+        load_income(args[0]),
+        load_expenses(args[1]),
+        load_debts(args[2]),
+        load_savings(args[3]),
+        load_accounts(args[4]),
     )
 
 
