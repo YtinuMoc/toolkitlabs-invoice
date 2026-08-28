@@ -1,0 +1,5 @@
+name,type,balance
+Checking,asset,4200.00
+Savings,asset,8200.00
+Brokerage,investment,18500.00
+Mortgage,liability,0.00
