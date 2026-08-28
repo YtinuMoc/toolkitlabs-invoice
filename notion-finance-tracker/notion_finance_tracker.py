@@ -121,6 +121,34 @@ def summarize_dashboard(income_path, expense_path, accounts_path, goals_path, de
     print(f"  Net worth:           {fmt_money(net_worth)}")
 
 
+def summarize_tax_buffer(income_path, expense_path, reserve_pct=DEFAULT_TAX_PCT):
+    """faisalmq/4gao: deposit lands → per-payment buffer → tax-only savings → tracker upsell."""
+    income = load_income(income_path)
+    expenses = load_expenses(expense_path)
+    collected = sum(i["amount"] for i in income)
+    deductible = sum(e["amount"] for e in expenses)
+    net_profit = collected - deductible
+    tax_buffer = max(net_profit, 0) * reserve_pct / 100
+    safe_to_spend = max(net_profit - tax_buffer, 0)
+    print("=== PER-PAYMENT TAX BUFFER (faisalmq/4gao shape) ===")
+    print("  Deposit lands → five minutes of joy → tax panic → buffer same day.")
+    print(f"  {'Source':<20} {'Collected':>12} {'Buffer':>10} {'Safe':>12}")
+    for i in income:
+        share = i["amount"] / collected if collected else 0
+        buf = net_profit * share * reserve_pct / 100 if net_profit > 0 else 0
+        safe = i["amount"] - buf
+        label = (i["source"] or i["category"] or "Payment")[:20]
+        print(f"  {label:<20} ${i['amount']:>10,.2f} ${buf:>8,.2f} ${safe:>10,.2f}")
+    print()
+    print("=== EXPENSE + TAX BUFFER ===")
+    print(f"  Expenses YTD:        ${deductible:,.2f}")
+    print(f"  Net profit:            ${net_profit:,.2f}")
+    print(f"  Tax buffer ({reserve_pct:.0f}%):   ${tax_buffer:,.2f}")
+    print(f"  Safe to spend:       ${safe_to_spend:,.2f}")
+    print("  Transfer buffer to tax-only savings when payment lands — not in April.")
+    print("  Guide: tax-buffer-guide.md · income-sample.csv · expenses-sample.csv")
+
+
 def summarize_quarterly_tax(income_path, expense_path, tax_pct=DEFAULT_TAX_PCT, hourly_rate=75.0):
     """wilsonhoe/4lhd: tax season cash crunch → quarterly set-aside system."""
     income = load_income(income_path)
@@ -171,8 +199,12 @@ def main():
     if not args:
         print("Usage: notion_finance_tracker.py <income> <expenses> <accounts> <goals> <debts> <subscriptions>")
         print("       notion_finance_tracker.py --quarterly-tax <income> <expenses>")
+        print("       notion_finance_tracker.py --tax-buffer <income> <expenses> [tax_pct]")
         sys.exit(1)
-    if args[0] == "--quarterly-tax":
+    if args[0] == "--tax-buffer":
+        tax_pct = float(args[3]) if len(args) > 3 else DEFAULT_TAX_PCT
+        summarize_tax_buffer(args[1], args[2], tax_pct)
+    elif args[0] == "--quarterly-tax":
         summarize_quarterly_tax(args[1], args[2])
     else:
         if len(args) < 6:
