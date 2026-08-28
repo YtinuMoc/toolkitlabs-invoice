@@ -134,6 +134,33 @@ def dashboard(income, expenses, debts, savings, accounts):
     print(f"  Net worth:           {fmt_money(net_worth)}")
 
 
+def summarize_net_income(income_path, expense_path, tax_pct=DEFAULT_TAX_PCT):
+    """faisalmq/5797: net income visibility — safe-to-spend after tax + subscriptions."""
+    income = load_income(income_path)
+    expenses = load_expenses(expense_path)
+    collected = sum(i["amount"] for i in income)
+    deductible = sum(e["amount"] for e in expenses)
+    subs = sum(
+        e["amount"] for e in expenses
+        if e["category"].lower() in ("software", "subscriptions", "saas", "tools")
+    )
+    net_profit = collected - deductible
+    tax_set_aside = max(net_profit, 0) * (tax_pct / 100.0)
+    safe_to_spend = max(net_profit - tax_set_aside, 0)
+    print("\n=== NET INCOME VISIBILITY (faisalmq/5797 shape) ===")
+    print(f"  Gross collected:     {fmt_money(collected)}")
+    print(f"  Expenses (deductible): {fmt_money(deductible)}")
+    if subs:
+        print(f"    subscriptions/SaaS:  {fmt_money(subs)}")
+    print(f"  Net profit:            {fmt_money(net_profit)}")
+    print(f"  Tax set-aside ({tax_pct:.0f}%): {fmt_money(tax_set_aside)}")
+    print(f"  Safe to spend:         {fmt_money(safe_to_spend)}")
+    if collected:
+        print(f"  Take-home rate:        {safe_to_spend / collected * 100:.1f}% of gross deposits")
+    print("\n  Gross deposits lie. Safe-to-spend is what you can actually use.")
+    print("  Guide: net-income-guide.md · income-sample.csv · expenses-sample.csv")
+
+
 def summarize_tax_buffer(income_path, expense_path, reserve_pct=DEFAULT_TAX_PCT):
     """faisalmq/4gao: per-payment buffer + YTD safe-to-spend."""
     income = load_income(income_path)
@@ -165,6 +192,10 @@ def main():
         pct = float(args[3]) if len(args) >= 4 else DEFAULT_TAX_PCT
         summarize_tax_buffer(args[1], args[2], pct)
         return
+    if len(args) >= 3 and args[0] == "--net-income":
+        pct = float(args[3]) if len(args) >= 4 else DEFAULT_TAX_PCT
+        summarize_net_income(args[1], args[2], pct)
+        return
     if len(args) < 5:
         print(
             "Usage: personal_finance_tracker_2026.py "
@@ -173,6 +204,10 @@ def main():
         )
         print(
             "       personal_finance_tracker_2026.py --tax-buffer income.csv expenses.csv [pct]",
+            file=sys.stderr,
+        )
+        print(
+            "       personal_finance_tracker_2026.py --net-income income.csv expenses.csv [pct]",
             file=sys.stderr,
         )
         sys.exit(1)
