@@ -2,6 +2,10 @@
 
 Clone of [saksham82 cueko ($9)](https://saksham82.gumroad.com/l/cueko).
 
+## Guide index
+
+See [mesh-hub.md](mesh-hub.md) for all 5 dev.to buyer-channel guides.
+
 ## 15-minute monthly routine
 
 1. Log new invoices in `invoices-template.csv` (or your copy).
