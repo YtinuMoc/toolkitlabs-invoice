@@ -1,6 +1,6 @@
 # Net income visibility — what's actually safe to spend
 
-Clone of [faisalmq/5797](https://dev.to/faisalmq/freelance-finance-tracker-google-sheets-5797) buyer channel + [jordilabs Notion Budget Tracker (105 ratings · 4.9★)](https://jordilabs.gumroad.com/l/budget-planner).
+Clone of [faisalmq/5797](https://dev.to/faisalmq/freelance-finance-tracker-google-sheets-5797) buyer channel + [Tony David Notion Finance Tracker (52 ratings · 5★)](https://tonydavid.gumroad.com/l/rjwua).
 
 ## The financial fog
 
@@ -14,12 +14,12 @@ Then the fog:
 
 faisalmq/5797 frames the fix as **net income visibility** — see safe-to-spend after obligations, not gross deposits.
 
-jordilabs' **Budget Planner** rolls monthly income, category budgets, and expense tracking into one overview — the safe-spend number belongs in the same workbook.
+Tony David's **Finance Tracker** rolls income, categorized expenses, summary cards, and budget tracking into one overview — the safe-spend number belongs in the same workbook.
 
 ## Free CLI preview
 
 ```bash
-python3 budget_planner_tracker.py --net-income income-sample.csv expenses-sample.csv
+python3 tonydavid_finance_tracker.py --net-income income-sample.csv expenses-sample.csv
 ```
 
 Read the **NET INCOME VISIBILITY** block — gross collected, deductible expenses, tax set-aside, and safe-to-spend.
@@ -34,8 +34,8 @@ Spending from gross deposits is how freelancers overspend in Q3 and panic in Apr
 
 ## Pair with
 
-- [tax-buffer-guide.md](tax-buffer-guide.md) — faisalmq/4gao deposit-day transfers (run341)
-- [take-home-guide.md](take-home-guide.md) — marginmap/14ag buyer channel (run340)
+- [tax-buffer-guide.md](tax-buffer-guide.md) — faisalmq/4gao deposit-day transfers (run346)
+- [take-home-guide.md](take-home-guide.md) — marginmap/14ag buyer channel (run345)
 - [start-here.md](start-here.md) — full income + expense setup
 
-Full bundle: [Budget Planner Tracker landing](https://ytinumoc.github.io/toolkitlabs-invoice/budget-planner-tracker/) — CSV templates, dashboard CLI, and all buyer-channel guides.
+Full bundle: [Tony David Finance Tracker landing](https://ytinumoc.github.io/toolkitlabs-invoice/tonydavid-finance-tracker/) — CSV templates, dashboard CLI, and all buyer-channel guides.
