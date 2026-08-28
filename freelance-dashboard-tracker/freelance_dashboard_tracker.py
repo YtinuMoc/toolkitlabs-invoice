@@ -207,6 +207,33 @@ def summarize_finance_tracker(revenue_path, expense_path, tax_pct=DEFAULT_TAX_PC
     print("  Guide: freelance-finance-tracker-guide.md · revenue-sample.csv · expenses-sample.csv")
 
 
+def summarize_net_income(revenue_path, expense_path, tax_pct=DEFAULT_TAX_PCT):
+    """faisalmq/5797: net income visibility — safe-to-spend after tax + subscriptions."""
+    revenue = load_revenue(revenue_path)
+    expenses = load_expenses(expense_path)
+    collected = sum(r["amount"] for r in revenue)
+    deductible = sum(e["amount"] for e in expenses)
+    subs = sum(
+        e["amount"] for e in expenses
+        if e["category"].lower() in ("software", "subscriptions", "saas", "tools")
+    )
+    net_profit = collected - deductible
+    tax_set_aside = max(net_profit, 0) * (tax_pct / 100.0)
+    safe_to_spend = max(net_profit - tax_set_aside, 0)
+    print("\n=== NET INCOME VISIBILITY (faisalmq/5797 shape) ===")
+    print(f"  Gross collected:     {fmt_money(collected)}")
+    print(f"  Expenses (deductible): {fmt_money(deductible)}")
+    if subs:
+        print(f"    subscriptions/SaaS:  {fmt_money(subs)}")
+    print(f"  Net profit:            {fmt_money(net_profit)}")
+    print(f"  Tax set-aside ({tax_pct:.0f}%): {fmt_money(tax_set_aside)}")
+    print(f"  Safe to spend:         {fmt_money(safe_to_spend)}")
+    if collected:
+        print(f"  Take-home rate:        {safe_to_spend / collected * 100:.1f}% of gross deposits")
+    print("\n  Gross deposits lie. Safe-to-spend is what you can actually use.")
+    print("  Guide: net-income-guide.md · revenue-sample.csv · expenses-sample.csv")
+
+
 def summarize_tax_buffer(revenue_path, expense_path, reserve_pct=DEFAULT_TAX_PCT):
     """faisalmq/4gao: deposit lands → per-payment buffer → tax-only savings → dashboard upsell."""
     revenue = load_revenue(revenue_path)
@@ -311,12 +338,17 @@ def main():
         tax_pct = float(sys.argv[4]) if len(sys.argv) > 4 else DEFAULT_TAX_PCT
         summarize_tax_buffer(sys.argv[2], sys.argv[3], tax_pct)
         return
+    if len(sys.argv) >= 4 and sys.argv[1] == "--net-income":
+        tax_pct = float(sys.argv[4]) if len(sys.argv) > 4 else DEFAULT_TAX_PCT
+        summarize_net_income(sys.argv[2], sys.argv[3], tax_pct)
+        return
     if len(sys.argv) < 3:
         print("Usage: freelance_dashboard_tracker.py revenue.csv expenses.csv [tax_pct]")
         print("       freelance_dashboard_tracker.py --daily-check revenue.csv expenses.csv [tax_pct]")
         print("       freelance_dashboard_tracker.py --finance-tracker revenue.csv expenses.csv [tax_pct]")
         print("       freelance_dashboard_tracker.py --spreadsheet-trap revenue.csv expenses.csv [tax_pct]")
         print("       freelance_dashboard_tracker.py --tax-buffer revenue.csv expenses.csv [tax_pct]")
+        print("       freelance_dashboard_tracker.py --net-income revenue.csv expenses.csv [tax_pct]")
         print("Clone target: cedabranding.gumroad.com/l/pro-dashboard ($97 · 1251 sales · 69 ratings)")
         sys.exit(1)
     revenue = load_revenue(sys.argv[1])
