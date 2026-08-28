@@ -1,7 +1,7 @@
-# Finance OS Dashboard — guide index
+# Grace Finance Tracker — guide index
 
-Mesh hub: [dev.to index article](https://dev.to/toolkitlabs/finance-os-dashboard-complete-guide-index-4-chrisnotion-clones-4g09)
+Mesh hub: [dev.to index article](https://dev.to/toolkitlabs/grace-finance-tracker-complete-guide-index-4-gracedigitalsco-clones-kcf)
 
-Checkout: https://buy.stripe.com/00w00k1uCeigf7E7NX5Ne0V
+Checkout: https://buy.stripe.com/6oU6oI2yG3DCe3A7NX5Ne0W
 
-Clone of [chrisnotion Finance OS Dashboard (30,427 sales · 506 ratings · 4.9★)](https://chrisnotion.gumroad.com/l/fcufra).
+Clone of [gracedigitalsco Finance Tracker (3,000 sales · 91 ratings · 5.0★)](https://gracedigitalsco.gumroad.com/l/FinanceTracker).

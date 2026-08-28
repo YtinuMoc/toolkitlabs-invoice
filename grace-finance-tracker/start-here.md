@@ -2,6 +2,10 @@
 
 Clone of [gracedigitalsco Finance Tracker (3,000 sales · 91 ratings · 5.0★)](https://gracedigitalsco.gumroad.com/l/FinanceTracker).
 
+## Guide index
+
+See [mesh-hub.md](mesh-hub.md) for all 4 dev.to buyer-channel guides.
+
 ## 10-minute setup
 
 1. Copy the seven template CSVs to your workspace.
