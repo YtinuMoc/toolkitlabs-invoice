@@ -1,0 +1,5 @@
+name,due_day,amount,category,paid
+Rent,1,1200,Housing,yes
+Electric,15,92,Utilities,no
+Internet,20,60,Utilities,yes
+Phone,25,45,Utilities,no
