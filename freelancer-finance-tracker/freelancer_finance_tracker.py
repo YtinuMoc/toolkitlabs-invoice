@@ -132,6 +132,67 @@ def summarize_net_income(income, expenses, tax_pct=DEFAULT_TAX_PCT):
     print("  Guide: net-income-guide.md · income-sample.csv · expenses-sample.csv")
 
 
+def summarize_profit_margins(income, expenses, month=None):
+    """faisalmq/3cpo: monthly margin % + categorized breakdown + per-client rank."""
+    by_month = defaultdict(
+        lambda: {
+            "income": 0.0,
+            "expense": 0.0,
+            "categories": defaultdict(lambda: {"income": 0.0, "expense": 0.0}),
+        }
+    )
+    by_client = defaultdict(float)
+    for i in income:
+        if i["status"] != "paid" or not i["date"]:
+            continue
+        key = i["date"][:7]
+        by_month[key]["income"] += i["amount"]
+        by_month[key]["categories"][i["client"]]["income"] += i["amount"]
+        by_client[i["client"]] += i["amount"]
+    for e in expenses:
+        if not e["date"]:
+            continue
+        key = e["date"][:7]
+        by_month[key]["expense"] += e["amount"]
+        by_month[key]["categories"][e["category"]]["expense"] += e["amount"]
+
+    months = sorted(by_month.keys())
+    active = month or (months[-1] if months else None)
+    print("\n=== PROFIT MARGINS AT A GLANCE (faisalmq/3cpo shape) ===")
+    if active:
+        print(f"  Active month: {active}")
+    for m in months:
+        inc = by_month[m]["income"]
+        exp = by_month[m]["expense"]
+        net = inc - exp
+        margin = (net / inc * 100) if inc else 0.0
+        flag = " ← selected" if m == active else ""
+        print(f"    {m}  income ${inc:,.2f}  expense ${exp:,.2f}  net ${net:,.2f}  margin {margin:.1f}%{flag}")
+
+    if active and active in by_month:
+        print(f"\n  Categorized breakdown ({active}) — tax preparedness:")
+        cats = by_month[active]["categories"]
+        for cat in sorted(cats.keys()):
+            c = cats[cat]
+            if c["income"] or c["expense"]:
+                net = c["income"] - c["expense"]
+                print(f"    {cat}: income ${c['income']:,.2f}  expense ${c['expense']:,.2f}  net ${net:,.2f}")
+
+    if by_client:
+        total_client = sum(by_client.values())
+        print("\n  Per-client income rank (paid income) — price the next project:")
+        for client, amt in sorted(by_client.items(), key=lambda x: -x[1]):
+            share = (amt / total_client * 100) if total_client else 0
+            print(f"    {client}: ${amt:,.2f} ({share:.0f}% of collected)")
+
+    ytd_income = sum(m["income"] for m in by_month.values())
+    ytd_expense = sum(m["expense"] for m in by_month.values())
+    ytd_net = ytd_income - ytd_expense
+    ytd_margin = (ytd_net / ytd_income * 100) if ytd_income else 0.0
+    print(f"\n  YTD profit margin: {ytd_margin:.1f}%  (${ytd_net:,.2f} net on ${ytd_income:,.2f} income)")
+    print("  Guide: profit-margins-guide.md · income-sample.csv · expenses-sample.csv")
+
+
 def summarize_invoice_panic(invoices):
     """faisalmq/43dl: end-of-month panic → invoice status log + overdue flags."""
     paid = [i for i in invoices if i["status"] == "paid"]
@@ -220,6 +281,12 @@ def main():
         invoices = load_invoices(args[1])
         summarize_invoice_panic(invoices)
         return
+    if len(args) >= 3 and args[0] == "--profit-margins":
+        income = load_income(args[1])
+        expenses = load_expenses(args[2])
+        month = args[3] if len(args) >= 4 else None
+        summarize_profit_margins(income, expenses, month)
+        return
     if len(args) >= 3 and args[0] == "--net-income":
         income = load_income(args[1])
         expenses = load_expenses(args[2])
@@ -235,6 +302,7 @@ def main():
     if len(args) < 3:
         print("Usage: freelancer_finance_tracker.py income.csv expenses.csv invoices.csv [tax_pct]")
         print("       freelancer_finance_tracker.py --invoice-panic invoices.csv")
+        print("       freelancer_finance_tracker.py --profit-margins income.csv expenses.csv [month]")
         print("       freelancer_finance_tracker.py --net-income income.csv expenses.csv [tax_pct]")
         print("       freelancer_finance_tracker.py --tax-buffer income.csv expenses.csv invoices.csv [tax_pct]")
         print("Clone target: moonlight573.gumroad.com/l/unsjlk ($10 Freelancer Finance Tracker)")
