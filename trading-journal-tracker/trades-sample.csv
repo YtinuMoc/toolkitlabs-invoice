@@ -1,0 +1,16 @@
+date,market,setup,direction,entry_price,exit_price,position_size,pnl,reflection
+2026-07-01,EURUSD,breakout,long,1.0850,1.0892,1.0,420.00,Clean London breakout — held to target
+2026-07-02,XAUUSD,mean_revert,short,2340,2328,0.2,240.00,RSI overbought fade worked
+2026-07-03,BTCUSDT,breakout,long,62000,61500,0.3,-150.00,Stopped out — news spike against position
+2026-07-05,EURUSD,scalp,long,1.0820,1.0835,2.0,300.00,Quick NY session scalp
+2026-07-08,GBPUSD,breakout,short,1.2750,1.2680,1.5,1050.00,Best trade of the week
+2026-07-09,XAUUSD,breakout,long,2360,2345,0.15,-225.00,FOMO entry before confirmation
+2026-07-11,BTCUSDT,mean_revert,long,60800,62100,0.25,325.00,Bought the dip per plan
+2026-07-14,EURUSD,scalp,short,1.0910,1.0895,1.8,270.00,Range-bound day — scalped edges
+2026-07-16,GBPUSD,mean_revert,long,1.2680,1.2720,1.0,400.00,Support held at weekly level
+2026-07-18,BTCUSDT,breakout,short,63500,62800,0.2,140.00,Breakdown after consolidation
+2026-07-21,XAUUSD,scalp,long,2380,2388,0.3,240.00,NY open momentum
+2026-07-23,EURUSD,breakout,long,1.0880,1.0920,1.2,480.00,ECB day trend follow
+2026-07-25,GBPUSD,breakout,long,1.2740,1.2710,1.0,-300.00,False breakout — need tighter filter
+2026-07-28,BTCUSDT,mean_revert,short,64200,63800,0.15,60.00,Small fade at resistance
+2026-07-30,EURUSD,scalp,long,1.0950,1.0968,2.5,450.00,Month-end positioning flow

@@ -1,0 +1,3 @@
+date,market,setup,direction,entry_price,exit_price,position_size,pnl,reflection
+2026-07-01,EURUSD,breakout,long,1.0850,1.0892,1.0,,Followed plan — waited for London open
+2026-07-02,XAUUSD,mean_revert,short,2340,2355,0.1,,Revenge trade — broke rules
