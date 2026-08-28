@@ -140,6 +140,31 @@ def summarize_dashboard_setup(revenue_path, expense_path, tax_pct=DEFAULT_TAX_PC
     print("  Guide: dashboard-setup-guide.md · revenue-sample.csv · expenses-sample.csv")
 
 
+def summarize_beginner_friendly(revenue_path, expense_path, tax_pct=DEFAULT_TAX_PCT):
+    """faisalmq/2fj6: beginner-friendly — shaded cells only, no formulas."""
+    revenue = load_revenue(revenue_path)
+    expenses = load_expenses(expense_path)
+    total_revenue = sum(r["amount"] for r in revenue)
+    total_expenses = sum(e["amount"] for e in expenses)
+    net_profit = total_revenue - total_expenses
+    tax_set_aside = max(net_profit, 0) * (tax_pct / 100.0)
+    take_home = max(net_profit - tax_set_aside, 0)
+    rev_rows = len(revenue)
+    exp_rows = len(expenses)
+    print("=== BEGINNER-FRIENDLY (faisalmq/2fj6 — no formulas required) ===")
+    print("  You only type into shaded cells. In this kit that's your CSV rows.")
+    print("  Type here:     revenue + expense CSV columns (see templates)")
+    print("  Auto-calculated: monthly P&L, client %, tax set-aside, margins")
+    print(f"  Revenue log: {rev_rows} rows · Expense log: {exp_rows} rows (expandable — duplicate templates)")
+    print()
+    print("  Three outcomes freelancers actually want:")
+    print(f"    1. Income + expenses in one place: ${total_revenue:,.2f} in · ${total_expenses:,.2f} out")
+    print(f"    2. Take-home pay after costs:      ${take_home:,.2f} (net ${net_profit:,.2f} − tax ${tax_set_aside:,.2f})")
+    print("    3. Tax season ready:               organized CSV logs — no formula hunting")
+    print()
+    print("  Guide: beginner-guide.md · revenue-sample.csv · expenses-sample.csv")
+
+
 def summarize_portable(revenue_path, expense_path, tax_pct=DEFAULT_TAX_PCT):
     """faisalmq/3gcp: portable solo business tracker — single source of truth, any device."""
     revenue = load_revenue(revenue_path)
@@ -223,10 +248,15 @@ def main():
         tax_pct = float(sys.argv[4]) if len(sys.argv) > 4 else DEFAULT_TAX_PCT
         summarize_portable(sys.argv[2], sys.argv[3], tax_pct)
         return
+    if len(sys.argv) >= 4 and sys.argv[1] == "--beginner":
+        tax_pct = float(sys.argv[4]) if len(sys.argv) > 4 else DEFAULT_TAX_PCT
+        summarize_beginner_friendly(sys.argv[2], sys.argv[3], tax_pct)
+        return
     if len(sys.argv) < 3:
         print("Usage: solo_business_revenue_tracker.py revenue.csv expenses.csv [tax_pct]")
         print("       solo_business_revenue_tracker.py --dashboard revenue.csv expenses.csv [tax_pct]")
         print("       solo_business_revenue_tracker.py --portable revenue.csv expenses.csv [tax_pct]")
+        print("       solo_business_revenue_tracker.py --beginner revenue.csv expenses.csv [tax_pct]")
         print("Clone target: amyragland.gumroad.com/l/tckuq ($10 2026 Solo Business Revenue & Expense Tracker)")
         sys.exit(1)
     revenue = load_revenue(sys.argv[1])
