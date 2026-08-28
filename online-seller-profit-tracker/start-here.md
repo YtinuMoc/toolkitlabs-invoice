@@ -33,3 +33,4 @@ python3 multi_platform_seller_tracker.py --price-profit 10 8 3 1 etsy
 ## 4. Full zip
 
 EUR 9 one-time checkout on the landing page — same delivery shape as the Gumroad original.
+See also: [pricing calculator guide](pricing-calculator-guide.md) for Vinted/eBay hourly-rate examples.
