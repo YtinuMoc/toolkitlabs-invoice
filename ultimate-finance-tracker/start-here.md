@@ -2,6 +2,10 @@
 
 Clone of [simonotion Ultimate Finance Tracker ($47 · 109 ratings · 5.0★)](https://simonotion.gumroad.com/l/finance-tracker).
 
+## Guide index
+
+See [mesh-hub.md](mesh-hub.md) for all 4 dev.to buyer-channel guides.
+
 ## 10-minute setup
 
 1. Copy the seven template CSVs to your workspace.
