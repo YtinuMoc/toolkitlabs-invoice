@@ -1,0 +1,8 @@
+date,order_id,item,platform,sale_price,platform_fee,postage,packaging,cogs,time_minutes
+2026-07-02,ET-1042,Handmade ceramic mug,etsy,25.00,,3.50,1.20,8.00,75
+2026-07-05,VB-882,Vintage denim jacket,vinted,32.00,,2.80,0.80,4.50,20
+2026-07-08,EB-331,Retro game cartridge,ebay,18.50,,4.20,1.00,3.00,15
+2026-07-12,ET-1048,Custom pet portrait,etsy,45.00,,4.50,2.00,12.00,180
+2026-07-15,DP-221,Upcycled tote bag,depop,22.00,,2.50,0.50,5.00,40
+2026-07-18,VB-901,Designer scarf,vinted,28.00,,2.80,0.60,6.00,12
+2026-07-22,ET-1055,Low-margin sticker pack,etsy,12.00,,2.20,0.80,7.50,30

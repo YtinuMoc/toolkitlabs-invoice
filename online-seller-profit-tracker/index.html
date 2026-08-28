@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Online Seller Profit & Fee Tracker — Etsy, eBay & Vinted</title>
+<meta name="description" content="Clone of ambrosetheshield xdjzq (£14.85 Gumroad). Multi-platform order log, pricing calculator, effective hourly rate. EUR 9 one-time instant zip.">
+<style>
+:root{--ink:#1e1b4b;--panel:#eef2ff;--text:#334155;--muted:#64748b;--acc:#4338ca;--line:#c7d2fe}
+*{box-sizing:border-box}
+body{margin:0;font:16px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;color:var(--text);background:#fff}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 64px}
+nav{font-size:.9rem;margin-bottom:24px}
+nav a{color:var(--acc);text-decoration:none}
+h1{font-size:1.85rem;line-height:1.25;margin:0 0 12px;color:var(--ink)}
+.lead{color:var(--muted);font-size:1.05rem;margin:0 0 28px}
+.badge{display:inline-block;background:#eef2ff;color:#3730a3;padding:4px 10px;border-radius:4px;font-size:.8rem;font-weight:600;margin-bottom:12px}
+.price-box{background:var(--panel);border:2px solid var(--acc);border-radius:8px;padding:24px;margin:28px 0;text-align:center}
+.price-box .amt{font-size:2rem;font-weight:700;color:var(--ink)}
+.cta{display:inline-block;margin-top:16px;padding:14px 28px;background:var(--acc);color:#fff;text-decoration:none;border-radius:6px;font-weight:600;font-size:1.05rem}
+.mod{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:18px 20px;margin-bottom:14px}
+.mod h3{margin:0 0 6px;font-size:1rem;color:var(--ink)}
+.mod p{margin:0;color:var(--muted);font-size:.95rem}
+.peek{background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;padding:18px 20px;margin:28px 0;font-size:.85rem;font-family:ui-monospace,monospace;white-space:pre-wrap}
+footer{margin-top:40px;font-size:.85rem;color:var(--muted);text-align:center}
+footer a{color:var(--acc)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav><a href="../profit-after-fees-tracker/">Profit after fees</a> · <a href="../reseller-profit-tracker/">Reseller tracker</a> · <a href="https://github.com/YtinuMoc/toolkitlabs-invoice">source</a></nav>
+
+<span class="badge">Clone of ambrosetheshield xdjzq · £14.85 → EUR 9 · Gumroad checkout · Instant download</span>
+<h1>Online Seller Profit & Fee Tracker — Etsy, eBay &amp; Vinted</h1>
+<p class="lead">Shameless clone of <a href="https://ambrosetheshield.gumroad.com/l/xdjzq">ambrosetheshield's tracker on Gumroad (£14.85)</a>. You sold forty things last month — do you know what you actually kept? Between platform fees, postage, packaging, and COGS, a £25 order can leave you under £4.</p>
+
+<div class="price-box">
+<div class="amt">EUR 9 · one-time</div>
+<p style="color:var(--muted);margin:8px 0 0">Instant zip — order CSV log + pricing calculator CLI · 400-row scale</p>
+<a class="cta" id="buy-cta" href="https://buy.stripe.com/8x24gA3CK6PO7Fcc4d5Ne0I">Get the tracker →</a>
+<p style="margin:14px 0 0;font-size:.9rem;color:var(--muted)">Free: <a href="start-here.md">start here</a> · <a href="orders-sample.csv">sample CSV</a> · <a href="faq.md">FAQ</a></p>
+</div>
+
+<div class="mod"><h3>📋 Order log</h3><p>Etsy, eBay, Vinted, Depop, Amazon Handmade, Gumroad, own site — fees, postage, packaging, COGS → net profit per order.</p></div>
+<div class="mod"><h3>🧮 Pricing calculator</h3><p>Target profit or target margin → minimum price to charge. Clone of ambrosetheshield pricing tab.</p></div>
+<div class="mod"><h3>⏱ Effective hourly rate</h3><p>The number handmade sellers most need to see — net profit divided by time spent.</p></div>
+<div class="mod"><h3>📊 Profit by platform</h3><p>Side-by-side monthly rollup — which channel actually pays after the fee stack.</p></div>
+<div class="mod"><h3>⚠️ Worst order</h3><p>Names the single order that lost you the most money.</p></div>
+
+<div class="peek">=== ONLINE SELLER DASHBOARD (ambrosetheshield xdjzq clone) ===
+  Orders logged:       7
+  Gross sales:         £182.50
+  Platform fees:       £24.18
+  Postage + packaging: £18.60
+  COGS:                £46.00
+  Net profit:          £93.72
+  Profit margin:       51.4%
+
+=== WORST ORDER ===
+  2026-07-22 · etsy · Low-margin sticker pack
+  Sale £12.00 → net £0.12 (1.0% margin)
+  Effective hourly:    £0.24/hr</div>
+
+<p style="margin-top:24px;font-size:.92rem;color:var(--muted)">Buyer channel: <a id="devto-link" href="https://dev.to/toolkitlabs/a-ps25-etsy-sale-left-me-under-ps4-heres-the-multi-platform-math-most-sellers-ignore-3a9h">dev.to article</a> (sellermind/4341057 Etsy-math buyer channel shape). Related: <a href="../profit-after-fees-tracker/">Profit after fees</a> · <a href="../reseller-profit-tracker/">Reseller tracker</a>.</p>
+
+<footer>Toolkit Labs · machine operator · clone of <a href="https://ambrosetheshield.gumroad.com/l/xdjzq">ambrosetheshield</a></footer>
+</div>
+</body>
+</html>
