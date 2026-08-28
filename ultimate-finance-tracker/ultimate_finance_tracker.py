@@ -202,6 +202,31 @@ def dashboard(income, expenses, debts, savings, accounts, subscriptions, investm
     print(f"  Net worth:           {fmt_money(net_worth)}")
 
 
+def summarize_beginner_friendly(income_path, expense_path, tax_pct=DEFAULT_TAX_PCT):
+    """faisalmq/2fj6: beginner-friendly — shaded cells only, no formulas."""
+    income = load_income(income_path)
+    expenses = load_expenses(expense_path)
+    total_income = sum(i["amount"] for i in income)
+    total_expenses = sum(e["amount"] for e in expenses)
+    net_profit = total_income - total_expenses
+    tax_set_aside = max(net_profit, 0) * (tax_pct / 100.0)
+    take_home = max(net_profit - tax_set_aside, 0)
+    inc_rows = len(income)
+    exp_rows = len(expenses)
+    print("=== BEGINNER-FRIENDLY (faisalmq/2fj6 — no formulas required) ===")
+    print("  You only type into shaded cells. In this kit that's your CSV rows.")
+    print("  Type here:     income + expense CSV columns (see templates)")
+    print("  Auto-calculated: monthly P&L, tax set-aside, net worth preview")
+    print(f"  Income log: {inc_rows} rows · Expense log: {exp_rows} rows (expandable — duplicate templates)")
+    print()
+    print("  Three outcomes freelancers actually want:")
+    print(f"    1. Income + expenses in one place: ${total_income:,.2f} in · ${total_expenses:,.2f} out")
+    print(f"    2. Take-home pay after costs:      ${take_home:,.2f} (net ${net_profit:,.2f} − tax ${tax_set_aside:,.2f})")
+    print("    3. Tax season ready:               organized CSV logs — no formula hunting")
+    print()
+    print("  Guide: beginner-guide.md · income-sample.csv · expenses-sample.csv")
+
+
 def summarize_guesswork(income_path, expense_path, subs_path, tax_pct=DEFAULT_TAX_PCT):
     """faisalmq/54h7: guesswork → clarity — one file replaces mental math."""
     income = load_income(income_path)
@@ -239,6 +264,10 @@ def summarize_guesswork(income_path, expense_path, subs_path, tax_pct=DEFAULT_TA
 
 def main():
     args = sys.argv[1:]
+    if len(args) >= 3 and args[0] == "--beginner":
+        pct = float(args[3]) if len(args) >= 4 else DEFAULT_TAX_PCT
+        summarize_beginner_friendly(args[1], args[2], pct)
+        return
     if len(args) >= 4 and args[0] == "--guesswork":
         pct = float(args[4]) if len(args) >= 5 else DEFAULT_TAX_PCT
         summarize_guesswork(args[1], args[2], args[3], pct)
@@ -251,6 +280,10 @@ def main():
         )
         print(
             "       ultimate_finance_tracker.py --guesswork income.csv expenses.csv subscriptions.csv [tax_pct]",
+            file=sys.stderr,
+        )
+        print(
+            "       ultimate_finance_tracker.py --beginner income.csv expenses.csv [tax_pct]",
             file=sys.stderr,
         )
         sys.exit(1)
