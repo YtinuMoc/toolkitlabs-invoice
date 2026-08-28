@@ -32,6 +32,10 @@ Copy `trades-template.csv` and add one row per simulated trade:
 python3 backtesting_profit_tracker.py my-trades.csv --capital 25000
 ```
 
-## 4. Full zip
+## 4. SMC FVG back-testing
+
+See [smc-fvg-listicle-guide.md](smc-fvg-listicle-guide.md) — orion_operator/4219970 buyer channel shape.
+
+## 5. Full zip
 
 EUR 9 one-time checkout on the landing page — same delivery shape as the Gumroad original.
