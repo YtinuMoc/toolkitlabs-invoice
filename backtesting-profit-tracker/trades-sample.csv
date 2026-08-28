@@ -1,0 +1,13 @@
+date,strategy,symbol,direction,entry_price,exit_price,position_size,risk_pct,pnl
+2026-06-02,breakout,BTCUSDT,long,62000,63450,0.5,1.0,725.00
+2026-06-03,breakout,ETHUSDT,long,3400,3320,2.0,1.0,-160.00
+2026-06-05,mean_revert,BTCUSDT,short,64500,63800,0.4,0.5,280.00
+2026-06-07,breakout,SOLUSDT,long,145,152,10.0,1.0,70.00
+2026-06-09,mean_revert,ETHUSDT,long,3250,3180,1.5,1.0,-105.00
+2026-06-11,breakout,BTCUSDT,long,63000,64800,0.45,1.0,810.00
+2026-06-14,mean_revert,SOLUSDT,short,158,162,8.0,0.5,-32.00
+2026-06-16,breakout,ETHUSDT,long,3350,3510,1.8,1.0,288.00
+2026-06-18,mean_revert,BTCUSDT,short,65200,66100,0.35,1.0,-315.00
+2026-06-20,breakout,SOLUSDT,long,148,155,12.0,1.0,84.00
+2026-06-22,mean_revert,ETHUSDT,short,3480,3420,2.0,0.5,120.00
+2026-06-25,breakout,BTCUSDT,long,63800,65500,0.5,1.0,850.00
