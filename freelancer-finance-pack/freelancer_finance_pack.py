@@ -324,6 +324,69 @@ def summarize_net_income(invoice_path, expense_path, reserve_pct=TAX_BUFFER_PCT)
     print("  Guide: net-income-guide.md · invoices-sample.csv · expenses-sample.csv")
 
 
+def summarize_profit_margins(invoice_path, expense_path, month=None):
+    """faisalmq/3cpo: monthly margin % + categorized breakdown + per-client rank."""
+    invoices = load_invoices(invoice_path)
+    expenses = load_expenses(expense_path)
+    by_month = defaultdict(
+        lambda: {
+            "income": 0.0,
+            "expense": 0.0,
+            "categories": defaultdict(lambda: {"income": 0.0, "expense": 0.0}),
+        }
+    )
+    by_client = defaultdict(float)
+    for i in invoices:
+        if i["status"].lower() != "paid" or not i["date"]:
+            continue
+        key = i["date"][:7]
+        by_month[key]["income"] += i["amount"]
+        by_month[key]["categories"][i["client"]]["income"] += i["amount"]
+        by_client[i["client"]] += i["amount"]
+    for e in expenses:
+        if not e["date"]:
+            continue
+        key = e["date"][:7]
+        by_month[key]["expense"] += e["amount"]
+        by_month[key]["categories"][e["category"]]["expense"] += e["amount"]
+
+    months = sorted(by_month.keys())
+    active = month or (months[-1] if months else None)
+    print("\n=== PROFIT MARGINS AT A GLANCE (faisalmq/3cpo shape) ===")
+    if active:
+        print(f"  Active month: {active}")
+    for m in months:
+        inc = by_month[m]["income"]
+        exp = by_month[m]["expense"]
+        net = inc - exp
+        margin = (net / inc * 100) if inc else 0.0
+        flag = " ← selected" if m == active else ""
+        print(f"    {m}  income ${inc:,.2f}  expense ${exp:,.2f}  net ${net:,.2f}  margin {margin:.1f}%{flag}")
+
+    if active and active in by_month:
+        print(f"\n  Categorized breakdown ({active}) — tax preparedness:")
+        cats = by_month[active]["categories"]
+        for cat in sorted(cats.keys()):
+            c = cats[cat]
+            if c["income"] or c["expense"]:
+                net = c["income"] - c["expense"]
+                print(f"    {cat}: income ${c['income']:,.2f}  expense ${c['expense']:,.2f}  net ${net:,.2f}")
+
+    if by_client:
+        total_client = sum(by_client.values())
+        print("\n  Per-client income rank (paid invoices) — price the next project:")
+        for client, amt in sorted(by_client.items(), key=lambda x: -x[1]):
+            share = (amt / total_client * 100) if total_client else 0
+            print(f"    {client}: ${amt:,.2f} ({share:.0f}% of collected)")
+
+    ytd_income = sum(m["income"] for m in by_month.values())
+    ytd_expense = sum(m["expense"] for m in by_month.values())
+    ytd_net = ytd_income - ytd_expense
+    ytd_margin = (ytd_net / ytd_income * 100) if ytd_income else 0.0
+    print(f"\n  YTD profit margin: {ytd_margin:.1f}%  (${ytd_net:,.2f} net on ${ytd_income:,.2f} income)")
+    print("  Guide: profit-margins-guide.md · invoices-sample.csv · expenses-sample.csv")
+
+
 def summarize_tax_buffer(invoice_path, expense_path, reserve_pct=TAX_BUFFER_PCT):
     """faisalmq/4gao: per-payment buffer + YTD safe-to-spend."""
     invoices = load_invoices(invoice_path)
@@ -392,6 +455,10 @@ def main():
     if len(args) >= 3 and args[0] == "--net-income":
         pct = float(args[3]) if len(args) >= 4 else TAX_BUFFER_PCT
         summarize_net_income(args[1], args[2], pct)
+        return
+    if len(args) >= 3 and args[0] == "--profit-margins":
+        month = args[3] if len(args) >= 4 else None
+        summarize_profit_margins(args[1], args[2], month)
         return
     if "--merge" in args:
         idx = args.index("--merge")
