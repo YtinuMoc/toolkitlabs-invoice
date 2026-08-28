@@ -7,6 +7,77 @@ from datetime import datetime
 
 DEFAULT_TAX_RATE = 0.28
 
+PLATFORM_FEES = {
+    "etsy": {"listing": 0.20, "transaction_pct": 0.065, "processing_pct": 0.03, "processing_flat": 0.25},
+    "gumroad": {"pct": 0.10, "flat": 0.30},
+    "amazon": {"pct": 0.15, "flat": 0.0},
+    "ebay": {"pct": 0.129, "flat": 0.30},
+    "other": {"pct": 0.0, "flat": 0.0},
+}
+
+
+def calc_platform_fee(platform, gross):
+    platform = platform.lower().replace(" ", "_")
+    if platform == "etsy":
+        f = PLATFORM_FEES["etsy"]
+        return round(
+            f["listing"] + gross * f["transaction_pct"] + gross * f["processing_pct"] + f["processing_flat"],
+            2,
+        )
+    cfg = PLATFORM_FEES.get(platform, PLATFORM_FEES["other"])
+    return round(gross * cfg.get("pct", 0) + cfg.get("flat", 0), 2)
+
+
+def pricing_calculator(cogs, postage, packaging, platform, target_profit=None, target_margin=None):
+    platform = platform.lower().replace(" ", "_")
+    fixed = postage + packaging + cogs
+    if platform == "etsy":
+        f = PLATFORM_FEES["etsy"]
+        rate = f["transaction_pct"] + f["processing_pct"]
+        if target_profit is not None:
+            sale = (target_profit + fixed + f["listing"] + f["processing_flat"]) / (1 - rate)
+            return round(sale, 2)
+        if target_margin is not None:
+            m = target_margin / 100
+            sale = (fixed + f["listing"] + f["processing_flat"]) / (1 - rate - m)
+            return round(sale, 2)
+    cfg = PLATFORM_FEES.get(platform, PLATFORM_FEES["other"])
+    pct, flat = cfg.get("pct", 0), cfg.get("flat", 0)
+    if target_profit is not None:
+        return round((target_profit + fixed + flat) / (1 - pct), 2)
+    if target_margin is not None:
+        m = target_margin / 100
+        return round((fixed + flat) / (1 - pct - m), 2)
+    return None
+
+
+def print_pricing_modes(args):
+    if "--price-profit" in args:
+        idx = args.index("--price-profit")
+        target = float(args[idx + 1])
+        cogs = float(args[idx + 2])
+        postage = float(args[idx + 3])
+        packaging = float(args[idx + 4])
+        platform = args[idx + 5] if len(args) > idx + 5 else "etsy"
+        sale = pricing_calculator(cogs, postage, packaging, platform, target_profit=target)
+        print(f"\n=== PRICING CALCULATOR (target profit ${target:.2f}) ===")
+        print(f"  Platform: {platform}")
+        print(f"  Charge at least: ${sale:.2f}")
+        return True
+    if "--price-margin" in args:
+        idx = args.index("--price-margin")
+        margin = float(args[idx + 1])
+        cogs = float(args[idx + 2])
+        postage = float(args[idx + 3])
+        packaging = float(args[idx + 4])
+        platform = args[idx + 5] if len(args) > idx + 5 else "gumroad"
+        sale = pricing_calculator(cogs, postage, packaging, platform, target_margin=margin)
+        print(f"\n=== PRICING CALCULATOR (target margin {margin:.0f}%) ===")
+        print(f"  Platform: {platform}")
+        print(f"  Charge at least: ${sale:.2f}")
+        return True
+    return False
+
 
 def load_transactions(path):
     rows = []
@@ -90,12 +161,16 @@ def print_dashboard(transactions, tax_rate=DEFAULT_TAX_RATE):
 def main():
     tax_rate = DEFAULT_TAX_RATE
     args = sys.argv[1:]
+    if print_pricing_modes(args):
+        return
     if "--tax-rate" in args:
         idx = args.index("--tax-rate")
         tax_rate = float(args[idx + 1]) / 100
         args = args[:idx] + args[idx + 2:]
     if not args:
         print("Usage: python3 ecommerce_bookkeeping_dashboard.py transactions-sample.csv [--tax-rate 28]")
+        print("       python3 ecommerce_bookkeeping_dashboard.py --price-profit 10 8 3 1 etsy")
+        print("       python3 ecommerce_bookkeeping_dashboard.py --price-margin 40 6 0 0 gumroad")
         sys.exit(1)
     transactions = load_transactions(args[0])
     print_dashboard(transactions, tax_rate)
