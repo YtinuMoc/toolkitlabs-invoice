@@ -2,6 +2,10 @@
 
 Clone of [cedabranding pro-dashboard ($97 · 1,251 sales · 69 ratings)](https://cedabranding.gumroad.com/l/pro-dashboard).
 
+## Guide index
+
+See [mesh-hub.md](mesh-hub.md) for all 7 dev.to buyer-channel guides.
+
 ## 10-minute setup
 
 1. Copy `revenue-template.csv` and `expenses-template.csv`.
