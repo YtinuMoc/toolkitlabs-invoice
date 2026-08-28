@@ -1,0 +1,9 @@
+date,category,description,amount,deductible
+2026-01-03,Software,Figma annual,144.00,yes
+2026-01-08,Home office,Desk lamp,89.00,yes
+2026-01-12,Software,GitHub Pro,4.00,yes
+2026-01-20,Professional services,Accountant consult,175.00,yes
+2026-02-02,Payment fees,Stripe payout fee,12.40,yes
+2026-02-14,Travel,Client site visit mileage,48.00,yes
+2026-02-28,Software,Notion,10.00,yes
+2026-03-05,Subcontractors,Design contractor,450.00,yes

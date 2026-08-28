@@ -1,0 +1,6 @@
+date,client,project,amount,status
+2026-01-05,Acme Corp,January retainer,2500.00,paid
+2026-01-18,Beta LLC,API integration,4000.00,paid
+2026-02-01,Gamma Studio,Design sprint,1900.00,paid
+2026-02-10,Delta Inc,Consulting block,1200.00,paid
+2026-03-01,Acme Corp,Q1 maintenance,1800.00,pending
