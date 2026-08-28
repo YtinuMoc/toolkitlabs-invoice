@@ -207,6 +207,33 @@ def summarize_finance_tracker(revenue_path, expense_path, tax_pct=DEFAULT_TAX_PC
     print("  Guide: freelance-finance-tracker-guide.md · revenue-sample.csv · expenses-sample.csv")
 
 
+def summarize_tax_buffer(revenue_path, expense_path, reserve_pct=DEFAULT_TAX_PCT):
+    """faisalmq/4gao: deposit lands → per-payment buffer → tax-only savings → dashboard upsell."""
+    revenue = load_revenue(revenue_path)
+    expenses = load_expenses(expense_path)
+    collected = sum(r["amount"] for r in revenue)
+    deductible = sum(e["amount"] for e in expenses)
+    net_profit = collected - deductible
+    tax_buffer = max(net_profit, 0) * reserve_pct / 100
+    safe_to_spend = max(net_profit - tax_buffer, 0)
+    print("\n=== PER-PAYMENT TAX BUFFER (faisalmq/4gao shape) ===")
+    print("  Deposit lands → five minutes of joy → tax panic → buffer same day.")
+    print(f"  {'Client':<20} {'Collected':>12} {'Buffer':>10} {'Safe':>12}")
+    for r in revenue:
+        share = r["amount"] / collected if collected else 0
+        buf = net_profit * share * reserve_pct / 100 if net_profit > 0 else 0
+        safe = r["amount"] - buf
+        label = (r["client"] or r["description"] or "Payment")[:20]
+        print(f"  {label:<20} ${r['amount']:>10,.2f} ${buf:>8,.2f} ${safe:>10,.2f}")
+    print("\n=== EXPENSE + TAX BUFFER ===")
+    print(f"  Expenses YTD:        ${deductible:,.2f}")
+    print(f"  Net profit:            ${net_profit:,.2f}")
+    print(f"  Tax buffer ({reserve_pct:.0f}%):   ${tax_buffer:,.2f}")
+    print(f"  Safe to spend:       ${safe_to_spend:,.2f}")
+    print("  Transfer buffer to tax-only savings when payment lands — not in April.")
+    print("  Guide: tax-buffer-guide.md · revenue-sample.csv · expenses-sample.csv")
+
+
 def summarize_spreadsheet_trap(revenue_path, expense_path, tax_pct=DEFAULT_TAX_PCT):
     """wilsonhoe/4383424 4khk: spreadsheet trap → planning-layer dashboard."""
     revenue = load_revenue(revenue_path)
@@ -280,11 +307,16 @@ def main():
         tax_pct = float(sys.argv[4]) if len(sys.argv) > 4 else DEFAULT_TAX_PCT
         summarize_spreadsheet_trap(sys.argv[2], sys.argv[3], tax_pct)
         return
+    if len(sys.argv) >= 4 and sys.argv[1] == "--tax-buffer":
+        tax_pct = float(sys.argv[4]) if len(sys.argv) > 4 else DEFAULT_TAX_PCT
+        summarize_tax_buffer(sys.argv[2], sys.argv[3], tax_pct)
+        return
     if len(sys.argv) < 3:
         print("Usage: freelance_dashboard_tracker.py revenue.csv expenses.csv [tax_pct]")
         print("       freelance_dashboard_tracker.py --daily-check revenue.csv expenses.csv [tax_pct]")
         print("       freelance_dashboard_tracker.py --finance-tracker revenue.csv expenses.csv [tax_pct]")
         print("       freelance_dashboard_tracker.py --spreadsheet-trap revenue.csv expenses.csv [tax_pct]")
+        print("       freelance_dashboard_tracker.py --tax-buffer revenue.csv expenses.csv [tax_pct]")
         print("Clone target: cedabranding.gumroad.com/l/pro-dashboard ($97 · 1251 sales · 69 ratings)")
         sys.exit(1)
     revenue = load_revenue(sys.argv[1])
