@@ -92,6 +92,54 @@ def summarize(revenue, expenses, tax_pct=DEFAULT_TAX_PCT):
     }
 
 
+def summarize_dashboard_setup(revenue_path, expense_path, tax_pct=DEFAULT_TAX_PCT):
+    """datanestdigital/4l0h: five-minute dashboard setup — monthly metrics at a glance."""
+    revenue = load_revenue(revenue_path)
+    expenses = load_expenses(expense_path)
+    by_month = defaultdict(lambda: {"revenue": 0.0, "expense": 0.0})
+    for r in revenue:
+        key = month_key(r["date"])
+        if key != "unknown":
+            by_month[key]["revenue"] += r["amount"]
+    for e in expenses:
+        key = month_key(e["date"])
+        if key != "unknown":
+            by_month[key]["expense"] += e["amount"]
+    total_revenue = sum(r["amount"] for r in revenue)
+    total_expenses = sum(e["amount"] for e in expenses)
+    net_profit = total_revenue - total_expenses
+    tax_set_aside = max(net_profit, 0) * (tax_pct / 100.0)
+    take_home = max(net_profit - tax_set_aside, 0)
+    margin_pct = (net_profit / total_revenue * 100) if total_revenue > 0 else 0.0
+    print("=== SOLO BUSINESS FINANCIAL DASHBOARD (datanestdigital/4l0h shape) ===")
+    print("  Setup: copy revenue + expense templates → log rows → run this CLI.")
+    print("  No bookkeeper required — dashboard metrics from your CSV logs.")
+    print()
+    for m in sorted(by_month.keys()):
+        rev = by_month[m]["revenue"]
+        exp = by_month[m]["expense"]
+        net = rev - exp
+        reserve = max(net, 0) * (tax_pct / 100.0)
+        home = max(net - reserve, 0)
+        m_margin = (net / rev * 100) if rev > 0 else 0.0
+        label = m.replace("-", " ").upper()
+        print(f"  ═══════════════ {label} ═══════════════")
+        print(f"  Revenue:        {fmt_money(rev)}")
+        print(f"  Expenses:       {fmt_money(exp)}")
+        print(f"  Net Profit:     {fmt_money(net)}    Margin: {m_margin:.1f}%")
+        print(f"  Tax Set-Aside:  {fmt_money(reserve)}  ({tax_pct:.0f}% of net)")
+        print(f"  Take-Home:      {fmt_money(home)}")
+        print()
+    print("  ═══════════════ ALL-TIME SUMMARY ═══════════════")
+    print(f"  Revenue:        {fmt_money(total_revenue)}")
+    print(f"  Expenses:       {fmt_money(total_expenses)}")
+    print(f"  Net Profit:     {fmt_money(net_profit)}    Margin: {margin_pct:.1f}%")
+    print(f"  Tax Set-Aside:  {fmt_money(tax_set_aside)}  ({tax_pct:.0f}% of net)")
+    print(f"  Take-Home:      {fmt_money(take_home)}")
+    print()
+    print("  Guide: dashboard-setup-guide.md · revenue-sample.csv · expenses-sample.csv")
+
+
 def summarize_portable(revenue_path, expense_path, tax_pct=DEFAULT_TAX_PCT):
     """faisalmq/3gcp: portable solo business tracker — single source of truth, any device."""
     revenue = load_revenue(revenue_path)
@@ -167,12 +215,17 @@ def print_dashboard(d):
 
 
 def main():
+    if len(sys.argv) >= 4 and sys.argv[1] == "--dashboard":
+        tax_pct = float(sys.argv[4]) if len(sys.argv) > 4 else DEFAULT_TAX_PCT
+        summarize_dashboard_setup(sys.argv[2], sys.argv[3], tax_pct)
+        return
     if len(sys.argv) >= 4 and sys.argv[1] == "--portable":
         tax_pct = float(sys.argv[4]) if len(sys.argv) > 4 else DEFAULT_TAX_PCT
         summarize_portable(sys.argv[2], sys.argv[3], tax_pct)
         return
     if len(sys.argv) < 3:
         print("Usage: solo_business_revenue_tracker.py revenue.csv expenses.csv [tax_pct]")
+        print("       solo_business_revenue_tracker.py --dashboard revenue.csv expenses.csv [tax_pct]")
         print("       solo_business_revenue_tracker.py --portable revenue.csv expenses.csv [tax_pct]")
         print("Clone target: amyragland.gumroad.com/l/tckuq ($10 2026 Solo Business Revenue & Expense Tracker)")
         sys.exit(1)
